@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="fill_parent"
+	android:layout_height="fill_parent"
+	android:orientation="vertical">
+
+	<LinearLayout
+		android:layout_height="56dp"
+		android:layout_width="match_parent"
+		android:orientation="horizontal"
+		android:background="#FB7299"
+		android:gravity="center_vertical">
+
+		<ImageButton
+			style="@style/actionBartton"
+			android:src="@drawable/topmenu_back"
+			android:id="@+id/history_goback"/>
+
+		<TextView
+			android:layout_height="wrap_content"
+			android:textAppearance="?android:attr/textAppearanceMedium"
+			android:layout_width="match_parent"
+			android:text="观看历史记录"
+			android:textColor="#FFFFFF"
+			android:layout_weight="1.0"/>
+
+	</LinearLayout>
+
+	<LinearLayout
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:orientation="horizontal"
+		android:layout_weight="1.0">
+
+		<ListView
+			android:id="@+id/history_list"
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			android:layout_marginLeft="5dp"
+			android:layout_marginRight="5dp"
+			android:layout_weight="1.0"/>
+
+	</LinearLayout>
+
+</LinearLayout>
+

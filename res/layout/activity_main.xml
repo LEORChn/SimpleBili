@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="fill_parent"
+	android:layout_height="fill_parent"
+	
+	android:orientation="vertical">
+
+	<LinearLayout
+		android:layout_height="56dp"
+		android:layout_width="match_parent"
+		android:background="#FB7299"
+		android:orientation="horizontal"
+		android:gravity="center_vertical">
+
+		<ImageView
+			android:layout_height="46dp"
+			android:layout_width="46dp"
+			android:layout_marginLeft="5dp"
+			android:layout_marginRight="5dp"
+			android:id="@+id/main_myhead"
+			android:src="@drawable/ic_launcher"/>
+
+		<LinearLayout
+			android:layout_height="wrap_content"
+			android:layout_width="match_parent"
+			android:orientation="vertical"
+			android:layout_weight="1.0"
+			android:id="@+id/main_userinfo">
+
+			<TextView
+				android:layout_height="wrap_content"
+				android:text="未登录"
+				android:textAppearance="?android:attr/textAppearanceMedium"
+				android:layout_width="wrap_content"
+				android:textColor="#FFFFFF"
+				android:id="@+id/main_myname"/>
+
+			<TextView
+				android:layout_height="wrap_content"
+				android:text="硬币: 0.0"
+				android:textAppearance="?android:attr/textAppearanceSmall"
+				android:layout_width="wrap_content"
+				android:textColor="#FFFFFF"
+				android:id="@+id/main_mycoin"/>
+
+		</LinearLayout>
+
+		<EditText
+			android:layout_height="wrap_content"
+			android:inputType="number"
+			android:ems="10"
+			android:layout_width="match_parent"
+			android:layout_weight="1.0"
+			android:id="@+id/main_searchbox"/>
+
+		<ImageButton
+			style="@style/actionBartton"
+			android:src="@drawable/topmenu_search"
+			android:id="@+id/main_search"/>
+
+		<ImageButton
+			style="@style/actionBartton"
+			android:src="@drawable/topmenu_downloads"
+			android:id="@+id/main_download"/>
+
+		<ImageButton
+			style="@style/actionBartton"
+			android:src="@drawable/topmenu_setting"
+			android:id="@+id/main_gosetting"/>
+
+	</LinearLayout>
+
+	<ProgressBar
+		android:layout_height="wrap_content"
+		style="?android:attr/progressBarStyleHorizontal"
+		android:layout_width="match_parent"
+		android:id="@+id/main_webload"/>
+
+	<LinearLayout
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:orientation="horizontal"
+		android:layout_weight="1.0">
+
+		<WebView
+			android:id="@+id/main_login"
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			android:layout_marginLeft="5dp"
+			android:layout_marginRight="5dp"
+			android:layout_weight="1"
+			android:background="#000000"/>
+
+		<ListView
+			android:id="@+id/main_feedlist"
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			android:layout_marginLeft="5dp"
+			android:layout_marginRight="5dp"
+			android:layout_weight="1.0"/>
+
+	</LinearLayout>
+
+	<LinearLayout
+		android:layout_height="46dp"
+		android:layout_width="match_parent"
+		android:orientation="horizontal"
+		android:background="#000000"
+		style="?android:attr/actionBarStyle">
+
+		<ImageButton
+			style="@style/standBtn"
+			android:layout_width="match_parent"
+			android:src="@drawable/topmenu_menu"
+			android:layout_weight="1.0"
+			android:id="@+id/main_menu"/>
+
+		<ImageButton
+			style="@style/standBtn"
+			android:layout_width="match_parent"
+			android:src="@drawable/topmenu_refresh"
+			android:id="@+id/main_refreshfromfirstpage"
+			android:layout_weight="1.0"/>
+
+	</LinearLayout>
+
+</LinearLayout>
+

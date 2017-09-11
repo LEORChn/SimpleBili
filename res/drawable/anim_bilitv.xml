@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<animation-list xmlns:android="http://schemas.android.com/apk/res/android">
+	<item android:drawable="@drawable/anim_tv1"
+		android:duration="100"/>
+	<item android:drawable="@drawable/anim_tv2"
+		android:duration="100"/>
+	<item android:drawable="@drawable/anim_tv3"
+		android:duration="100"/>
+	<item android:drawable="@drawable/anim_tv4"
+		android:duration="100"/>
+	<item android:drawable="@drawable/anim_tv5"
+		android:duration="100"/>
+</animation-list>

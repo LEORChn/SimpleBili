@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">Simplebili</string>
+    <string name="app_name_main">Simplebili</string>
+	<string name="app_name_settings">SettingsSimplebili</string>
+	<style name="viewBtn">
+		<item name="android:scaleType">fitCenter</item>
+		<item name="android:background">@drawable/btn_top</item>
+	</style>
+	<style name="actionBartton" parent="@style/viewBtn">
+		<item name="android:layout_width">56dp</item>
+		<item name="android:layout_height">fill_parent</item>
+		<item name="android:padding">15dp</item>
+	</style>
+	<style name="standBtn" parent="@style/viewBtn">
+		<item name="android:layout_width">46dp</item>
+		<item name="android:layout_height">46dp</item>
+		<item name="android:padding">10dp</item>
+	</style>
+</resources>

@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="fill_parent"
+	android:layout_height="wrap_content"
+	android:orientation="vertical"
+	android:layout_marginLeft="10dp"
+	android:layout_marginTop="10dp"
+	android:layout_marginRight="10dp"
+	android:layout_marginBottom="10dp">
+
+	<LinearLayout
+		android:layout_height="wrap_content"
+		android:layout_width="match_parent"
+		android:orientation="horizontal"
+		android:layout_marginTop="10dp">
+
+		<ImageButton
+			android:layout_height="46dp"
+			android:layout_width="46dp"
+			android:src="@android:drawable/ic_menu_report_image"
+			android:layout_marginLeft="5dp"
+			android:layout_marginBottom="5dp"
+			android:layout_marginRight="5dp"
+			android:layout_marginTop="5dp"
+			android:focusable="false"
+			android:id="@+id/listsub_auth_img"/>
+
+		<TextView
+			android:layout_height="wrap_content"
+			android:text="视频作者 _ 投稿时间"
+			android:textAppearance="?android:attr/textAppearanceLarge"
+			android:layout_width="wrap_content"
+			android:layout_gravity="center_vertical"
+			android:id="@+id/listsub_auth_name"/>
+
+	</LinearLayout>
+
+	<LinearLayout
+		android:layout_height="wrap_content"
+		android:layout_width="match_parent"
+		android:orientation="horizontal"
+		android:layout_marginBottom="10dp">
+
+		<ImageView
+			android:layout_height="90dp"
+			android:layout_width="160dp"
+			android:src="@android:drawable/ic_menu_report_image"
+			android:id="@+id/listsub_v_img"/>
+
+		<LinearLayout
+			android:layout_height="match_parent"
+			android:layout_width="match_parent"
+			android:layout_marginLeft="5dp"
+			android:orientation="vertical">
+
+			<TextView
+				android:layout_height="match_parent"
+				android:text="视频标题"
+				android:textAppearance="?android:attr/textAppearanceLarge"
+				android:layout_width="match_parent"
+				android:id="@+id/listsub_v_title"
+				android:layout_weight="1.0"/>
+
+			<TextView
+				android:layout_height="wrap_content"
+				android:text="播放量 _ 弹幕"
+				android:textAppearance="?android:attr/textAppearanceSmall"
+				android:layout_width="wrap_content"
+				android:alpha=".66"
+				android:id="@+id/listsub_v_played"
+				android:layout_gravity="center_vertical"
+				android:layout_weight="0"/>
+
+		</LinearLayout>
+
+	</LinearLayout>
+
+</LinearLayout>
+

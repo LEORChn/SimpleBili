@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.LEORChn.SimpleBili" android:versionCode="3"
+    android:versionName="Beta 0.3" >
+
+    <uses-sdk android:minSdkVersion="8" android:targetSdkVersion="19" /><!--8=2.2;19=4.4-->
+	<!--<uses-permission android:name="android.permission.READ_FRAME_BUFFER"/>-->
+	<uses-permission android:name="android.permission.INTERNET"/>
+	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+	<uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
+	<uses-permission android:name="android.permission.WRITE_SETTINGS"/>
+    <application android:name="simplebili.App"
+        android:allowBackup="true" android:persistent="true"
+        android:icon="@drawable/ic_launcher"
+		android:theme="@style/BlackTheme"
+        android:label="@string/app_name">
+        <activity android:name="appforms.Main_Feeds"
+			android:allowBackup="true" android:persistent="true"
+			android:label="@string/app_name_main"
+			android:icon="@drawable/ic_launcher"
+			android:configChanges="orientation|screenSize"
+			android:taskAffinity="appform.Main_Feeds"
+			android:launchMode="singleTask"
+			android:process=":Activity.Main"><!--
+			android:taskAffinity="appform.Main_Feeds"
+			android:launchMode="singleTask"
+			android:process=":Activity.Main"-->
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+                <!--category android:name="android.intent.category.DEFAULT" /-->
+            </intent-filter>
+        </activity>
+		<activity android:name="appforms.VideoDetail" android:configChanges="orientation|screenSize"/>
+		<activity android:name="appforms.VideoPlaySimple" android:configChanges="orientation|screenSize" android:screenOrientation="landscape"/>
+		<activity android:name="appforms.VideoHistory" android:configChanges="orientation|screenSize"/>
+		<activity android:name="appforms.TestChangeLayout" android:configChanges="orientation|screenSize"/>
+		<activity android:name="appforms.Settings"
+			android:label="@string/app_name_settings"
+			android:icon="@drawable/ic_settings"
+			android:configChanges="orientation|screenSize"
+			android:taskAffinity="appform.Settings"
+			android:launchMode="singleInstance"
+			android:process=":Activity.Settings"><!--
+			android:taskAffinity="appform.Settings"
+			android:launchMode="singleInstance"
+			android:process=":Activity.Settings"-->
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+		<service android:name="appforms.LiveUpgrade"
+			android:allowBackup="true" android:persistent="true"
+			android:process=":service.LiveUpgrade">
+			<intent-filter>
+				<action android:name="appforms.LiveUpgrade"/>
+			</intent-filter>
+		</service>
+    </application>
+
+</manifest>

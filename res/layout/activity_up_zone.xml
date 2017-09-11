@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="fill_parent"
+	android:layout_height="fill_parent"
+	android:orientation="vertical">
+
+	<LinearLayout
+		android:layout_height="56dp"
+		android:layout_width="match_parent"
+		android:orientation="horizontal"
+		android:background="#FB7299"
+		android:gravity="center_vertical">
+
+		<ImageButton
+			style="@style/actionBartton"
+			android:src="@drawable/topmenu_back"
+			android:id="@+id/upzone_goback"/>
+
+		<EditText
+			android:layout_height="wrap_content"
+			android:ems="10"
+			android:layout_width="wrap_content"
+			android:layout_weight="1.0"/>
+
+		<ImageButton
+			android:layout_height="wrap_content"
+			android:layout_width="wrap_content"
+			android:src="@drawable/topmenu_msgp2p"
+			style="@style/actionBartton"/>
+
+	</LinearLayout>
+
+	<LinearLayout
+		android:layout_height="wrap_content"
+		android:layout_width="match_parent"
+		android:orientation="horizontal"
+		android:padding="10dp">
+
+		<LinearLayout
+			android:layout_height="wrap_content"
+			android:layout_width="wrap_content"
+			android:orientation="vertical"
+			android:layout_marginRight="10dp">
+
+			<ImageView
+				android:layout_height="56dp"
+				android:layout_width="56dp"
+				android:src="@android:drawable/ic_delete"/>
+
+			<Button
+				android:layout_height="wrap_content"
+				style="?android:attr/buttonStyleSmall"
+				android:text="+关注"
+				android:layout_width="wrap_content"/>
+
+		</LinearLayout>
+
+		<LinearLayout
+			android:layout_height="wrap_content"
+			android:layout_width="match_parent"
+			android:orientation="vertical">
+
+			<LinearLayout
+				android:layout_height="wrap_content"
+				android:layout_width="wrap_content"
+				android:orientation="horizontal">
+
+				<TextView
+					android:layout_height="wrap_content"
+					android:text="(UP主名字)"
+					android:textAppearance="?android:attr/textAppearanceLarge"
+					android:layout_width="wrap_content"/>
+
+			</LinearLayout>
+
+			<LinearLayout
+				android:layout_height="wrap_content"
+				android:layout_width="match_parent"
+				android:orientation="horizontal">
+
+				<TextView
+					android:layout_height="wrap_content"
+					android:text="(他关注的人数)"
+					android:textAppearance="?android:attr/textAppearanceMedium"
+					android:layout_width="wrap_content"
+					android:layout_weight="1.0"
+					android:gravity="center"
+					style="@style/viewBtn"/>
+
+				<LinearLayout
+					android:layout_height="match_parent"
+					android:layout_width="2dp"
+					android:orientation="vertical"
+					android:background="#7f7f7f"/>
+
+				<TextView
+					android:layout_height="wrap_content"
+					android:text="(关注他的人数)"
+					android:textAppearance="?android:attr/textAppearanceMedium"
+					android:layout_width="wrap_content"
+					android:layout_weight="1.0"
+					android:gravity="center"
+					style="@style/viewBtn"/>
+
+			</LinearLayout>
+
+			<TextView
+				android:layout_height="wrap_content"
+				android:text="(UP主简介)"
+				android:textAppearance="?android:attr/textAppearanceSmall"
+				android:layout_width="wrap_content"
+				android:layout_marginTop="10dp"/>
+
+		</LinearLayout>
+
+	</LinearLayout>
+
+</LinearLayout>
+

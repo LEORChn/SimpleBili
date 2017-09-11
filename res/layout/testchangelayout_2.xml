@@ -1,0 +1,19 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical">
+	<Button
+		android:layout_height="wrap_content"
+		android:layout_width="wrap_content"
+		android:id="@+id/test_big"/>
+	<ImageButton
+		android:layout_height="wrap_content"
+		android:layout_width="wrap_content"
+		android:src="@android:drawable/ic_menu_close_clear_cancel"
+		android:id="@+id/test_change"/>
+	<Button
+		android:layout_height="wrap_content"
+		style="?android:attr/buttonStyleSmall"
+		android:layout_width="wrap_content"
+		android:id="@+id/test_small"/>
+</LinearLayout>

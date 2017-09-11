@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="fill_parent"
+	android:layout_height="fill_parent"
+	android:id="@+id/vplay_root">
+
+	<VideoView
+		android:layout_height="match_parent"
+		android:layout_width="match_parent"
+		android:id="@+id/vplay_player"/>
+
+	<LinearLayout
+		android:layout_height="match_parent"
+		android:layout_width="match_parent"
+		android:orientation="horizontal"
+		android:layout_above="@id/vplay_player"
+		android:id="@+id/vplay_preload">
+
+		<TextView
+			android:layout_height="match_parent"
+			android:layout_width="match_parent"
+			android:text="Danmaku Player Debug Text Sample"
+			android:textAppearance="?android:attr/textAppearanceMedium"
+			android:layout_weight="1"
+			android:gravity="bottom|left"
+			android:id="@+id/vplay_playerdbg"/>
+
+		<LinearLayout
+			android:layout_height="match_parent"
+			android:layout_width="match_parent"
+			android:orientation="vertical"
+			android:layout_weight="1"
+			android:gravity="center">
+
+			<LinearLayout
+				android:layout_height="match_parent"
+				android:layout_width="wrap_content"
+				android:orientation="vertical"
+				android:layout_weight="1"/>
+
+			<ImageView
+				android:layout_height="match_parent"
+				style="?android:attr/buttonBarButtonStyle"
+				android:layout_width="wrap_content"
+				android:background="@drawable/anim_tv1"
+				android:id="@+id/vplay_animtv"
+				android:layout_weight="1"
+				android:scaleType="fitCenter"/>
+
+			<TextView
+				android:layout_height="match_parent"
+				android:text="Filling Danmaku Debug Text Sample"
+				android:textAppearance="?android:attr/textAppearanceMedium"
+				android:layout_width="match_parent"
+				android:layout_weight="1"
+				android:gravity="bottom|left"
+				android:id="@+id/vplay_dandbg"/>
+
+		</LinearLayout>
+
+		<LinearLayout
+			android:layout_height="match_parent"
+			android:layout_width="match_parent"
+			android:orientation="horizontal"
+			android:layout_weight="1"/>
+
+	</LinearLayout>
+
+</RelativeLayout>
+

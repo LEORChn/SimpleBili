@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="fill_parent"
+	android:layout_height="wrap_content"
+	android:orientation="vertical"
+	android:paddingBottom="10dp"
+	android:paddingTop="10dp"
+	android:id="@+id/listsub_videofeeds"
+	android:background="@drawable/btn_top">
+
+	<LinearLayout
+		android:layout_height="wrap_content"
+		android:layout_width="match_parent"
+		android:orientation="vertical">
+
+		<LinearLayout
+			android:layout_height="wrap_content"
+			android:layout_width="match_parent"
+			android:orientation="horizontal">
+
+			<TextView
+				android:layout_height="match_parent"
+				android:text="某UP主"
+				android:textAppearance="?android:attr/textAppearanceMedium"
+				android:layout_width="wrap_content"
+				android:id="@+id/listsub_auth_name"
+				android:textColor="#FB7299"/>
+
+			<TextView
+				android:layout_height="wrap_content"
+				android:text="XX分钟前 投稿"
+				android:textAppearance="?android:attr/textAppearanceMedium"
+				android:layout_width="match_parent"
+				android:id="@+id/listsub_submit_time"
+				android:textColor="#FB7299"
+				android:paddingBottom="15dp"
+				android:gravity="right"
+				android:layout_weight="1.0"/>
+
+		</LinearLayout>
+
+		<TextView
+			android:layout_height="wrap_content"
+			android:text="Title Sample Text"
+			android:textAppearance="?android:attr/textAppearanceMedium"
+			android:layout_width="match_parent"
+			android:id="@+id/listsub_v_title"/>
+
+		<LinearLayout
+			android:layout_height="wrap_content"
+			android:layout_width="wrap_content"
+			android:orientation="horizontal">
+
+			<ImageView
+				android:layout_height="match_parent"
+				android:layout_width="wrap_content"
+				android:src="@android:drawable/ic_menu_slideshow"/>
+
+			<TextView
+				android:layout_height="wrap_content"
+				android:text="0"
+				android:textAppearance="?android:attr/textAppearanceSmall"
+				android:layout_width="wrap_content"
+				android:id="@+id/listsub_v_played"/>
+
+			<ImageView
+				android:layout_height="match_parent"
+				android:layout_width="wrap_content"
+				android:src="@android:drawable/ic_menu_send"/>
+
+			<TextView
+				android:layout_height="wrap_content"
+				android:text="0"
+				android:textAppearance="?android:attr/textAppearanceSmall"
+				android:layout_width="wrap_content"
+				android:id="@+id/listsub_v_dan"/>
+
+		</LinearLayout>
+
+	</LinearLayout>
+
+</LinearLayout>
+
