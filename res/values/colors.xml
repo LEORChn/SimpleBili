@@ -3,4 +3,11 @@
     <!--color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color-->
+	<color name="ul0">#d1d1d1</color>
+	<color name="ul1">#bfbfbf</color>
+	<color name="ul2">#90d1e6</color>
+	<color name="ul3">#7da4f4</color>
+	<color name="ul4">#ff905a</color>
+	<color name="ul5">#e94949</color>
+	<color name="ul6">#884ee9</color>
 </resources>

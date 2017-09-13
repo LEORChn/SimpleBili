@@ -24,6 +24,7 @@ public class VideoHistory extends Activity implements OnClickListener,MessageQue
 		switch(hasinit){case 0:
 				setContentView(R.layout.activity_history);
 				cookie=getIntent().getStringExtra("cookie"); if(cookie==null)cookie="";
+				break;
 			case 1:
 				ListView vl=(ListView)fv(R.id.history_list);
 				vl.setOnScrollListener(this); //允许用手指刷动态
@@ -89,16 +90,17 @@ public class VideoHistory extends Activity implements OnClickListener,MessageQue
 				runOnUiThread(new Runnable(){public void run(){
 					try{
 						String progtext=(d.get("device", 3) == 2 ?"电脑 ": "");
-						int watchto;
+						int watchpart=0,watchto;
 						if(d.getObject("page")!=null){
-							watchto=d.getObject("page").get("page",1);
-							if(watchto != 1)progtext+="第"+watchto+"段 "; }
+							watchpart=d.getObject("page").get("page",1);
+							if(watchpart != 1)progtext+="第"+watchpart+"段 "; }
 						watchto=d.get("progress",0);
 						progtext+=watchto>0?Formater.format(watchto*1000):watchto==-1?"已看完":"";
 						hl.additem(d.getObject("owner").get("name", "UP主信息错误"),
 							时间.动态时间差(d.get("view_at", 0)),
 							d.get("title", "标题信息错误"),
 							progtext,
+							watchpart,//在HistoryListControl里面已经减一过了。//如果没获取到，就传0，获取到就传段数。传出的段数会比焦点索引多1，但是不是bug，因为列表获取焦点后正好多向下展示1格，可以让用户选择是播放当前段还是下一段
 							d.get("pic", ""),
 							d2.get("view", "0"),
 							d2.get("danmaku", "0"),

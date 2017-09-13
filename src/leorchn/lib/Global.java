@@ -22,9 +22,8 @@ public class Global{
 	public static boolean setssave(String value){ return 文本.写出(value,getContext().getFilesDir().getPath()+"/app.setting","UTF8"); }
 	
 	static int statheight;
-	static Toast pub=Toast.makeText(getContext(),"",0);
-	public static void multip(String s){pub.setText(s);pub.show();}
-	public static void tip(String s){Toast.makeText(getContext(),s,s.length()<10?0:1).show();}
+	public static void multip(String s){mainhandler.obtainMessage(1000,s).sendToTarget();}
+	public static void tip(String s){mainhandler.obtainMessage(1001,s).sendToTarget();}
 	public static void enableMenuIcon(Menu menu){
 		if(android.os.Build.VERSION.SDK_INT<14)return;
 		try {
@@ -144,4 +143,17 @@ public class Global{
 			new Handler(Looper.getMainLooper()).post(new Runnable(){public void run(){r();}});
 		}
 	}
+	public static Handler mainhandler=new Handler(Looper.getMainLooper()){
+		Toast pub=Toast.makeText(getContext(),"",0);
+		@Override public void handleMessage(Message msg) {
+			super.handleMessage(msg);
+			switch(msg.what){
+				case 0:tip("简哔提示：\n"+msg.obj); break;
+				case 1:信息框(((String[])msg.obj)[0],((String[])msg.obj)[1],"OK");break;
+				case 2:((Runnable)msg.obj).run(); break;
+				case 1000: pub.setText(msg.obj.toString());pub.show(); break; //multip
+				case 1001: String s=msg.obj.toString();Toast.makeText(getContext(),s,s.length()<10?0:1).show(); break; //tip
+			}
+		} 
+	};
 }

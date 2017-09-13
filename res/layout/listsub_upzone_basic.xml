@@ -14,45 +14,17 @@
 		android:layout_width="match_parent"
 		android:orientation="vertical">
 
-		<LinearLayout
-			android:layout_height="wrap_content"
-			android:layout_width="match_parent"
-			android:orientation="horizontal">
-
-			<TextView
-				android:layout_height="match_parent"
-				android:text="(UP主名)"
-				android:textAppearance="?android:attr/textAppearanceMedium"
-				android:layout_width="wrap_content"
-				android:id="@+id/listsub_auth_name"
-				android:textColor="#FB7299"/>
-
-			<TextView
-				android:layout_height="wrap_content"
-				android:text="(观看时间)"
-				android:textAppearance="?android:attr/textAppearanceMedium"
-				android:layout_width="match_parent"
-				android:id="@+id/listsub_time"
-				android:textColor="#FB7299"
-				android:paddingBottom="15dp"
-				android:gravity="right"
-				android:layout_weight="1.0"/>
-
-		</LinearLayout>
-
 		<TextView
 			android:layout_height="wrap_content"
-			android:text="(视频标题)"
+			android:text="Title Sample Text"
 			android:textAppearance="?android:attr/textAppearanceMedium"
 			android:layout_width="match_parent"
 			android:id="@+id/listsub_v_title"/>
 
 		<LinearLayout
 			android:layout_height="wrap_content"
-			android:layout_width="wrap_content"
+			android:layout_width="match_parent"
 			android:orientation="horizontal">
-
-			
 
 			<ImageView
 				android:layout_height="match_parent"
@@ -77,13 +49,25 @@
 				android:textAppearance="?android:attr/textAppearanceSmall"
 				android:layout_width="wrap_content"
 				android:id="@+id/listsub_v_dan"/>
+
 			<TextView
 				android:layout_height="wrap_content"
-				android:text="(观看方式和进度)"
+				android:text="59:59"
 				android:textAppearance="?android:attr/textAppearanceSmall"
-				android:layout_width="wrap_content"
-				android:id="@+id/listsub_progress"
-				android:layout_marginLeft="10dp" android:textColor="#FB7299"/>
+				android:layout_width="match_parent"
+				android:layout_weight="1.0"
+				android:gravity="center"
+				android:id="@+id/listsub_videolength"/>
+
+			<TextView
+				android:layout_height="wrap_content"
+				android:text="1998-01-01"
+				android:textAppearance="?android:attr/textAppearanceSmall"
+				android:layout_width="match_parent"
+				android:id="@+id/listsub_submit_time"
+				android:gravity="right"
+				android:layout_weight="1.0"/>
+
 		</LinearLayout>
 
 	</LinearLayout>

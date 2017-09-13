@@ -71,7 +71,10 @@ public class FeedListControl implements View.OnClickListener{
 			Super.startActivity(it); break;
 		case R.id.listsub_auth_name:
 			tip("准备加载 space"+v.getTag());
-			tip("还没有做出来读取UP主空间功能");break;
+			Intent uz=new Intent(Super,UpZone.class)
+				.putExtra("space",(String)v.getTag())
+				.putExtra("cookie",cookie);
+			Super.startActivity(uz); break;
 		}
 	}
 	public void additem(String auth,String pubtime,String video,String cover,String played,String danmakued,String auth_id,String v_id){

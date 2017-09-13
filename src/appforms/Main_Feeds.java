@@ -2,6 +2,7 @@ package appforms;
 
 import android.app.*;
 import android.content.*;
+import android.net.*;
 import android.os.*;
 import android.view.*;
 import android.view.View.*;
@@ -9,10 +10,10 @@ import android.webkit.*;
 import android.widget.*;
 import com.LEORChn.SimpleBili.*;
 import formevents.*;
-import static leorchn.lib.Global.*;
 import leorchn.lib.*;
 import simplebili.lib.*;
 
+import static leorchn.lib.Global.*;
 import static com.LEORChn.SimpleBili.R.id.*;
 import static leorchn.lib.WidgetOverride.*;
 import static formevents.程序事件.*;
@@ -126,8 +127,8 @@ public class Main_Feeds extends Activity implements OnClickListener,OnKeyListene
 	}
 	final int menuidx=Menu.FIRST;
 	public boolean onCreateOptionsMenu(Menu menu) {
-		String[]menus="我的收藏,历史记录,关注的人".split(",");
-		int[]menuicons={R.drawable.topmenu_stared, R.drawable.topmenu_history, R.drawable.topmenu_people};
+		String[]menus="我的收藏,历史记录,关注的人,关于简哔".split(",");
+		int[]menuicons={R.drawable.topmenu_stared, R.drawable.topmenu_history, R.drawable.topmenu_people,R.drawable.topmenu_about};
 		enableMenuIcon(menu);
 		for(int i=0;i<menus.length;i++)
 			menu.add(0,menuidx+i,0,menus[i]).setIcon(menuicons[i]);
@@ -137,6 +138,14 @@ public class Main_Feeds extends Activity implements OnClickListener,OnKeyListene
 		switch(item.getItemId()-menuidx){
 			//case 0: break;
 			case 1: startActivity(new Intent(this,VideoHistory.class).putExtra("cookie",cookie)); break;
+			case 3: this.closeOptionsMenu();
+				int chose=列表信息框(this,"关于简哔","小瑞的空间","GitHub");
+				switch(chose){
+					case 0: startActivity(new Intent(this,UpZone.class).putExtra("space","3084436").putExtra("cookie",cookie)); break;
+					case 1: startActivity(new Intent(Intent.ACTION_VIEW,Uri.parse("https://github.com/LEORChn/SimpleBili"))); break;
+					case -1:
+				}
+				break;
 			default: tip("此功能以后开放..."); break;
 		}return super.onOptionsItemSelected(item);
 	}

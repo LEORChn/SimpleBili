@@ -90,19 +90,29 @@
 				android:orientation="horizontal"
 				android:gravity="center_vertical">
 
-				<ImageView
-					android:layout_height="wrap_content"
-					android:layout_width="wrap_content"
-					android:src="@android:drawable/ic_menu_gallery"
-					android:id="@+id/videodetail_auth_img"/>
+				
 
-				<TextView
-					android:layout_height="wrap_content"
-					android:text="Video Auth"
-					android:textAppearance="?android:attr/textAppearanceMedium"
+				<LinearLayout
+					android:layout_height="match_parent"
 					android:layout_width="wrap_content"
-					android:textColor="#FB7299"
-					android:id="@+id/videodetail_auth_name"/>
+					android:orientation="horizontal"
+					android:gravity="center_vertical"
+					android:id="@+id/videodetail_goupzone"
+					style="@style/viewBtn">
+					<ImageView
+						android:layout_height="wrap_content"
+						android:layout_width="wrap_content"
+						android:src="@android:drawable/ic_menu_gallery"
+						android:id="@+id/videodetail_auth_img"/>
+					<TextView
+						android:layout_height="wrap_content"
+						android:text="Video Auth"
+						android:textAppearance="?android:attr/textAppearanceMedium"
+						android:layout_width="wrap_content"
+						android:textColor="#FB7299"
+						android:id="@+id/videodetail_auth_name"/>
+
+				</LinearLayout>
 
 				<Button
 					android:layout_height="wrap_content"

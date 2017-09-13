@@ -16,4 +16,12 @@
 		<item name="android:layout_height">46dp</item>
 		<item name="android:padding">10dp</item>
 	</style>
+	<!--style name="ul0"> <item name="android:background">#d1d1d1</item> </style>
+	<style name="ul1"> <item name="android:background">#bfbfbf</item> </style>
+	<style name="ul2"> <item name="android:background">#90d1e6</item> </style>
+	<style name="ul3"> <item name="android:background">#7da4f4</item> </style>
+	<style name="ul4"> <item name="android:background">#ff905a</item> </style>
+	<style name="ul5"> <item name="android:background">#e94949</item> </style>
+	<style name="ul6"> <item name="android:background">#884ee9</item> </style-->
+	
 </resources>

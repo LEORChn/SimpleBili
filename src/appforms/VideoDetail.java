@@ -22,7 +22,7 @@ import java.security.*;
 import java.math.*;
 public class VideoDetail extends Activity implements OnClickListener,MessageQueue.IdleHandler{
 	Activity This; public Activity getContext(){return This;}
-	String vid="-1",cookie="";
+	String vid="-1",uid="",cookie="";
     protected void onCreate(Bundle sis) {
         super.onCreate(sis);
 		CrashHandlerReg.reg(this);
@@ -43,7 +43,7 @@ public class VideoDetail extends Activity implements OnClickListener,MessageQueu
 	}
 	int hasinit=0;
 	void init(){
-		btnbind(id.videodetail_goback,id.videodetail_refresh,id.videodetail_gosetting,
+		btnbind(id.videodetail_goback,id.videodetail_refresh,id.videodetail_gosetting, id.videodetail_goupzone,
 				id.videodetail_share,id.videodetail_like,id.videodetail_star,id.videodetail_download,id.videodetail_review,
 				id.videodetail_openlist,id.videodetail_playfirst);
 		ImageButton refreshBtn=(ImageButton)fv(id.videodetail_refresh);
@@ -68,6 +68,12 @@ public class VideoDetail extends Activity implements OnClickListener,MessageQueu
 				hasinit=1;
 				((ImageButton)v).setImageResource(ic_popup_sync); break;
 			case id.videodetail_gosetting: startActivity(new Intent(This,Settings.class)); break;
+			case id.videodetail_goupzone:
+				tip("准备加载 space"+uid);
+				Intent uz=new Intent(this,UpZone.class)
+					.putExtra("space",uid)
+					.putExtra("cookie",cookie);
+				startActivity(uz); break;
 			case id.videodetail_share: tip("客户端每日分享经验功能以后开放...");break;
 			case id.videodetail_download: changeDownloadState(); break;
 			case id.videodetail_playfirst: 播放视频(firstcid); break;
@@ -97,6 +103,7 @@ public class VideoDetail extends Activity implements OnClickListener,MessageQueu
 			t.setText(j.get("title","(视频标题获取失败)"));
 			d.setText(j.get("description","(视频没有说明)"));
 			a.setText(j.get("author","(未知up主)"));
+			uid=j.get("mid","");
 			likecoin.setText(j.get("coins","-1"));
 			favo.setText(j.get("favorites","-1"));
 			reviews.setText(j.get("review","-1"));
@@ -121,6 +128,10 @@ public class VideoDetail extends Activity implements OnClickListener,MessageQueu
 						cid=""+onepart.get("cid",-1);
 						l.additem("【"+(i+1)+"】"+onepart.get("pagename",""),"Cid: "+cid,cid);
 					}
+					//分段加载成功，开始放置焦点。至于单段的，放不放焦点都无所谓，可拉倒吧
+					int partprog=getIntent().getIntExtra("partprog",0);
+					if(partprog>=l.size()) partprog=l.size()-1;
+					ls.setSelection(partprog);
 				}else{
 					l.additem("更多分段加载失败","重新进入本页面可重试加载","-1");
 				}
