@@ -185,7 +185,7 @@ public class VideoDetail extends Activity implements OnClickListener,MessageQueu
 			信息框(this,"解析错误","视频地址解析错误，请重试。其返回的调试信息是\na"+vid+"c"+cid+data,"ok");
 			return;}//错误的数据，拒绝播放
 		switch(sets.get("player",0)){
-			case 0: startActivity(new Intent(This,VideoPlaySimple.class).putExtra("path",data)); break;
+			case 0: startActivity(new Intent(This,VideoPlaySimple.class).putExtra("path",data).putExtra("cid",cid)); break;
 			case 2: startActivity(new Intent(Intent.ACTION_VIEW,Uri.parse(data))); break;//todo: send url
 			case 3: //复制到剪贴板
 				复制文本(data);

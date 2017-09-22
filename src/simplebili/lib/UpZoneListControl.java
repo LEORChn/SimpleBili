@@ -47,7 +47,7 @@ public class UpZoneListControl implements View.OnClickListener{
 	}
 	@Override public void onClick(View v) {switch(v.getId()){
 			case R.id.listsub_videofeeds:
-				tip("准备加载 av"+v.getTag());
+				multip("准备加载 av"+v.getTag());
 				Intent it=new Intent(Super,VideoDetail.class)
 					.putExtra("vid",(String)v.getTag())
 					.putExtra("cookie",cookie);

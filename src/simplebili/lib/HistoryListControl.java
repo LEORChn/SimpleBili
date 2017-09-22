@@ -55,7 +55,7 @@ public class HistoryListControl implements View.OnClickListener{
 	}
 	@Override public void onClick(View v) {switch(v.getId()){
 			case R.id.listsub_videofeeds:
-				tip("准备加载 av"+v.getTag());
+				multip("准备加载 av"+v.getTag());
 				Intent it=new Intent(Super,VideoDetail.class)
 					.putExtra("vid",(String)v.getTag())
 					.putExtra("cookie",cookie);
@@ -63,7 +63,7 @@ public class HistoryListControl implements View.OnClickListener{
 				if(partprogress.getClass()==Integer.class)it.putExtra("partprog",(int)partprogress -1/*虽然在这个地方决定减1了呵呵因为我发现根本不用担心*/);
 				Super.startActivity(it); break;
 			case R.id.listsub_auth_name:
-				tip("准备加载 space"+v.getTag());
+				multip("准备加载 space"+v.getTag());
 				Intent uz=new Intent(Super,UpZone.class)
 					.putExtra("space",(String)v.getTag())
 					.putExtra("cookie",cookie);

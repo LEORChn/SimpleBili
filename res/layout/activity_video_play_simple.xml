@@ -5,19 +5,18 @@
 	android:layout_height="fill_parent"
 	android:background="#404040">
 
-	<VideoView
+	<VideoView desc="视频播放组件"
 		android:layout_height="match_parent"
 		android:layout_width="match_parent"
 		android:id="@+id/vplay_player"
 		android:background="#bababa"
 		android:layout_gravity="center"/>
 
-	<LinearLayout
+	<LinearLayout desc="底部进度条"
 		android:layout_height="wrap_content"
 		android:layout_width="match_parent"
 		android:orientation="horizontal"
 		android:gravity="bottom"
-		android:layout_below="@id/vplay_player"
 		android:layout_gravity="bottom">
 
 		<TextView
@@ -46,7 +45,7 @@
 
 	</LinearLayout>
 
-	<LinearLayout
+	<LinearLayout desc="播放完成-操作面板"
 		android:layout_height="wrap_content"
 		android:layout_width="wrap_content"
 		android:orientation="horizontal"
@@ -166,7 +165,7 @@
 
 	</LinearLayout>
 
-	<LinearLayout
+	<LinearLayout desc="加载中界面，包含播放器日志区，填充器日志区以及电视动画"
 		android:layout_height="match_parent"
 		android:layout_width="match_parent"
 		android:orientation="horizontal"
@@ -203,7 +202,7 @@
 
 	</LinearLayout>
 
-	<TextView
+	<TextView desc="手势操作的提示块"
 		android:layout_height="wrap_content"
 		android:textAppearance="?android:attr/textAppearanceMedium"
 		android:layout_width="wrap_content"
@@ -212,6 +211,11 @@
 		android:layout_marginBottom="25dp"
 		android:id="@+id/vplay_scrolldisplay"
 		android:gravity="center"/>
+
+	<FrameLayout desc="弹幕显示区"
+		android:layout_height="match_parent"
+		android:layout_width="match_parent"
+		android:id="@+id/vplay_danmakuview"/>
 
 </FrameLayout>
 

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">简哔 0.3.4</string>
+    <string name="app_name">简哔 0.4</string>
     <string name="app_name_main">简哔</string>
 	<string name="app_name_settings">简哔设置</string>
 </resources>

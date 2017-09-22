@@ -65,19 +65,19 @@ public final class R {
     public static final class id {
         public static final int history_goback=0x7f070000;
         public static final int history_list=0x7f070001;
-        public static final int listsub_auth_img=0x7f070055;
-        public static final int listsub_auth_name=0x7f07004d;
-        public static final int listsub_desc=0x7f07004b;
-        public static final int listsub_progress=0x7f070052;
-        public static final int listsub_submit_time=0x7f070054;
-        public static final int listsub_time=0x7f07004e;
-        public static final int listsub_title=0x7f07004a;
-        public static final int listsub_v_dan=0x7f070051;
-        public static final int listsub_v_img=0x7f070056;
-        public static final int listsub_v_played=0x7f070050;
-        public static final int listsub_v_title=0x7f07004f;
-        public static final int listsub_videofeeds=0x7f07004c;
-        public static final int listsub_videolength=0x7f070053;
+        public static final int listsub_auth_img=0x7f070056;
+        public static final int listsub_auth_name=0x7f07004e;
+        public static final int listsub_desc=0x7f07004c;
+        public static final int listsub_progress=0x7f070053;
+        public static final int listsub_submit_time=0x7f070055;
+        public static final int listsub_time=0x7f07004f;
+        public static final int listsub_title=0x7f07004b;
+        public static final int listsub_v_dan=0x7f070052;
+        public static final int listsub_v_img=0x7f070057;
+        public static final int listsub_v_played=0x7f070051;
+        public static final int listsub_v_title=0x7f070050;
+        public static final int listsub_videofeeds=0x7f07004d;
+        public static final int listsub_videolength=0x7f070054;
         public static final int main_download=0x7f070008;
         public static final int main_feedlist=0x7f07000c;
         public static final int main_gosetting=0x7f070009;
@@ -95,10 +95,10 @@ public final class R {
         public static final int setting_goback=0x7f07000f;
         public static final int setting_list=0x7f070011;
         public static final int setting_starthome=0x7f070012;
-        public static final int test_animview=0x7f07005a;
-        public static final int test_big=0x7f070058;
-        public static final int test_change=0x7f070059;
-        public static final int test_small=0x7f070057;
+        public static final int test_animview=0x7f07005b;
+        public static final int test_big=0x7f070059;
+        public static final int test_change=0x7f07005a;
+        public static final int test_small=0x7f070058;
         public static final int upzone_addsubs=0x7f070018;
         public static final int upzone_desc=0x7f07001f;
         public static final int upzone_fans=0x7f07001d;
@@ -141,6 +141,7 @@ public final class R {
         public static final int vplay_animtv=0x7f07003e;
         public static final int vplay_backward15=0x7f070045;
         public static final int vplay_dandbg=0x7f07003f;
+        public static final int vplay_danmakuview=0x7f07004a;
         public static final int vplay_endplay=0x7f070044;
         public static final int vplay_nextpart=0x7f070048;
         public static final int vplay_panelfinish=0x7f070043;
@@ -177,9 +178,10 @@ public final class R {
         public static final int app_name_settings=0x7f050002;
     }
     public static final class style {
-        public static final int BlackTheme=0x7f060004;
-        public static final int WhiteTheme=0x7f060003;
+        public static final int BlackTheme=0x7f060005;
+        public static final int WhiteTheme=0x7f060004;
         public static final int actionBartton=0x7f060001;
+        public static final int danmakuText=0x7f060003;
         public static final int standBtn=0x7f060002;
         public static final int viewBtn=0x7f060000;
     }
