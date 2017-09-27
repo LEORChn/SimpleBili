@@ -139,7 +139,8 @@
 			android:background="@drawable/btn_top"
 			style="@style/viewBtn"
 			android:id="@+id/videodetail_share"
-			android:padding="5dp">
+			android:padding="5dp"
+			android:layout_weight="1.0">
 
 			<ImageView
 				android:src="@drawable/topmenu_share"
@@ -164,7 +165,8 @@
 			android:background="@drawable/btn_top"
 			style="@style/viewBtn"
 			android:id="@+id/videodetail_like"
-			android:padding="5dp">
+			android:padding="5dp"
+			android:layout_weight="1.0">
 
 			<ImageView
 				android:layout_height="match_parent"
@@ -190,7 +192,8 @@
 			android:background="@drawable/btn_top"
 			style="@style/viewBtn"
 			android:id="@+id/videodetail_star"
-			android:padding="5dp">
+			android:padding="5dp"
+			android:layout_weight="1.0">
 
 			<ImageView
 				android:layout_height="match_parent"
@@ -216,7 +219,8 @@
 			android:background="@drawable/btn_top"
 			style="@style/viewBtn"
 			android:id="@+id/videodetail_download"
-			android:padding="5dp">
+			android:padding="5dp"
+			android:layout_weight="1.0">
 
 			<ImageView
 				android:layout_height="match_parent"
@@ -242,7 +246,8 @@
 			android:background="@drawable/btn_top"
 			style="@style/viewBtn"
 			android:id="@+id/videodetail_review"
-			android:padding="5dp">
+			android:padding="5dp"
+			android:layout_weight="1.0">
 
 			<ImageView
 				android:layout_height="match_parent"

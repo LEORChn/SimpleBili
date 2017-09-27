@@ -212,7 +212,7 @@
 		android:id="@+id/vplay_scrolldisplay"
 		android:gravity="center"/>
 
-	<FrameLayout desc="弹幕显示区"
+	<FrameLayout desc=""
 		android:layout_height="match_parent"
 		android:layout_width="match_parent"
 		android:id="@+id/vplay_danmakuview"/>

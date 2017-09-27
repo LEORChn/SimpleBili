@@ -132,8 +132,8 @@ public class VideoPlaySimple extends Activity implements View.OnClickListener,Vi
 	}
 	public void onClick(View v){switch(v.getId()){
 		case vplay_endplay: finish(); break;
-		case vplay_backward15: vp.seekTo(vp.getDuration()-15000); visible(panelfin,false); vp.start(); break;
-		case vplay_replay: vp.seekTo(0); visible(panelfin,false); vp.start(); break;
+		case vplay_backward15: seekto(vp.getDuration()-15000); visible(panelfin,false); vp.start(); break;
+		case vplay_replay: seekto(0); visible(panelfin,false); vp.start(); break;
 		case vplay_panelhide: visible(panelfin,false); break;
 		case vplay_nextpart: break; //TODO
 	}}
@@ -189,7 +189,7 @@ public class VideoPlaySimple extends Activity implements View.OnClickListener,Vi
 		if(et.getAction()==et.ACTION_UP){
 			if(scrolltype==1){
 				if(Math.abs(sclreal)>4)//拖进度条的无效范围
-					vp.seekTo(vp.getCurrentPosition()+sclreal*1000);//隐患：跳转到范围外的时间、播放完毕后重新跳转不隐藏面板
+					seekto(vp.getCurrentPosition()+sclreal*1000);//隐患：跳转到范围外的时间、播放完毕后重新跳转不隐藏面板
 				visible(panelfin,false);
 				vp.start();
 			}
@@ -287,6 +287,7 @@ public class VideoPlaySimple extends Activity implements View.OnClickListener,Vi
 			default: break;
 		}return super.onOptionsItemSelected(item);
 	}
+	void seekto(int t){ t=t<1000?0:t; vp.seekTo(t); dvc.onVideoSeekto(t); }
 	
 	void btnbind(int...id){for(int btnid:id)btnbind(btnid);}
 	void btnbind(int id){fv(id).setOnClickListener(this);}

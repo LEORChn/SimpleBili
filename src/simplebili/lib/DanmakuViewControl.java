@@ -34,6 +34,13 @@ public class DanmakuViewControl {
 			linenext[0]++;
 		}
 	}
+	public void onVideoSeekto(long time){
+		for(int i=0,len=timepool.length;i<len-1;i++)
+			if(time<timepool[i]){
+				danprog=i;
+				break;
+			}
+	}
 	ViewGroup danmakuView,vroot; DMText tx[];
 	int whatnext=0;//当前所操作的组件的索引值
 	int[]linenext={0};//当前操作的组件应在的行数
@@ -45,9 +52,9 @@ public class DanmakuViewControl {
 			gt=graphicTool;
 		}
 		public void scroll(String text,int[]outline){
-			String[]tparam=text.split(desplit);
-			text=tparam[2]; 
-			setText(text); setTextColor(0xFF000000+Integer.valueOf(tparam[1]));
+			String[]tparam=text.split(desplit); if(tparam.length<3)return;
+			text=tparam[2]; int c=Integer.valueOf(tparam[1]); if(c<0x01000000)c+=0xFF000000;//防止了在一次测试过程中偶发的int溢出错误
+			setText(text); setTextColor(c);
 			outside=outline; myline=outline[0];
 			getPaint().getTextBounds(text,0,text.length(),gt);//计算文字宽度和高度
 			AnimationSet an1=new AnimationSet(true); //Toast.makeText(This,This.danmakuView.getWidth()+","+(0-gt.width()),0).show();
@@ -84,7 +91,7 @@ public class DanmakuViewControl {
 				return deflateDecoder(input);
 			}
 			@Override protected void onPostExecute(String r){
-				log("\n弹幕下载完成，装填中...");
+				log("弹幕下载完成，装填中...");
 				loadDanmakuString(r);
 			}
 		}.execute(url);
@@ -92,7 +99,7 @@ public class DanmakuViewControl {
 	public void loadDanmakuString(String content){
 		Node doc=getNodeFromXmlString(content);
 		if(doc==null){
-			log("\n弹幕数据读取错误。");
+			log("弹幕数据读取错误。");
 			error(2,content);
 			return;
 		}int location=0; 
@@ -108,13 +115,13 @@ public class DanmakuViewControl {
 			timelist.add(0xffffffffffl);//最后一个时间点永远不允许被超越！！
 			timepool=timelist.toArray(new Long[timelist.size()]);
 		}catch(Exception e){
-			log("\n弹幕数据格式错误。");
+			log("弹幕数据格式错误。");
 			error(4,location+" :location\n"+e+Arrays.toString(e.getStackTrace())+content);
 			return;
 		}
 		Arrays.sort(timepool);
 		//pool.put(0l,"");//add while zero exception handler
-		log("\n弹幕装填完毕。");
+		log("弹幕装填完毕。");
 		completed();
 	}
 	long addtopool(double time,String mode,String color,String text){
@@ -122,7 +129,7 @@ public class DanmakuViewControl {
 		pool.put(serial,mode+split+color+split+text);
 		return serial;
 	}
-	void log(String s){ if(dll!=null)dll.onDanmakuLog(s); }
+	void log(String s){ if(dll!=null)dll.onDanmakuLog(s+"\n"); }
 	void error(int i,String s){ if(dll!=null)dll.onDanmakuLoadError(i,s); }
 	void completed(){ if(dll!=null)dll.onDanmakuLoadCompleted(); }
 	

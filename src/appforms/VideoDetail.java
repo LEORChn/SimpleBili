@@ -86,7 +86,7 @@ public class VideoDetail extends Activity implements OnClickListener,MessageQueu
 	void changeDownloadState(){
 		downstate=!downstate;
 		if(downstate){
-			downloadtext.setText("退出缓存模式");
+			downloadtext.setText("播放");
 			videoid.setText(videoid.getText()+" (缓存模式)");
 		}else{
 			downloadtext.setText("缓存");

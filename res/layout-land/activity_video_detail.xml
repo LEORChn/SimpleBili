@@ -66,7 +66,7 @@
 
 				<TextView
 					android:layout_height="wrap_content"
-					android:text="Video Title Text Sample"
+					android:text="(视频标题)"
 					android:textAppearance="?android:attr/textAppearanceMedium"
 					android:layout_width="wrap_content"
 					android:id="@+id/videodetail_v_title"
@@ -76,7 +76,7 @@
 
 			<TextView
 				android:layout_height="wrap_content"
-				android:text="Video Detail Text Sample"
+				android:text="(视频简介)"
 				android:textAppearance="?android:attr/textAppearanceSmall"
 				android:layout_width="match_parent"
 				android:alpha=".8"
@@ -90,8 +90,6 @@
 				android:orientation="horizontal"
 				android:gravity="center_vertical">
 
-				
-
 				<LinearLayout
 					android:layout_height="match_parent"
 					android:layout_width="wrap_content"
@@ -99,14 +97,16 @@
 					android:gravity="center_vertical"
 					android:id="@+id/videodetail_goupzone"
 					style="@style/viewBtn">
+
 					<ImageView
 						android:layout_height="wrap_content"
 						android:layout_width="wrap_content"
 						android:src="@android:drawable/ic_menu_gallery"
 						android:id="@+id/videodetail_auth_img"/>
+
 					<TextView
 						android:layout_height="wrap_content"
-						android:text="Video Auth"
+						android:text="(视频作者)"
 						android:textAppearance="?android:attr/textAppearanceMedium"
 						android:layout_width="wrap_content"
 						android:textColor="#FB7299"
