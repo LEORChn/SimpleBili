@@ -25,8 +25,13 @@ public abstract class PartsListControl implements View.OnClickListener{
 			}};
 		l.setAdapter(adapter);
 	}
+	//基本数据类型的传址版本，其实可以使用数组来传址
+	//public static class RefBoolean{ public RefBoolean(boolean b){set(b);} boolean d=false; public void set(boolean b){d=b;}public boolean get(){return d;} }
 	public void onClick(View v){
-		onItemClick((int)v.getTag(),(String)list.get((int)v.getTag()).get("itemtag"));
+		boolean[]isSetWatched={false};
+		onItemClick((int)v.getTag(),(String)list.get((int)v.getTag()).get("itemtag"),isSetWatched);
+		if(isSetWatched[0])//数组传址到此处，因此还能读取
+			((TextView)v.findViewById(R.id.listsub_title)).setTextColor(0xFFFFC000);
 	}
 	public void additem(String title,String desc,String itemtag){
 		Map<String, Object> map = new HashMap<String, Object>();
@@ -48,5 +53,5 @@ public abstract class PartsListControl implements View.OnClickListener{
 	}
 	public ListView getMainView(){return l;}
 	public int size(){ return list.size(); }
-	abstract public void onItemClick(int idx,String itemtag);
+	abstract public void onItemClick(int idx,String itemtag,boolean[]isSetWatched);
 }

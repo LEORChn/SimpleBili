@@ -11,8 +11,9 @@ import simplebili.lib.*;
 
 import static com.LEORChn.SimpleBili.R.*;
 import static leorchn.lib.Global.*;
+import static leorchn.lib.WidgetOverride.*;
 
-public class UpZone extends Activity implements OnClickListener,MessageQueue.IdleHandler ,OnGenericMotionListener,AbsListView.OnScrollListener{
+public class UpZone extends Activity implements OnClickListener,MessageQueue.IdleHandler ,OnGenericMotionListener,AbsListView.OnScrollListener,Follow.OnFollowListener{
 	Activity This; public Activity getContext(){return This;}
 	String uid="",cookie="",//本类不用cookie，不代表不用传值！
 		contenttype="Content-Type: application/x-www-form-urlencoded\r\n",
@@ -30,6 +31,7 @@ public class UpZone extends Activity implements OnClickListener,MessageQueue.Idl
 				cookie=getIntent().getStringExtra("cookie"); if(cookie==null)cookie="";
 				break;
 			case 1:
+				infoarea=fv(id.upzone_infoarea);
 				ListView vl=(ListView)fv(id.upzone_vlist);
 				vl.setOnScrollListener(this); //允许用手指刷
 				vl.setOnGenericMotionListener(this); //允许用鼠标滚轮刷
@@ -41,41 +43,62 @@ public class UpZone extends Activity implements OnClickListener,MessageQueue.Idl
 				fans=(TextView)fv(id.upzone_fans);
 				vcount=(TextView)fv(id.upzone_videocount);
 				desc=(TextView)fv(id.upzone_desc);
+				addsubs=(Button)fv(id.upzone_addsubs); //visible(addsubs,false);//主动隐藏（请在布局里隐藏）
 				btnbind(id.upzone_goback,id.upzone_msgp2p, id.upzone_addsubs,id.upzone_subs,id.upzone_fans);
 				break;
 			case 2:
+				Follow.addOnFollowListener(this);
 				new Thread(){public void run(){
 					loadUpzone(uid);
 				}}.start();
 				loadUpzoneVideo(1);
+				Follow.check(uid,-1,cookie);
 				break;
 		}
 		hasinit++;
 		return hasinit<4;
 	}
-	int hasinit=0;
+	int hasinit=0,followstat=0;
 	UpZoneListControl l;
+	Button addsubs;
 //监听器 开始
 	public void onClick(View v) {switch(v.getId()){
 		case id.upzone_goback: finish(); break;
-		case id.upzone_msgp2p: //私信功能todo
-		case id.upzone_addsubs: //加关注功能todo
+		case id.upzone_msgp2p: return;//私信功能todo
+		case id.upzone_addsubs: //加关注or取消关注
+			if(followstat==0){
+				if(!Follow.follow(uid,cookie))multip("先休息一下好不好？");
+				else addsubs.setText("操作中");
+			}else if(信息框2(this,"取消关注此人？","请确认：","取消关注","返回")==0)
+				if(!Follow.unfollow(uid,cookie))multip("先休息一下好不好？");
+				else addsubs.setText("操作中");
+			break;
 		case id.upzone_subs: //看他关注的人todo
 		case id.upzone_fans: tip("此功能暂未开放");//看关注他的人todo
 	}}
+	public void onFollowStatChange(String fid, boolean stat) {
+		if(uid.equals(fid)){
+			followstat=stat?1:0;
+			visible(addsubs,true);
+			addsubs.setText(stat?"已关注":"+关注");
+		}
+	}
 	public boolean onGenericMotion(View v,MotionEvent et){//响应鼠标滚轮更新列表
 		if((v instanceof AbsListView) && //instanceof:确保是动态列表的操作。getAction:确保是鼠标滚轮。getAxisValue<0:确保是向下滚动
 		   et.getAction()==et.ACTION_SCROLL && et.getAxisValue(et.AXIS_VSCROLL)<0f)
 			onScrollStateChanged((AbsListView)v,0);
 		return super.onGenericMotionEvent(et);
 	}
-	public void onScrollStateChanged(final AbsListView p1, int p2){//响应手指滑动更新列表
+	public void onScrollStateChanged(AbsListView p1, int p2){//响应手指滑动更新列表
+		if(p2==0)visible(infoarea,firstvisibleitem==0);//这个位置有一点不好，就是向上滚轮时即使到第一个也不会显示顶部信息，需要再向下滚轮一次才显示
+		
 		if(p2==0 && (p1.getLastVisiblePosition()+5)>p1.getCount()){
 			loadUpzoneVideo(((p1.getCount()+(20-p1.getCount()%20))/20)+1);//有些人的空间读到最后一页时就不够20个了，这会导致重复加载最后一页。此问题已修复
 		}
-	} //switch(p2){case 0:case 1:};//0=stop; 1=scrolling; 2=fastscrolling
-	public void onScroll(AbsListView p1, int p2, int p3, int p4) {}
+	} int firstvisibleitem=0;//switch(p2){case 0:case 1:};//0=stop; 1=scrolling; 2=fastscrolling
+	public void onScroll(AbsListView p1, int p2, int p3, int p4){ firstvisibleitem=p2; }
 //监听器 结束
+	View infoarea;
 	TextView name,ul,exp,subs,fans,vcount,desc;
 	int loadUpzone(final String uid){ if(uid==null || uid.isEmpty())return 1003;//1003=程序内部错误
 		String data=网络.获得数据("POST","http://space.bilibili.com/ajax/member/GetInfo",contenttype+referer+cookie,"mid="+uid);

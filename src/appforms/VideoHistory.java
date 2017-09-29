@@ -30,7 +30,7 @@ public class VideoHistory extends Activity implements OnClickListener,MessageQue
 				vl.setOnScrollListener(this); //允许用手指刷动态
 				vl.setOnGenericMotionListener(this); //允许用鼠标滚轮刷动态
 				hl=new HistoryListControl(this,vl,cookie);
-				btnbind(R.id.history_goback);
+				btnbind(R.id.history_goback,R.id.history_refreshfromfirstpage);
 				getMoreHistory(1);
 		}
 		hasinit++;
@@ -41,6 +41,7 @@ public class VideoHistory extends Activity implements OnClickListener,MessageQue
 	@Override
 	public void onClick(View v) {switch(v.getId()){
 		case R.id.history_goback: finish();break;
+		case R.id.history_refreshfromfirstpage: if(listupdating)return;hl.clear();getMoreHistory(1); break;
 	}}
 	
 	public boolean onGenericMotion(View v,MotionEvent et){//响应鼠标滚轮更新列表

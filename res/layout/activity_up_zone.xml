@@ -57,7 +57,8 @@
 				style="?android:attr/buttonStyleSmall"
 				android:text="+关注"
 				android:layout_width="wrap_content"
-				android:id="@+id/upzone_addsubs"/>
+				android:id="@+id/upzone_addsubs"
+				android:visibility="invisible"/>
 
 		</LinearLayout>
 
@@ -75,10 +76,11 @@
 				<TextView
 					android:layout_height="wrap_content"
 					android:text="(UP主名字)"
-					android:textAppearance="?android:attr/textAppearanceLarge"
 					android:layout_width="wrap_content"
 					android:layout_weight="1.0"
-					android:id="@+id/upzone_upname"/>
+					android:id="@+id/upzone_upname"
+					android:maxLines="1"
+					style="?android:attr/textAppearanceMedium"/>
 
 				<TextView
 					android:layout_height="wrap_content"
@@ -110,7 +112,6 @@
 				<TextView
 					android:layout_height="wrap_content"
 					android:text="(他关注的人数)"
-					android:textAppearance="?android:attr/textAppearanceMedium"
 					android:layout_width="wrap_content"
 					android:layout_weight="1.0"
 					android:gravity="center"
@@ -126,7 +127,6 @@
 				<TextView
 					android:layout_height="wrap_content"
 					android:text="(关注他的人数)"
-					android:textAppearance="?android:attr/textAppearanceMedium"
 					android:layout_width="wrap_content"
 					android:layout_weight="1.0"
 					android:gravity="center"
@@ -142,7 +142,6 @@
 				<TextView
 					android:layout_height="wrap_content"
 					android:text="(他的视频数量)"
-					android:textAppearance="?android:attr/textAppearanceMedium"
 					android:layout_width="wrap_content"
 					android:layout_weight="1.0"
 					android:gravity="center"
@@ -153,7 +152,6 @@
 			<TextView
 				android:layout_height="wrap_content"
 				android:text="(UP主简介)"
-				android:textAppearance="?android:attr/textAppearanceSmall"
 				android:layout_width="wrap_content"
 				android:layout_marginTop="10dp"
 				android:id="@+id/upzone_desc"

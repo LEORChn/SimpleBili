@@ -5,14 +5,16 @@
 	android:layout_height="fill_parent"
 	android:background="#404040">
 
-	<VideoView desc="视频播放组件"
+	<VideoView
+		desc="视频播放组件"
 		android:layout_height="match_parent"
 		android:layout_width="match_parent"
 		android:id="@+id/vplay_player"
 		android:background="#bababa"
 		android:layout_gravity="center"/>
 
-	<LinearLayout desc="底部进度条"
+	<LinearLayout
+		desc="底部进度条"
 		android:layout_height="wrap_content"
 		android:layout_width="match_parent"
 		android:orientation="horizontal"
@@ -45,7 +47,8 @@
 
 	</LinearLayout>
 
-	<LinearLayout desc="播放完成-操作面板"
+	<LinearLayout
+		desc="播放完成-操作面板"
 		android:layout_height="wrap_content"
 		android:layout_width="wrap_content"
 		android:orientation="horizontal"
@@ -165,7 +168,8 @@
 
 	</LinearLayout>
 
-	<LinearLayout desc="加载中界面，包含播放器日志区，填充器日志区以及电视动画"
+	<LinearLayout
+		desc="加载中界面，包含播放器日志区，填充器日志区以及电视动画"
 		android:layout_height="match_parent"
 		android:layout_width="match_parent"
 		android:orientation="horizontal"
@@ -197,12 +201,14 @@
 			android:gravity="bottom|left"
 			android:layout_weight="1.0"
 			android:text="Filling Danmaku Debug Text Area\n- 弹幕填充器调试输出区 -\n"
+			android:textIsSelectable="true"
 			android:id="@+id/vplay_dandbg"
 			android:textColor="#000000"/>
 
 	</LinearLayout>
 
-	<TextView desc="手势操作的提示块"
+	<TextView
+		desc="手势操作的提示块"
 		android:layout_height="wrap_content"
 		android:textAppearance="?android:attr/textAppearanceMedium"
 		android:layout_width="wrap_content"
@@ -212,10 +218,18 @@
 		android:id="@+id/vplay_scrolldisplay"
 		android:gravity="center"/>
 
-	<FrameLayout desc=""
+	<FrameLayout
+		desc=""
 		android:layout_height="match_parent"
 		android:layout_width="match_parent"
 		android:id="@+id/vplay_danmakuview"/>
+
+	<ImageButton
+		android:layout_height="wrap_content"
+		android:layout_width="wrap_content"
+		android:src="@drawable/vplay_step"
+		android:layout_gravity="bottom|right"
+		android:id="@+id/vplay_frameplay"/>
 
 </FrameLayout>
 
