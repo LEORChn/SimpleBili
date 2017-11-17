@@ -64,13 +64,13 @@ public class FeedListControl implements View.OnClickListener{
 	}
 	@Override public void onClick(View v) {switch(v.getId()){
 		case R.id.listsub_videofeeds:
-			tip("准备加载 av"+v.getTag());
+			multip("准备加载 av"+v.getTag());
 			Intent it=new Intent(Super,VideoDetail.class)
 				.putExtra("vid",(String)v.getTag())
 				.putExtra("cookie",cookie);
 			Super.startActivity(it); break;
 		case R.id.listsub_auth_name:
-			tip("准备加载 space"+v.getTag());
+			multip("准备加载 space"+v.getTag());
 			Intent uz=new Intent(Super,UpZone.class)
 				.putExtra("space",(String)v.getTag())
 				.putExtra("cookie",cookie);

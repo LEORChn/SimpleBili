@@ -54,8 +54,9 @@ public final class 程序事件 {
 		new itf(){void r(){
 			列.clear();
 		}};
-		int 刷新结果=读取关注动态(1);
-		if(刷新结果!=0)提示("刷新动态失败，错误码 "+刷新结果+"\n"+错误信息_读取动态(刷新结果));
+		int refres=读取关注动态(1);
+		if(refres!=0)提示("刷新动态失败，错误码 "+refres+"\n"+错误信息_读取动态(refres));
+		if(refres==-101 && 信息框2("帐号验证失效","要重新登录吗？","重新登录","下次")==0)帐户登录.重新登录();
 	}
 	public static String 错误信息_读取动态(int code){
 		String[]s={"正常",//0

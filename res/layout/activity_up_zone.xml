@@ -33,143 +33,21 @@
 
 	</LinearLayout>
 
-	<LinearLayout
-		android:layout_height="wrap_content"
-		android:layout_width="match_parent"
-		android:orientation="horizontal"
-		android:padding="10dp"
-		android:id="@+id/upzone_infoarea">
-
-		<LinearLayout
-			android:layout_height="wrap_content"
-			android:layout_width="wrap_content"
-			android:orientation="vertical"
-			android:layout_marginRight="10dp">
-
-			<ImageView
-				android:layout_height="56dp"
-				android:layout_width="56dp"
-				android:src="@android:drawable/ic_menu_gallery"
-				android:id="@+id/upzone_head"/>
-
-			<Button
-				android:layout_height="wrap_content"
-				style="?android:attr/buttonStyleSmall"
-				android:text="+关注"
-				android:layout_width="wrap_content"
-				android:id="@+id/upzone_addsubs"/>
-
-		</LinearLayout>
-
-		<LinearLayout
-			android:layout_height="wrap_content"
-			android:layout_width="match_parent"
-			android:orientation="vertical">
-
-			<LinearLayout
-				android:layout_height="wrap_content"
-				android:layout_width="match_parent"
-				android:orientation="horizontal"
-				android:gravity="bottom|center_horizontal">
-
-				<TextView
-					android:layout_height="wrap_content"
-					android:text="(UP主名字)"
-					android:textAppearance="?android:attr/textAppearanceLarge"
-					android:layout_width="wrap_content"
-					android:layout_weight="1.0"
-					android:id="@+id/upzone_upname"/>
-
-				<TextView
-					android:layout_height="wrap_content"
-					android:text="(等级信息)"
-					android:textAppearance="?android:attr/textAppearanceMedium"
-					android:layout_width="wrap_content"
-					android:gravity="center"
-					android:id="@+id/upzone_upul"
-					android:paddingRight="5dp"
-					android:paddingLeft="5dp"
-					android:layout_marginBottom="1dp"/>
-
-				<TextView
-					android:layout_height="wrap_content"
-					android:text="(经验值信息)"
-					android:textAppearance="?android:attr/textAppearanceSmall"
-					android:layout_width="wrap_content"
-					android:id="@+id/upzone_upexp"
-					android:paddingLeft="5dp"
-					android:paddingRight="5dp"/>
-
-			</LinearLayout>
-
-			<LinearLayout
-				android:layout_height="wrap_content"
-				android:layout_width="match_parent"
-				android:orientation="horizontal">
-
-				<TextView
-					android:layout_height="wrap_content"
-					android:text="(他关注的人数)"
-					android:textAppearance="?android:attr/textAppearanceMedium"
-					android:layout_width="wrap_content"
-					android:layout_weight="1.0"
-					android:gravity="center"
-					style="@style/viewBtn"
-					android:id="@+id/upzone_subs"/>
-
-				<LinearLayout
-					android:layout_height="match_parent"
-					android:layout_width="2dp"
-					android:orientation="vertical"
-					android:background="#7f7f7f"/>
-
-				<TextView
-					android:layout_height="wrap_content"
-					android:text="(关注他的人数)"
-					android:textAppearance="?android:attr/textAppearanceMedium"
-					android:layout_width="wrap_content"
-					android:layout_weight="1.0"
-					android:gravity="center"
-					style="@style/viewBtn"
-					android:id="@+id/upzone_fans"/>
-
-				<LinearLayout
-					android:layout_height="match_parent"
-					android:layout_width="2dp"
-					android:orientation="vertical"
-					android:background="#7f7f7f"/>
-
-				<TextView
-					android:layout_height="wrap_content"
-					android:text="(他的视频数量)"
-					android:textAppearance="?android:attr/textAppearanceMedium"
-					android:layout_width="wrap_content"
-					android:layout_weight="1.0"
-					android:gravity="center"
-					android:id="@+id/upzone_videocount"/>
-
-			</LinearLayout>
-
-			<TextView
-				android:layout_height="wrap_content"
-				android:text="(UP主简介)"
-				android:textAppearance="?android:attr/textAppearanceSmall"
-				android:layout_width="wrap_content"
-				android:layout_marginTop="10dp"
-				android:id="@+id/upzone_desc"
-				android:textIsSelectable="true"/>
-
-		</LinearLayout>
-
-	</LinearLayout>
-
-	<ListView
+	<ScrollView
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
 		android:layout_marginLeft="5dp"
 		android:layout_marginRight="5dp"
 		android:layout_weight="1.0"
-		android:id="@+id/upzone_vlist"/>
+		android:id="@+id/upzone_vlist">
+
+		<LinearLayout
+			android:layout_height="wrap_content"
+			android:layout_width="match_parent"
+			android:orientation="vertical"
+			android:id="@+id/ScrollViewRoot"/>
+
+	</ScrollView>
 
 </LinearLayout>
 

@@ -111,14 +111,20 @@ public class Global{
 		return ExitDialog.result;
 	}
 	public static void 附加功能(Activity a){
-		int r=列表信息框(a,"启动附加功能","直播等级挂机助手");
+		int r=列表信息框(a,"启动附加功能","绿色弹幕辅助模块","社区温暖注册模块");
+		String cook=formevents.帐户数据.cookie();
 		switch (r) {
 			case 0:
-				String cook=formevents.帐户数据.cookie();
 				if (cook.equals("")) {
 					tip("请先进入主界面登录后再使用此功能");
 				} else {
 					a.startService(new Intent(a, LiveUpgrade.class).putExtra("cookie", cook)); 
+				}break;
+			case 1:
+				if (cook.equals("")) {
+					tip("请先进入主界面登录后再使用此功能");
+				} else {
+					a.startService(new Intent(a, GetAllowance.class).putExtra("cookie", "Cookie: "+cook)); 
 				}break;
 		}
 	}

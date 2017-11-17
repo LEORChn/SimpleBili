@@ -98,20 +98,52 @@
 					android:src="@android:drawable/ic_menu_gallery"
 					android:id="@+id/videodetail_auth_img"/>
 
-				<TextView
+				<LinearLayout
 					android:layout_height="wrap_content"
-					android:text="(视频作者)"
-					android:textAppearance="?android:attr/textAppearanceMedium"
 					android:layout_width="wrap_content"
-					android:textColor="#FB7299"
-					android:id="@+id/videodetail_auth_name"/>
+					android:orientation="vertical">
+
+					<TextView
+						android:layout_height="wrap_content"
+						android:text="(视频作者)"
+						android:textAppearance="?android:attr/textAppearanceMedium"
+						android:layout_width="wrap_content"
+						android:textColor="#FB7299"
+						android:id="@+id/videodetail_auth_name"/>
+
+					<LinearLayout
+						android:layout_height="wrap_content"
+						android:layout_width="wrap_content"
+						android:orientation="horizontal">
+
+						<TextView
+							android:layout_height="wrap_content"
+							android:text="(发布时间)"
+							android:layout_width="wrap_content"
+							android:id="@+id/videodetail_submit_time"/>
+
+						<ImageView
+							android:layout_height="match_parent"
+							android:layout_width="24dp"
+							android:src="@android:drawable/ic_menu_send"/>
+
+						<TextView
+							android:layout_height="wrap_content"
+							android:text="(弹幕量)"
+							android:layout_width="wrap_content"
+							android:id="@+id/videodetail_danmaku_count"/>
+
+					</LinearLayout>
+
+				</LinearLayout>
 
 				<Button
 					android:layout_height="wrap_content"
 					style="?android:attr/buttonStyleSmall"
 					android:text="+关注"
 					android:layout_width="wrap_content"
-					android:textColor="#FB7299"/>
+					android:textColor="#FB7299"
+					android:visibility="invisible"/>
 
 			</LinearLayout>
 
@@ -139,7 +171,8 @@
 			android:background="@drawable/btn_top"
 			style="@style/viewBtn"
 			android:id="@+id/videodetail_share"
-			android:padding="5dp">
+			android:padding="5dp"
+			android:layout_weight="1.0">
 
 			<ImageView
 				android:src="@drawable/topmenu_share"
@@ -164,7 +197,8 @@
 			android:background="@drawable/btn_top"
 			style="@style/viewBtn"
 			android:id="@+id/videodetail_like"
-			android:padding="5dp">
+			android:padding="5dp"
+			android:layout_weight="1.0">
 
 			<ImageView
 				android:layout_height="match_parent"
@@ -190,7 +224,8 @@
 			android:background="@drawable/btn_top"
 			style="@style/viewBtn"
 			android:id="@+id/videodetail_star"
-			android:padding="5dp">
+			android:padding="5dp"
+			android:layout_weight="1.0">
 
 			<ImageView
 				android:layout_height="match_parent"
@@ -216,7 +251,8 @@
 			android:background="@drawable/btn_top"
 			style="@style/viewBtn"
 			android:id="@+id/videodetail_download"
-			android:padding="5dp">
+			android:padding="5dp"
+			android:layout_weight="1.0">
 
 			<ImageView
 				android:layout_height="match_parent"
@@ -242,7 +278,8 @@
 			android:background="@drawable/btn_top"
 			style="@style/viewBtn"
 			android:id="@+id/videodetail_review"
-			android:padding="5dp">
+			android:padding="5dp"
+			android:layout_weight="1.0">
 
 			<ImageView
 				android:layout_height="match_parent"

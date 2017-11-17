@@ -16,6 +16,16 @@
 		<item name="android:layout_height">46dp</item>
 		<item name="android:padding">10dp</item>
 	</style>
+	<style name="danmakuText">
+		<item name="android:singleLine">true</item>
+		<item name="android:layout_height">wrap_content</item>
+		<item name="android:textAppearance">?android:attr/textAppearanceSmall</item>
+		<item name="android:layout_width">wrap_content</item>
+		<item name="android:shadowColor">#808080</item>
+		<item name="android:shadowDx">0</item>
+		<item name="android:shadowDy">0</item>
+		<item name="android:shadowRadius">3</item>
+	</style>
 	<!--style name="ul0"> <item name="android:background">#d1d1d1</item> </style>
 	<style name="ul1"> <item name="android:background">#bfbfbf</item> </style>
 	<style name="ul2"> <item name="android:background">#90d1e6</item> </style>

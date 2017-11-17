@@ -14,6 +14,7 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 import android.widget.*;
+import java.util.zip.*;
 
 public class 网络 {
 	public static String 获得数据(Activity form,String msg,final String 方法,final String 地址,final String 请求头,final String 主体){
@@ -84,6 +85,30 @@ public class 网络 {
 		}
 		return v8;
 	}
+	public static InputStream getdataInputStream(String 方法,String 地址,String 请求头,final String 主体){
+		InputStream s=null;
+		try{
+			final HttpURLConnection h=(HttpURLConnection)new URL(地址).openConnection();
+			h.setRequestMethod(方法);h.setDoOutput(!主体.isEmpty());//DoOutput：主体发送开关，如果没有主体则关闭
+			h.setConnectTimeout(5000);
+			for(String 分条:请求头.split("\n"))//自动分割请求头并逐条添加。注意：请不要故意添加错误的请求头
+				if(分条.contains(":")){String[]dat=分条.split(":",2);//sys.o.pl("addRequestHead:"+分条.split(": ")[0].trim()+","+分条.split(": ")[1].trim());
+					h.setRequestProperty(dat[0].trim(),dat[1].trim());}
+
+			if(!主体.isEmpty()) h.getOutputStream().write(主体.getBytes("UTF8"));
+
+			switch(h.getResponseCode()){
+				case HttpURLConnection.HTTP_OK:
+				case HttpURLConnection.HTTP_CREATED:
+				case HttpURLConnection.HTTP_ACCEPTED:
+					s = h.getInputStream();
+					break;
+				default:
+					s = h.getErrorStream();
+			}//不能在此关闭输入流，会造成错误
+		}catch(Exception e){}
+		return s;
+	}
 	public static void 下载文件(String 网络文件,String 文件名,Runnable 下载完成时执行){下载文件(网络文件,文件名,下载完成时执行,true);}
 	public static void 下载文件(String 网络文件,String 文件名,Runnable 下载完成时执行,boolean 覆盖文件){
 		try{
@@ -119,6 +144,31 @@ public class 网络 {
 			return "";
 		}
 	}
+	public static String deflateDecoder(InputStream is){
+		try{
+			byte[]v0=new byte[1024],buffer=new byte[4096];
+			ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+			int v4;
+			while(true){
+				if((v4 = is.read(v0)) == -1)break;
+				outputStream.write(v0, 0, v4);
+			}
+			is.close();//必须在此处才能关闭输入流
+			Inflater inflater = new Inflater(true);
+			inflater.setInput(outputStream.toByteArray());
+
+			outputStream = new ByteArrayOutputStream(outputStream.toByteArray().length);
+			while(!inflater.finished()){
+				int count = inflater.inflate(buffer);
+				outputStream.write(buffer, 0, count);
+			}
+			byte[] output = outputStream.toByteArray();
+			outputStream.close();
+			return new String(output, "UTF-8");
+		}catch(Exception e){
+			return Arrays.toString(e.getStackTrace());
+		}
+    }
 	static void tip(String s){Toast.makeText(Main_Feeds.getContext(),s,0).show();}
 	abstract static class t{
 		abstract void r();

@@ -28,20 +28,24 @@ public class LiveUpgrade extends Service implements DialogInterface.OnClickListe
 		cookie=i.getStringExtra("cookie");if(cookie==null)cookie="";//提示参数错误
 		uid=i.getStringExtra("uid");if(uid==null)uid="-1";
 		referer=i.getStringExtra("referer");if(referer==null)随机引用();
-		定时线程();
+		start();
 		return Service.START_NOT_STICKY;
 	}
 	int infotime=0,beattime=0;//onStartTimeing
-	void 定时线程(){
-		new Thread(){public void run(){
-			while(true){
-				if(infotime<=0){ 查询信息();infotime=30; }
-				if(beattime<=0){ 心跳包();beattime=29; }
-				infotime--;beattime--;
-				try{ Thread.sleep(10000); }catch(Exception e){}
-			}
-		}}.start();
+	void start(){
+		if(start==null||!start.isAlive()){
+			start=new Thread(){public void run(){//链接到本类以防回收
+					while(true){
+						if(infotime<=0){ 查询信息();infotime=30; }
+						if(beattime<=0){ 心跳包();beattime=13; }
+						infotime--;beattime--;
+						try{ Thread.sleep(10000); }catch(Exception e){}
+					}
+				}};
+			start.start();
+		}
 	}
+	Thread start;//线程不能在结束后再次直接启动，已放在方法内重建
 	void 查询信息(){
 		String debug=网络.获得数据("GET", "http://api.live.bilibili.com/User/getUserInfo", "Cookie: "+cookie, "");
 		FSON j=new FSON(debug);
@@ -80,13 +84,13 @@ public class LiveUpgrade extends Service implements DialogInterface.OnClickListe
 	void showControls(){
 		if(alreadyShowControls)return;alreadyShowControls=true;
 		java.util.List<String>l=new java.util.ArrayList<String>();
-		l.add("退出挂机"); l.add("注销(todo)");
-		l.add("帐户："+name+"\nID："+uid+
+		l.add("退出挂机"); l.add("");//注销(todo)");
+		l.add("帐户："+name+//"\nID："+uid+
 			"\n等级："+lvl+"\n经验："+current+"k/"+(total<10000?total+"k":(total/1000)+"m")+
 			"\n升级剩余时间："+需求经验转时间(last,speed)+
 			"\n登录有效时间：从你登录开始30天内");
 		l.add("刷新随机参数("+referer+")");
-		if(!gotinfo)l.add("手动重连(todo)");
+		if(!gotinfo)l.add("手动重连");
 		l.add("关闭面板");
 		m=l.toArray(new String[l.size()]);l=null;//final int menulen=m.length;
 		AlertDialog d=new AlertDialog.Builder(this)/*.setTitle("控制面板")*/
@@ -99,24 +103,23 @@ public class LiveUpgrade extends Service implements DialogInterface.OnClickListe
 			case 0: confirmExit();break;
 			case 1:/*confirmSignOut();*/break;//todo
 			case 3:随机引用();break;
-			case 4:if(m.length==6)/*set time to zero*/
+			case 4:if(m.length==6){infotime=0;beattime=0;tip("将在10秒内重试。");}/*set time to zero*/
 				//alert(new String[]{"开发信息",debug},null,null,true);
 				break;//todo
-		}m=null;alreadyShowControls=false;System.gc();
+		}m=null;alreadyShowControls=false;start();System.gc();
 	}
 	void confirmExit(){
 		alert(this,true,"确认退出？","",
 			new String[]{"是","取消"},
 			new Runnable(){public void run(){
-				new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(new Runnable(){public void run(){
-					This.stopSelf();
-				}},1000);
+				This.stopForeground(true);
+				This.stopSelf();
 		}});
 	}
-	void tip(String s){Toast.makeText(This,s,1).show();}
+	void tip(String s){Toast t=Toast.makeText(This,s,1);t.setGravity(48/*上*/,0,0);t.show();}
 	
 	void 随机引用() {
-		String[] backReferer = {"", "295460", "945012", "1017", "1024"};
+		String[] backReferer = {"295460", "945012", "1017", "1024"};
 		referer = backReferer[new java.util.Random().nextInt(backReferer.length)];
 		tip("当前随机参数为 " + referer);
 	}

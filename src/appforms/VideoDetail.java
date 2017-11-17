@@ -20,6 +20,7 @@ import android.view.View.*;
 import android.net.*;
 import java.security.*;
 import java.math.*;
+import java.text.*;
 public class VideoDetail extends Activity implements OnClickListener,MessageQueue.IdleHandler{
 	Activity This; public Activity getContext(){return This;}
 	String vid="-1",uid="",cookie="";
@@ -48,6 +49,8 @@ public class VideoDetail extends Activity implements OnClickListener,MessageQueu
 				id.videodetail_openlist,id.videodetail_playfirst);
 		ImageButton refreshBtn=(ImageButton)fv(id.videodetail_refresh);
 		downloadtext=(TextView)fv(id.videodetail_downstate);
+		submiTime=(TextView)fv(id.videodetail_submit_time);
+		danCount=(TextView)fv(id.videodetail_danmaku_count);
 		applyVideoInfo(
 			(TextView)fv(id.videodetail_v_title),
 			(TextView)fv(id.videodetail_v_desc),
@@ -76,7 +79,7 @@ public class VideoDetail extends Activity implements OnClickListener,MessageQueu
 				startActivity(uz); break;
 			case id.videodetail_share: tip("客户端每日分享经验功能以后开放...");break;
 			case id.videodetail_download: changeDownloadState(); break;
-			case id.videodetail_playfirst: 播放视频(firstcid); break;
+			case id.videodetail_playfirst: 播放视频(firstcid,0,new boolean[]{false}); break;
 			case id.videodetail_openlist:
 				View basicinf=fv(id.videodetail_basicinfo);
 				if (basicinf != null) visible(basicinf, !visible(basicinf)); break;
@@ -86,14 +89,16 @@ public class VideoDetail extends Activity implements OnClickListener,MessageQueu
 	void changeDownloadState(){
 		downstate=!downstate;
 		if(downstate){
-			downloadtext.setText("退出缓存模式");
+			downloadtext.setText("播放");
 			videoid.setText(videoid.getText()+" (缓存模式)");
 		}else{
 			downloadtext.setText("缓存");
 			videoid.setText(((String)videoid.getText()).split(" ")[0]);
 		}
 	}
+	PartsListControl plc;
 	String firstcid="-1";
+	TextView submiTime,danCount;
 	void applyVideoInfo(TextView t,TextView d,TextView a,TextView c,TextView likecoin,TextView favo,TextView reviews,TextView plays,ListView ls,ImageButton refresh){
 		//tip("loading... vid= "+vid);
 		if(vid=="-1")return;//↓获取视频概览
@@ -109,13 +114,15 @@ public class VideoDetail extends Activity implements OnClickListener,MessageQueu
 			reviews.setText(j.get("review","-1"));
 			plays.setText(j.get("play","-1"));
 			c.setText("共 "+j.get("pages",-1)+" 段视频");
-			PartsListControl l=new PartsListControl(this, ls){
-				public void onItemClick(int idx, String itemtag) {if(downstate)下载视频(itemtag);else 播放视频(itemtag);}
+			submiTime.setText(j.get("created_at","(未知时间)"));
+			danCount.setText(j.get("video_review","-1"));
+			plc=new PartsListControl(this, ls){
+				public void onItemClick(int idx, String itemtag,boolean[]setwatch) {if(downstate)下载视频(itemtag);else 播放视频(itemtag,idx,setwatch);}
 			};
 			FSON j2=j.getList("list").getObject(0);
 			String cid=""+j2.get("cid",-1);
 			firstcid=cid;
-			l.additem("【1】"+j2.get("part",""),"Cid: "+cid,cid);
+			plc.additem("【1】"+j2.get("part",""),"Cid: "+cid,cid);
 			if(j.get("pages",1)>1){//视频有多个分段
 				//信息框(this,"检测到多个分段","即将开始加载","ok");//↓获取视频多段信息
 				String partsdata=网络.获得数据("GET", "http://www.bilibili.com/widget/getPageList?aid="+vid,cookie,"");
@@ -126,14 +133,14 @@ public class VideoDetail extends Activity implements OnClickListener,MessageQueu
 					for(int i=1,len=j.length();i<len;i++){
 						FSON onepart=j.getObject(i);
 						cid=""+onepart.get("cid",-1);
-						l.additem("【"+(i+1)+"】"+onepart.get("pagename",""),"Cid: "+cid,cid);
+						plc.additem("【"+(i+1)+"】"+onepart.get("pagename",""),"Cid: "+cid,cid);
 					}
 					//分段加载成功，开始放置焦点。至于单段的，放不放焦点都无所谓，可拉倒吧
 					int partprog=getIntent().getIntExtra("partprog",0);
-					if(partprog>=l.size()) partprog=l.size()-1;
-					ls.setSelection(partprog);
+					if(partprog>=plc.size()) partprog=plc.size()-1;
+					ls.setSelection(partprog);//重载此activity之后，自动翻页到对应位置
 				}else{
-					l.additem("更多分段加载失败","重新进入本页面可重试加载","-1");
+					plc.additem("更多分段加载失败","重新进入本页面可重试加载","-1");
 				}
 			}
 			
@@ -148,7 +155,7 @@ public class VideoDetail extends Activity implements OnClickListener,MessageQueu
 	String getVideoUrl(String cid){
 		if(cid.equals("-1"))return"";
 		setsload();
-		String prms = "cid="+cid+"&player=1&quality="+(sets.get("quality",0)*2 +1/*参数只接受1和3，设置值0对应参数1，设置值1对应参数3*/)+"&ts="+(System.currentTimeMillis()/1000),
+		String prms = "cid="+cid+"&player=1&quality="+(sets.get("quality",0)+1/*参数只接受1到3，设置值0对应参数1，设置值1对应参数3*/)+"&ts="+(System.currentTimeMillis()/1000),
 			chksum = toMD5(prms+"1c15888dc316e05a15fdd0a02ed6584f"),
 			url = "http://interface.bilibili.com/playurl?"+prms+"&sign="+chksum.toLowerCase();
 		//↓获取视频地址
@@ -178,14 +185,37 @@ public class VideoDetail extends Activity implements OnClickListener,MessageQueu
 				data=datapack[choose];
 		}return data;
 	}
-	void 播放视频(String cid){
+	void 播放视频(String cid,int index,boolean[]settowatched){
 		if(cid.equals("-1"))return;
-		String data=getVideoUrl(cid);
-		if(!data.startsWith("http")){
-			信息框(this,"解析错误","视频地址解析错误，请重试。其返回的调试信息是\na"+vid+"c"+cid+data,"ok");
-			return;}//错误的数据，拒绝播放
-		switch(sets.get("player",0)){
-			case 0: startActivity(new Intent(This,VideoPlaySimple.class).putExtra("path",data)); break;
+		boolean notgeturl=false; int checksumretry=sets==null?3:sets.get("checksumretry",3);//判断null临时补救措施
+		String data="";
+		do{//先获取一次看看能不能有正确的数据
+			data=getVideoUrl(cid);
+			if(!data.startsWith("http")){
+				String errmsg="视频地址解析错误，请重试。";
+				FSON code=null;
+				if(data.startsWith("{") && (code=new FSON(data).getObject("video"))!=null)
+					switch(code.get("code",0)){
+						case -5006: //checksum error: 所提交的参数校验出错
+							if(checksumretry>0){
+								notgeturl=true;
+								checksumretry--;
+								multip("Checksum重试剩余 "+checksumretry);
+								continue;
+							}break;
+						case -5016: //no dispatch info: 该段视频没有对应清晰度
+							errmsg="该视频不支持此清晰度，请切换清晰度。"; break;//此处还可制作“画质自动”“省流自动”
+					}
+				信息框(this,"解析错误",errmsg+"其返回的调试信息是\na"+vid+"c"+cid+data,"ok");
+				return;//到达此处，说明该错误已严重到无法自动处理的地步，直接拒绝播放
+			}else break;
+		}while(notgeturl);
+		switch(sets.get("playeronline",0)){
+			case 0:
+				startActivity(new Intent(This,VideoPlaySimple.class).putExtra("path",data).putExtra("vid",vid).putExtra("cid",cid).putExtra("cookie",cookie).putExtra("history",true));
+				settowatched[0]=true;
+				getIntent().putExtra("partprog",index);//此处写入播放进度，重载activity时使用
+				break;
 			case 2: startActivity(new Intent(Intent.ACTION_VIEW,Uri.parse(data))); break;//todo: send url
 			case 3: //复制到剪贴板
 				复制文本(data);
