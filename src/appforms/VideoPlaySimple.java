@@ -17,12 +17,14 @@ import leorchn.lib.CrashHandlerReg;
 import static leorchn.lib.WidgetOverride.*;
 import static android.media.MediaPlayer.*;
 import static leorchn.lib.Global.*;
+import leorchn.lib.*;
+import static leorchn.lib.HttpRequest.*;
 import android.provider.Settings;
 import java.text.*;
 import simplebili.lib.*;
 
 //This Class Only For Online Video!!!
-public class VideoPlaySimple extends Activity implements View.OnClickListener,View.OnTouchListener,MessageQueue.IdleHandler,OnErrorListener,OnPreparedListener,OnBufferingUpdateListener,OnCompletionListener,DanmakuViewControl.OnDanmakuLogListener {
+public class VideoPlaySimple extends Activity1 implements View.OnClickListener,View.OnTouchListener,MessageQueue.IdleHandler,OnErrorListener,OnPreparedListener,OnBufferingUpdateListener,OnCompletionListener,DanmakuViewControl.OnDanmakuLogListener {
 	VideoPlaySimple This; public Activity getContext(){return This;}
 	String path="",title="",partname="",vid="",cid="",cookie="",
 	referer="Referer: http://www.bilibili.com/video/\r\n",
@@ -31,11 +33,10 @@ public class VideoPlaySimple extends Activity implements View.OnClickListener,Vi
 	boolean allowhistory=false,readyplay=false,readyinfo=false;int readydanmaku=0;//0=准备加载，1=不开启弹幕，2=弹幕错误，3=弹幕完成
 	protected void onCreate(Bundle sis){
 		super.onCreate(sis);
-		CrashHandlerReg.reg(this);
 		This=this; if(sets==null)setsload();
 		retryplay();//Looper.myQueue().addIdleHandler(this);
 	}
-	public boolean queueIdle(){
+	public boolean onIdle(){
 		switch(hasinit){
 			case 0://初始化界面
 				dvc=new DanmakuViewControl(this,R.layout.activity_video_play_simple,R.id.vplay_danmakuview,50);
@@ -55,6 +56,7 @@ public class VideoPlaySimple extends Activity implements View.OnClickListener,Vi
 				AnimationDrawable bg=(AnimationDrawable)itv.getBackground();
 				bg.start();
 				path=getIntent().getStringExtra("path");
+				vid=getIntent().getStringExtra("vid");
 				cid=getIntent().getStringExtra("cid");
 				cookie=getIntent().getStringExtra("cookie");
 				allowhistory=getIntent().getBooleanExtra("history",false);
@@ -94,10 +96,6 @@ public class VideoPlaySimple extends Activity implements View.OnClickListener,Vi
 				vp.setOnPreparedListener(this);
 				vp.setOnCompletionListener(this);
 				//vp.setOnGenericMotionListener(this);
-				readyplay=true;
-				break;
-			case 4:
-				onRequestPlay(); //如果未禁用并且在加载中则等待弹幕加载完成或出错
 		}
 		hasinit++;
 		return hasinit<10;
@@ -122,13 +120,15 @@ public class VideoPlaySimple extends Activity implements View.OnClickListener,Vi
 		p1.setScreenOnWhilePlaying(true);
 		p1.setOnBufferingUpdateListener(this);
 		totaltime.setText("/"+Formater.format(p1.getDuration()));
+		readyplay=true;
+		onRequestPlay(); //如果未禁用并且在加载中则等待弹幕加载完成或出错
 	}
 	public void onBufferingUpdate(MediaPlayer p1, int p2) { 
 		buffprog=p2; keepUpdateThreadAlive();//progressupdate();
 	}
 	public void onCompletion(MediaPlayer p1){
 		visible(panelfin,true);
-		signHistory(cid,-1,cookie);
+		signHistory(vid,cid,-1,cookie);
 	}
 	public void onClick(View v){switch(v.getId()){
 		case vplay_endplay: finish(); break;
@@ -147,17 +147,21 @@ public class VideoPlaySimple extends Activity implements View.OnClickListener,Vi
 				if(scrolltype==0) //只在第一次滚动时触发判断是何种滚动
 					if(Math.abs(x)>Math.abs(y)){// 左右移动，调整进度
 						scrollval=0;
-						scrolltype=1; vp.pause();
+						if(et1.getY()<(vp.getHeight()*.8))
+							scrolltype=3;
+						else
+							scrolltype=4;
+						vp.pause();
 					}else if(et1.getX()<(vp.getWidth()/2)){ //在屏幕左侧移动，调整亮度
-						scrollval=brigmtp*getbright()/17;
-						scrolltype=2;
+						scrollval=brigmtp*getbright();
+						scrolltype=1;
 					}else{ //屏在幕右侧移动，调整音量
 						scrollval=volmtp*volume*15;
-						scrolltype=3;
+						scrolltype=2;
 					}
 				visible(scltip,true);
 				switch(scrolltype){
-					case 1:
+					case 3://微调进度
 						scrollval-=x;
 						sclreal=(int)Math.floor(scrollval/progmtp);
 						//int curpos=...;
@@ -166,13 +170,22 @@ public class VideoPlaySimple extends Activity implements View.OnClickListener,Vi
 							Formater.format(vp.getCurrentPosition()+(sclreal*1000))+totaltime.getText()+"\n"+
 							sclreal+(Math.abs(sclreal)>4?" 秒 进度":" 秒 无效"));
 						break;
-					case 2://亮度
+					case 4://大量进度
+						scrollval-=x;
+						sclreal=(int)Math.floor(scrollval);
+						//int curpos=...;
+						sclfix(1,0-(vp.getCurrentPosition()/1000),(vp.getDuration()-vp.getCurrentPosition())/1000);
+						scltip.setText(
+							Formater.format(vp.getCurrentPosition()+(sclreal*1000))+totaltime.getText()+"\n"+
+							sclreal+(Math.abs(sclreal)>4?" 秒 进度":" 秒 无效"));
+						break;
+					case 1://亮度
 						scrollval+=y;
 						sclfix(brigmtp,0,15);
 						setbright(sclreal);
 						scltip.setText("亮度 "+sclreal);
 						break;
-					case 3://音量
+					case 2://音量
 						scrollval+=y; 
 						sclfix(volmtp,0,15);
 						volume=sclreal/15f;
@@ -188,7 +201,7 @@ public class VideoPlaySimple extends Activity implements View.OnClickListener,Vi
 	}
 	public boolean onTouch(View p1, MotionEvent et) {
 		if(et.getAction()==et.ACTION_UP){
-			if(scrolltype==1){
+			if(scrolltype>2){// 1和2为拖进度条
 				vp.start();
 				if(Math.abs(sclreal)>4)//拖进度条的无效范围
 					seekto(vp.getCurrentPosition()+sclreal*1000);//隐患：跳转到范围外的时间、播放完毕后重新跳转不隐藏面板
@@ -219,15 +232,21 @@ public class VideoPlaySimple extends Activity implements View.OnClickListener,Vi
 			vp.setOnTouchListener(this);
 			init_Ges();
 		}else if(readydanmaku>0 && readyplay){
-			delayplay.execute();
+			if(delayplay !=null)delayplay.execute();//因为执行完毕一次后它会自毁以防止二次执行，并防止在载入视频信息时多次重试造成错误
 		}
 	}
 	//监听器 结束
-	void setbright(int b){
-		Settings.System.putInt(this.getContentResolver(),Settings.System.SCREEN_BRIGHTNESS,b*17);
-	}
-	int getbright(){
-		return Settings.System.getInt(this.getContentResolver(),Settings.System.SCREEN_BRIGHTNESS,18);
+	void setbright(float b){
+		//Settings.System.putInt(this.getContentResolver(),Settings.System.SCREEN_BRIGHTNESS,b*17);
+		Window w=getWindow();
+		WindowManager.LayoutParams lp=w.getAttributes();
+		lp.screenBrightness=b/15;
+		w.setAttributes(lp);
+		realbright=(int)b;
+	} int realbright=-5;
+	float getbright(){
+		//return Settings.System.getInt(this.getContentResolver(),Settings.System.SCREEN_BRIGHTNESS,18);
+		return realbright==-5?getWindow().getAttributes().screenBrightness:realbright;
 	}
 	
 	void sclfix(int multiple,int realmin,int realmax){ 
@@ -245,7 +264,7 @@ public class VideoPlaySimple extends Activity implements View.OnClickListener,Vi
 		pb.setSecondaryProgress(buffprog*progbarAccurate);
 		inf.setText(Formater.format( playpos ));
 		if(readydanmaku==3)dvc.updateDanmaku( playpos ); //弹幕完成时才能updated
-		if(pb.getProgress()/progbarAccurate<99)signHistory(cid,playpos/1000,cookie);//观看进度小于99%才能写入时间，这样不至于把-1也就是“已看完”覆盖掉
+		if(pb.getProgress()/progbarAccurate<99)signHistory(vid,cid,playpos/1000,cookie);//观看进度小于99%才能写入时间，这样不至于把-1也就是“已看完”覆盖掉
 	}
 	Thread updatethread=new Thread(){public void run(){
 		Runnable updaterun=new Runnable(){public void run(){progressupdate();}};
@@ -265,10 +284,10 @@ public class VideoPlaySimple extends Activity implements View.OnClickListener,Vi
 					if(m.getParameterTypes().length==2) mTarget=m;
 			}
 			if(mTarget==null)
-				信息框(this,"Set Headers Fail","很抱歉！\n您的系统不支持覆盖此方法，视频可能无法正常播放。","ok");
+				new Msgbox("Set Headers Fail","很抱歉！\n您的系统不支持覆盖此方法，视频可能无法正常播放。","ok");
 			else
 				mTarget.invoke(vp,new Object[]{uri,mHeaders});
-		}catch(Exception e){信息框(this,"Set Headers Fail",Arrays.toString(e.getStackTrace()),"ok");}
+		}catch(Exception e){new Msgbox("Set Headers Fail",E.trace(e),"ok");}
 	}
 	long lastReqExit=0;
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
@@ -301,11 +320,10 @@ public class VideoPlaySimple extends Activity implements View.OnClickListener,Vi
 			default: break;
 		}return super.onOptionsItemSelected(item);
 	}
+	void plause(boolean to){}//play和pause的结合体，控制由用户引起的播放和暂停操作
 	void seekto(int t){ t=t<1000?0:t; vp.seekTo(t); if(readydanmaku==3)dvc.onVideoSeekto(t); }
 	
-	void btnbind(int...id){for(int btnid:id)btnbind(btnid);}
-	void btnbind(int id){fv(id).setOnClickListener(this);}
-	View fv(int id){return findViewById(id);}
+	
 	void plog(String s){playdbg.append(s);}
 	void dlog(String s){dandbg.append(s);}
 	void clearStringNull(String...s){for(String s2:s)if(s2==null)s2="";}
@@ -333,13 +351,13 @@ public class VideoPlaySimple extends Activity implements View.OnClickListener,Vi
 			@Override protected void onPostExecute(Void r){
 				pb.setProgress(0);
 				readyinfo=true;
-				onRequestPlay();
+				onRequestPlay(); delayplay=null;//自毁以防止二次执行，并防止在载入视频信息时多次重试造成错误
 			}
 		};
 		Looper.myQueue().addIdleHandler(this);
 	}
 	long lastSignHistory=System.currentTimeMillis();
-	void signHistory(final String cid,final int second,final String cookie){
+	void signHistory(final String aid,final String cid,final int second,final String cookie){//历史记录:秒数为-1即"已看完"
 		if(allowhistory && (second==-1 || (lastSignHistory+30000<System.currentTimeMillis() && second>30))){//如果需要记录的时间为“已看完”，那么不需要判断上次是在什么时候记录的
 			lastSignHistory = System.currentTimeMillis();
 			new AsyncTask<Object,Integer,Integer>(){
@@ -348,7 +366,7 @@ public class VideoPlaySimple extends Activity implements View.OnClickListener,Vi
 					//check cookie
 					if (!(cookie.contains("DedeUserID=") && cookie.contains("SESSDATA=")))return 1;
 					//check prepared
-					String data=网络.getdata("POST", "http://api.bilibili.com/x/report/web/heartbeat", cookie, "type=3&cid=" + cid + "&played_time=" + second);
+					String data=http("POST", "http://api.bilibili.com/x/report/web/heartbeat", cookie, "aid="+aid+"&cid="+cid+"&played_time="+second);
 					return new FSON(data).canRead() ?0: 2;
 				}
 				@Override protected void onPostExecute(Integer r) {

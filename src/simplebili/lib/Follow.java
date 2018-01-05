@@ -2,6 +2,7 @@ package simplebili.lib;
 import java.util.*;
 import android.os.*;
 import leorchn.lib.*;
+import static leorchn.lib.HttpRequest.*;
 
 public class Follow{
 	//public static void accessUpzone(String uid){}
@@ -15,7 +16,7 @@ public class Follow{
 			protected Integer doInBackground(String[]p) {
 				for(int i=0;i<2;i++){ //就查两次
 					try{ Thread.sleep(2000); }catch(Exception e){}
-					String data=网络.getdata("GET","http://api.bilibili.com/x/relation?fid="+uid,cookie,"");
+					String data=http("GET","http://api.bilibili.com/x/relation?fid="+uid,cookie,"");
 					FSON j=new FSON(data);
 					if(j.canRead() && j.get("code",-1)==0)//此步是校验所返回的数据是否具有有效性
 						switch(justnowdid){
@@ -49,7 +50,7 @@ public class Follow{
 						c2=c3.split("bili_jct=");
 						break;//分离完毕
 					}
-				String data=网络.getdata("POST","http://api.bilibili.com/x/relation/modify",cookie,"fid="+uid+"&act="+(tostat?"1":"2")+"&re_src=11&csrf="+c2[1].trim());
+				String data=http("POST","http://api.bilibili.com/x/relation/modify",cookie,"fid="+uid+"&act="+(tostat?"1":"2")+"&re_src=11&csrf="+c2[1].trim());
 				return new FSON(data).canRead()?1:-1;
 			}
 			@Override protected void onPostExecute(Integer r){

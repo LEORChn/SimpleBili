@@ -54,4 +54,4 @@ public abstract class PartsListControl implements View.OnClickListener{
 	public ListView getMainView(){return l;}
 	public int size(){ return list.size(); }
 	abstract public void onItemClick(int idx,String itemtag,boolean[]isSetWatched);
-}
+}//onItemClick(ListItemIndex,VideoCid,FeedbackSetWatched)

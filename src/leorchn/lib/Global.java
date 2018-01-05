@@ -12,15 +12,8 @@ import java.lang.reflect.*;
 
 import static simplebili.App.getContext;
 
-public class Global{
-	public static FSON sets;
-	public static String setspath(){return getContext().getFilesDir().getPath()+"/app.setting";}
-	public static String setsload(){sets=new FSON(文本.读取(setspath())); return sets.toString();}
-//	public static <E extends Object>E setsget(String key,E def){return sets.get(key,def);}
-//	public static <E extends Object>E setsget(int key,E def){return sets.get(key,def);}
-	public static boolean setssave(){ return setssave(sets.toString()); }
-	public static boolean setssave(String value){ return 文本.写出(value,getContext().getFilesDir().getPath()+"/app.setting","UTF8"); }
-	
+public class Global {
+		
 	static int statheight;
 	public static void multip(String s){mainhandler.obtainMessage(1000,s).sendToTarget();}
 	public static void tip(String s){mainhandler.obtainMessage(1001,s).sendToTarget();}
@@ -81,19 +74,9 @@ public class Global{
 	public static void 关闭进度对话框(){if(pd !=null)pd.dismiss();pd=null;}
 	static void ExitDialog(final int i){new t(){void r(){ throw new ExitDialog(i); }};}
 	static class ExitDialog extends RuntimeException{static int result=0;ExitDialog(int r){result=r;}ExitDialog(){}}
-	public static void 信息框(String title,String msg,String oktext){信息框(Main_Feeds.getContext(),title,msg,oktext);}
-	public static void 信息框(final Activity a,final String title,final String msg,final String oktext){
-		new t(){void r() {
-			new AlertDialog.Builder(a).setCancelable(false)
-				.setTitle(title).setMessage(msg)
-				.setPositiveButton(oktext, new Dialog.OnClickListener(){
-					public void onClick(DialogInterface p1,int p2){ throw new ExitDialog(); }
-				}).show();
-			try{
-				Looper.getMainLooper(); Looper.loop();
-			}catch(ExitDialog e){}
-		}};
-	}
+	
+	
+	
 	public static int 信息框2(String title,String msg,String oktext,String canceltext){return 信息框2(Main_Feeds.getContext(),title,msg,oktext,canceltext);}
 	public static int 信息框2(final Activity a,final String title,final String msg,final String oktext,final String canceltext){
 		new t(){void r(){
@@ -111,14 +94,20 @@ public class Global{
 		return ExitDialog.result;
 	}
 	public static void 附加功能(Activity a){
-		int r=列表信息框(a,"启动附加功能","直播等级挂机助手");
+		int r=列表信息框(a,"启动附加功能","绿色弹幕辅助模块","社区温暖注册模块");
+		String cook=formevents.帐户数据.cookie();
 		switch (r) {
 			case 0:
-				String cook=formevents.帐户数据.cookie();
 				if (cook.equals("")) {
 					tip("请先进入主界面登录后再使用此功能");
 				} else {
 					a.startService(new Intent(a, LiveUpgrade.class).putExtra("cookie", cook)); 
+				}break;
+			case 1:
+				if (cook.equals("")) {
+					tip("请先进入主界面登录后再使用此功能");
+				} else {
+					a.startService(new Intent(a, GetAllowance.class).putExtra("cookie", "Cookie: "+cook)); 
 				}break;
 		}
 	}
@@ -149,7 +138,7 @@ public class Global{
 			super.handleMessage(msg);
 			switch(msg.what){
 				case 0:tip("简哔提示：\n"+msg.obj); break;
-				case 1:信息框(((String[])msg.obj)[0],((String[])msg.obj)[1],"OK");break;
+				//case 1:信息框(((String[])msg.obj)[0],((String[])msg.obj)[1],"OK");break;
 				case 2:((Runnable)msg.obj).run(); break;
 				case 1000: pub.setText(msg.obj.toString());pub.show(); break; //multip
 				case 1001: String s=msg.obj.toString();Toast.makeText(getContext(),s,s.length()<10?0:1).show(); break; //tip

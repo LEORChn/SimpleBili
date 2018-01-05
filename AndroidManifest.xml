@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.LEORChn.SimpleBili" android:versionCode="4"
-    android:versionName="Beta 0.4" >
+    package="com.LEORChn.SimpleBili" android:versionCode="5"
+    android:versionName="Beta 0.5" >
 
     <uses-sdk android:minSdkVersion="8" android:targetSdkVersion="19" /><!--8=2.2;19=4.4-->
 	<!--<uses-permission android:name="android.permission.READ_FRAME_BUFFER"/>-->
@@ -9,7 +9,9 @@
 	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
 	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 	<uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
-	<uses-permission android:name="android.permission.WRITE_SETTINGS"/>
+	<!--uses-permission android:name="android.permission.WRITE_SETTINGS"/-->
+	<uses-permission android:name="android.permission.WAKE_LOCK"/>
+	<uses-permission android:name="android.permission.DEVICE_POWER"/>
     <application android:name="simplebili.App"
         android:allowBackup="true" android:persistent="true"
         android:icon="@drawable/ic_launcher"
@@ -42,21 +44,29 @@
 			android:icon="@drawable/ic_settings"
 			android:configChanges="orientation|screenSize"
 			android:taskAffinity="appform.Settings"
-			android:launchMode="singleInstance"
-			android:process=":Activity.Settings"><!--
+			android:launchMode="singleTask"
+			android:process=":Activity.Main"><!--
 			android:taskAffinity="appform.Settings"
-			android:launchMode="singleInstance"
 			android:process=":Activity.Settings"-->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-		<service android:name="appforms.LiveUpgrade"
+		<activity android:name="appforms.Login" android:configChanges="orientation|screenSize" android:process=":Activity.WebView"/><!-- android:launchMode="singleInstance"/-->
+		
+		<service android:name="appforms.LiveUpgrade" android:label="@string/service_name_liveupgrade"
 			android:allowBackup="true" android:persistent="true"
 			android:process=":service.LiveUpgrade">
 			<intent-filter>
 				<action android:name="appforms.LiveUpgrade"/>
+			</intent-filter>
+		</service>
+		<service android:name="appforms.GetAllowance" android:label="@string/service_name_getallowance"
+			android:allowBackup="true" android:persistent="true"
+			android:process=":service.GetAllowance">
+			<intent-filter>
+				<action android:name="appforms.GetAllowance"/>
 			</intent-filter>
 		</service>
     </application>

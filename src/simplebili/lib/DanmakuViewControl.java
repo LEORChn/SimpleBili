@@ -12,9 +12,9 @@ import org.w3c.dom.*;
 import javax.xml.parsers.*;
 import java.io.*;
 import android.os.*;
-import static leorchn.lib.网络.*;
-import static leorchn.lib.Global.*;
-
+import static leorchn.lib.HttpRequest.*;
+//import static leorchn.lib.*;
+import leorchn.lib.*;
 //usage://setContentView( new DanmakuViewControl(this,R.layout.,R.id.,50).getBackRootView() );
 public class DanmakuViewControl {
 	DanmakuViewControl This=this; OnDanmakuLogListener dll=null; static Rect rect=new Rect();
@@ -101,24 +101,24 @@ public class DanmakuViewControl {
 		}.execute(url);
 	}
 	public void loadDanmakuString(final String content){//弹幕装填过程方法
-		Node doc=getNodeFromXmlString(content);
-		if(doc==null){
+		XML x=new XML(content);
+		if(!x.canRead()){
 			log("弹幕数据读取错误。");
 			error(2,content);
 			return;
 		}
-		final int[]filllocation={0};
-		new AsyncTask<Node,Integer,Object>(){//装填弹幕
-			protected Object doInBackground(Node[]doc){
+		final int[]filllocation={0};//final 的意义是，内存地址不可变，而该内存区的内容可变
+		new AsyncTask<XML,Integer,Object>(){//装填弹幕
+			protected Object doInBackground(XML[]x){
 				try{
 					ArrayList<Long>timelist=new ArrayList<Long>();
-					Node[]ds=getNodeArray(getNodeArray(doc[0],"i")[0],"d");
+					XML[]ds=x[0].get("i").getList("d");// getNodeArray(getNodeArray(doc[0],"i")[0],"d");
 					pool.clear();
-					timelist.add(addtopool(0,"1",String.valueOf(0xFFFFFF),"已加载 "+ds.length+" 条弹幕"));
-					for(int i=0,len=ds.length;i<len;i++){
-						filllocation[0]=i;
-						String[]daninf=getNodeParam(ds[i],"p").split(",");
-						timelist.add(addtopool(Double.valueOf(daninf[0]),daninf[1],daninf[3],formatDanmakuText(getNodeText(ds[i]))));
+					timelist.add(addtopool(0.1,"1",String.valueOf(0xFFFFFF),new StringBuilder("已加载 ").append(ds.length).append(" 条弹幕").toString()));//反编译发现创建2个StringBuffer
+					for(XML each:ds){//int i=0,len=ds.length;i<len;i++){
+						String[]daninf=each.attr("p").split(",");
+						timelist.add(addtopool(Double.valueOf(daninf[0]),daninf[1],daninf[3],formatDanmakuText(each.text())));
+						filllocation[0]++;
 					}
 					timelist.add(0xffffffffffl);//最后一个时间点永远不允许被超越！！
 					timepool=timelist.toArray(new Long[timelist.size()]);
@@ -131,7 +131,7 @@ public class DanmakuViewControl {
 				switch(clscase){ 
 					case 1:
 						log("弹幕数据格式错误。");
-						error(4,filllocation[0]+" :location\n"+o+Arrays.toString(((Exception)o).getStackTrace())+content);
+						error(4,new StringBuilder(filllocation[0]).append(" :location\n").append(E.trace((Exception)o)).append(content).toString());
 						if(!false) break;//强行装填开关
 					case 0:
 						Arrays.sort(timepool);
@@ -139,25 +139,28 @@ public class DanmakuViewControl {
 						log((((int)o)-2)+" 条弹幕已装填完毕。");//-2是因为第一条是提示有多少弹幕，最后一条是无法被超越的时间点
 						completed(); break;
 					default:
-						error(4,filllocation[0]+" :location\n"+o+Arrays.toString(((Exception)o).getStackTrace()));
+						error(4,new StringBuilder(filllocation[0]).append(" :location\n").append(E.trace((Exception)o)).toString());
 				}
 			}
-		}.execute(doc);
+		}.execute(x);
 	}
 	long addtopool(double time,String mode,String color,String text){
 		long serial=((long)(time*100))*10000+pool.size();
-		pool.put(serial,mode+split+color+split+text);
+		StringBuilder str=new StringBuilder(mode).append(split).append(color).append(split).append(text);
+		pool.put(serial,str.toString());//反编译时发现上一行创建了4个StringBuffer
 		return serial;
 	}
 	String formatDanmakuText(String s){//规范化每一条弹幕的文本
-		if(sets.get("danmakushortly",0)!=0){
-			char cur='\u0000'; s+=" "+split;//空格在前面可以使空文本不造成错误，而且或许还能让左侧不残留文本
-			for(int i=0,len=s.split(desplit)[0].length(),tms=1;i<len;i++){
+		if(Activity1.sets.get("danmakushortly",0)!=0){
+			char cur='\u0000';
+			StringBuilder str=new StringBuilder(s);//反编译时发现整个方法创建至少3个StringBuffer（循环1倍增长）
+			str.append(" ").append(split);//空格在前面可以使空文本不造成错误，而且或许还能让左侧不残留文本
+			for(int i=0,len=str.toString().split(desplit)[0].length(),tms=1;i<len;i++){
 				char next=s.charAt(i);
 				if(cur==next) tms++; else{ cur=next; tms=1; }
-				if(tms<3)s+=cur;
+				if(tms<3)str.append(cur);
 			}
-			s=s.split(desplit,2)[1];
+			s=str.toString().split(desplit,2)[1];
 		}
 		return s;
 	}
@@ -165,7 +168,7 @@ public class DanmakuViewControl {
 	void error(int i,String s){ if(dll!=null)dll.onDanmakuLoadError(i,s); }
 	void completed(){ if(dll!=null)dll.onDanmakuLoadCompleted(); }
 	
-	Node getNodeFromXmlString(String XmlString){
+	/*Node getNodeFromXmlString(String XmlString){
 		try{
 			return DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new ByteArrayInputStream(XmlString.getBytes()));
 		}catch(Exception e){}
@@ -184,7 +187,7 @@ public class DanmakuViewControl {
 		return na.toArray(new Node[na.size()]);
 	}
 	String getNodeText(Node n){ return n.getTextContent(); }
-	String getNodeParam(Node n,String name){ return n.getAttributes().getNamedItem(name).getNodeValue(); }
+	String getNodeParam(Node n,String name){ return n.getAttributes().getNamedItem(name).getNodeValue(); }*/
 }
 /* strings.xml
 

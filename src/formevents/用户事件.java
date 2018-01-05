@@ -59,10 +59,10 @@ public class 用户事件 {
 		if(信息框2("注销","真的确定要注销帐号？\n\n注销将重启本程序。","确定注销","取消")==0){
 			android.webkit.CookieManager.getInstance().removeAllCookie();
 			new java.io.File(程序事件.files+"/account.cookie").delete();
-			信息框("注销","注销成功。","重启程序");
+			//信息框("注销","注销成功。","重启程序");
 			Activity app=Main_Feeds.getContext();
 			重启程序1(app);重启程序2(app);
-			信息框("重启失败","请手动重启本程序。","关闭程序");
+			//信息框("重启失败","请手动重启本程序。","关闭程序");
 			app.finish();
 		}
 	}

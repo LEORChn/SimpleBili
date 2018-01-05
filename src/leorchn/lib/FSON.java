@@ -15,7 +15,7 @@ public class FSON {
 		}catch(Exception e){
 			try{
 				basearr=new JSONArray(json);
-			}catch(Exception e2){
+			}catch(Exception e2){ e2.printStackTrace();
 				return;//just return and fuck who new this class within that json text
 			}
 		}
@@ -24,10 +24,13 @@ public class FSON {
 	}
 	public boolean canRead(){return usable;}
 	public boolean exists(String path){	
-		int lastIndexOfShortPath=path.replaceAll("\\\\","/").lastIndexOf("/");
+		int lastIndex=path.replaceAll("\\\\","/").lastIndexOf("/");
 		try{
-			return getObject(path.substring(0,lastIndexOfShortPath))
-				.baseobj.has(path.substring(lastIndexOfShortPath+1));
+			if(usable && baseisobj)
+				return lastIndex==-1?
+					baseobj.has(path):
+					getObject(path.substring(0,lastIndex))
+						.baseobj.has(path.substring(lastIndex+1));
 		}catch(Exception e){}
 		return false;
 	}
@@ -44,9 +47,14 @@ public class FSON {
 				if(JSONObject.NULL.equals(val))return defval;
 				if(defval.getClass().isAssignableFrom(val.getClass()))//checked
 					return (E)val;
-				if(defval.getClass()==Double.class && val.getClass()==Integer.class){
-					Double d=Double.parseDouble(val.toString());
-					return (E)d;}
+				
+				if(val.getClass()==Integer.class)
+					if(defval.getClass()==Double.class){
+						Double d=Double.parseDouble(val.toString());
+						return (E)d;}
+					else if(defval.getClass()==Long.class){
+						Long l=Long.parseLong(val.toString());
+						return (E)l;}
 				if(defval.getClass()==String.class)//checked
 					return (E)val.toString();
 			}
@@ -60,19 +68,50 @@ public class FSON {
 				if(JSONObject.NULL.equals(val))return defval;
 				if(defval.getClass().isAssignableFrom(val.getClass()))//checked
 					return (E)val;
-				if(defval.getClass()==Double.class && val.getClass()==Integer.class){
-					Double d=Double.parseDouble(val.toString());
-					return (E)d;}
+
+				if(val.getClass()==Integer.class)
+					if(defval.getClass()==Double.class){
+						Double d=Double.parseDouble(val.toString());
+						return (E)d;}
+					else if(defval.getClass()==Long.class){
+						Long l=Long.parseLong(val.toString());
+						return (E)l;}
 				if(defval.getClass()==String.class)//checked
 					return (E)val.toString();
 			}
 		}catch(Exception e){}
 		return defval;
 	}
+	public boolean add(Object obj){ return set(-1,obj); }
+	public boolean set(int index,Object obj){
+		try{
+			if(!usable||baseisobj)return false;
+			Class[]c={Object.class,FSON.class,Number.class,String.class,Boolean.class,JSONObject.class,JSONArray.class};
+			int idx=0;
+			for(int i=0,len=c.length;i<len;i++) if(c[i].isInstance(obj)) idx=i;
+			Object origin=obj;//如果是原生对象或数组，或者基本数据类型，直接赋值
+			switch(idx){
+				case 0:return false;//0不是废话嘛，只求数字、字符串、布尔、FSON封装和原装JSON对象
+				case 1://添加一个数组或对象（从FSON封装中拆包到原装对象）
+					FSON j=(FSON)obj;
+					if(!j.usable)return false;
+					origin=j.baseisobj?j.baseobj:j.basearr;
+			}
+			if(index==-1)basearr.put(origin);
+			else basearr.put(index,origin);//基本数据类型或原装数组及原装对象直接添加
+			return true;
+		}catch(Exception e){e.printStackTrace();}return false;
+	}
 	public boolean set(String key,Object value){//return true if successfully set the value
 		try{
 			baseobj.put(key,value);
 			return true;
+		}catch(Exception e){}return false;
+	}
+	public boolean set(String key,FSON j){
+		try{
+			if(!usable||!baseisobj||j==null||!j.usable)return false;
+			baseobj.put(key, j.baseisobj?j.baseobj:j.basearr);
 		}catch(Exception e){}return false;
 	}
 	public String getName(){return name;}

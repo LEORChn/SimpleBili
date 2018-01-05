@@ -38,12 +38,12 @@ public class 帐户数据 {
 		刷新用户信息();
 		return u==null?false:u.usable && 验证cookie();//帐户对象如果不空，那么返回其的“可用”属性值
 	}
-	public static void 刷新用户信息(){
+	public static void 刷新用户信息(){//这里应该非ui线程
 		new 程序事件.itf(){void r(){程序事件.用户名.setText("登录中...");}};
 		String uid=找cookie("DedeUserID"),//此处还未获取到空间信息，因此需要从Cookies中找用户ID
 			uidmd5=找cookie("DedeUserID__ckMd5"),
 			SESS=找cookie("SESSDATA");
-		String data=网络.获得数据("POST","http://space.bilibili.com/ajax/member/GetInfo",
+		String data=HttpRequest.http("POST","http://space.bilibili.com/ajax/member/GetInfo",
 			"Content-Type: application/x-www-form-urlencoded\n"+
 			"Referer: http://space.bilibili.com/\n"+
 			"Cookie: DedeUserID="+uid+"; DedeUserID__ckMd5="+uidmd5+"; SESSDATA="+SESS+"; ",
@@ -59,7 +59,7 @@ public class 帐户数据 {
 		return new String[]{"",""};
 	}
 	public static void 下载头像(){
-		网络.下载文件(u.facepic,"u"+u.uid+".png",new Runnable(){
+		HttpRequest.下载文件(u.facepic,"u"+u.uid+".png",new Runnable(){
 			public void run(){帐户登录.刷新头像();程序事件.提示("头像已更新。");}
 		});
 	}

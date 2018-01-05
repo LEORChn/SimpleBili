@@ -4,9 +4,9 @@
 	android:layout_width="fill_parent"
 	android:layout_height="wrap_content"
 	android:orientation="vertical"
-	android:paddingBottom="10dp"
 	android:paddingTop="10dp"
-	android:background="@drawable/btn_top">
+	android:background="@drawable/btn_top"
+	android:id="@+id/listsub_bg">
 
 	<LinearLayout
 		android:layout_height="wrap_content"
@@ -15,20 +15,26 @@
 
 		<TextView
 			android:layout_height="wrap_content"
-			android:text="Title Sample Text"
+			android:text="Title Sample Text; ID=listsub_title"
 			android:textAppearance="?android:attr/textAppearanceMedium"
 			android:layout_width="match_parent"
 			android:id="@+id/listsub_title"/>
 
 		<TextView
 			android:layout_height="wrap_content"
-			android:text="Descroption Sample Text"
+			android:text="Descroption Sample Text; ID=listsub_desc"
 			android:textAppearance="?android:attr/textAppearanceSmall"
 			android:layout_width="wrap_content"
 			android:alpha=".75"
 			android:id="@+id/listsub_desc"/>
 
 	</LinearLayout>
+
+	<View
+		android:layout_height="1dp"
+		android:background="?android:attr/dividerVertical"
+		android:layout_width="match_parent"
+		android:layout_marginTop="10dp"/>
 
 </LinearLayout>
 

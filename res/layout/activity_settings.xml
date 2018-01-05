@@ -33,13 +33,58 @@
 
 	</LinearLayout>
 
+	<ScrollView
+		android:layout_height="wrap_content"
+		android:layout_width="match_parent">
+
+		<LinearLayout
+			android:layout_height="wrap_content"
+			android:layout_width="match_parent"
+			android:orientation="vertical"
+			android:padding="5dp">
+
+			<LinearLayout
+				android:layout_height="wrap_content"
+				android:layout_width="match_parent"
+				android:orientation="vertical"
+				android:id="@+id/setting_usersViewGroup"/>
+
+			<LinearLayout
+				android:layout_height="wrap_content"
+				android:layout_width="match_parent"
+				android:orientation="horizontal">
+
+				<Button
+					android:layout_height="wrap_content"
+					android:text="添加/更新帐号"
+					android:layout_width="match_parent"
+					android:id="@+id/setting_addUser"
+					android:layout_weight="1.0"/>
+
+				<Button
+					android:layout_height="wrap_content"
+					style="?android:attr/buttonStyleSmall"
+					android:text="添加Cookie"
+					android:layout_width="wrap_content"
+					android:id="@+id/setting_addcookie"/>
+
+			</LinearLayout>
+
+			<LinearLayout
+				android:layout_height="wrap_content"
+				android:layout_width="match_parent"
+				android:orientation="vertical"
+				android:id="@+id/setting_setsViewGroup"/>
+
+		</LinearLayout>
+
+	</ScrollView>
+
 	<ListView
 		android:layout_height="wrap_content"
 		android:layout_width="match_parent"
 		android:layout_weight="1.0"
-		android:id="@+id/setting_list"
-		android:layout_marginLeft="12dp"
-		android:layout_marginRight="12dp"/>
+		android:id="@+id/setting_list"/>
 
 	<LinearLayout
 		android:layout_height="wrap_content"

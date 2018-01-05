@@ -32,7 +32,7 @@ public class TempDownPlay{//边下边播
 			id=dm.enqueue(req);
 			return vf.getPath();
 		}catch(Exception e){
-			信息框((Activity)c,"DownloadMgr Error",Arrays.toString(e.getStackTrace()),"ok");
+			//((Activity1)c).Msgbox("DownloadMgr Error",Arrays.toString(e.getStackTrace()),"ok");
 		}
 		return "";
 	}

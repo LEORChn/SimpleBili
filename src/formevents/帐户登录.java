@@ -25,15 +25,12 @@ public class 帐户登录 {
 		visible(登录器,true);
 		列.visible(false);
 		//登录器.clearCache(true);登录器.clearFormData();
-		HashMap<String,String>extHeader=new HashMap<String,String>();
-		//extHeader.put("User-Agent","AppleWebKit/537.36 Mobile");
-		extHeader.put("Referer", "http://m.bilibili.com/space.html");
-		登录器.loadUrl("https://passport.bilibili.com/login", extHeader);
+		
 		}};
 	}
 	public static void 更新帐户(){
 		new itf(){void r(){
-		帐户数据.cookie(CookieManager.getInstance().getCookie("bilibili.com"));
+		帐户数据.cookie();
 		if(验证帐户())帐户数据.下载头像();
 		登录器.clearCache(true);
 		登录器.clearFormData();
@@ -58,7 +55,7 @@ public class 帐户登录 {
 		new 程序事件.itf(){void r(){
 			visible(登录器,false);
 			登录器.loadUrl("about:blank");
-			登录器.freeMemory();
+			
 			列.visible(true);
 			String[]userinf=帐户数据.用户名();
 			用户名.setText(userinf[0]);

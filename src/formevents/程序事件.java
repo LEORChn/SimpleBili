@@ -32,7 +32,9 @@ public final class 程序事件 {
 
 	public static void 初始化主页(ImageView h,TextView n,TextView msg,WebView l,ProgressBar p,FeedListControl s){
 		头像 = h;用户名 = n;用户消息=msg;登录器 = l;登录器进度条=p;列 = s;
-		init(l,p); init_userhead(h); init(s);
+		init(l,p);//浏览器相关
+		init_userhead(h);//初始化头像点击事件
+		init(s);//初始化列表滚动监听
 		//帐户登录.读取组件(h,n,l,s);
 	}
 	public static void 初始化详情页(ImageView h,TextView t){
@@ -69,7 +71,7 @@ public final class 程序事件 {
 	}
 	//static java.util.HashMap<String,int>cover=new java.util.HashMap<String,int>();
 	public static int 读取关注动态(int page) {
-		String data=网络.获得数据("GET","http://api.bilibili.com/x/web-feed/feed?ps=20&pn="+page,"Cookie: DedeUserID="+帐户数据.找cookie("DedeUserID")+"; SESSDATA="+帐户数据.找cookie("SESSDATA")+"; ", "");
+		String data=HttpRequest.http("GET","http://api.bilibili.com/x/web-feed/feed?ps=20&pn="+page,"Cookie: DedeUserID="+帐户数据.找cookie("DedeUserID")+"; SESSDATA="+帐户数据.找cookie("SESSDATA")+"; ", "");
 		if(data.isEmpty())return 1000;
 		FSON j=new FSON(data);
 		if(!(j.canRead() && j.isObject())){
@@ -111,7 +113,7 @@ public final class 程序事件 {
 		}
 		return 0;
 	}
-	public static void 列表封面(final String aid,String url){
+	/*public static void 列表封面(final String aid,String url){
 		if(new java.io.File(cache+"/av"+aid+".png").exists()){
 			for(int i=0;i<列.size();i++)
 				if(i<10 && 列.getvid(i).equals(aid)){//限制初始化时最多加载10张图片
@@ -124,7 +126,7 @@ public final class 程序事件 {
 				列表封面(aid,"");
 			}});
 		}
-	}
+	}*/
 	/* 0=正常
 	 * -101=服务器验证身份失败
 	 * 1000=无法从服务器获取数据，检查网络连接
@@ -174,7 +176,8 @@ public final class 程序事件 {
 			super.handleMessage(msg);
 			switch(msg.what){
 				case 0:tip("简哔提示：\n"+msg.obj);break;
-				case 1:信息框(((String[])msg.obj)[0],((String[])msg.obj)[1],"OK");break;
+				case 1://信息框(((String[])msg.obj)[0],((String[])msg.obj)[1],"OK");
+				break;
 				case 2:((Runnable)msg.obj).run();
 			}
 		} 
