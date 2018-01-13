@@ -14,7 +14,6 @@
 
 		<ImageButton
 			style="@style/actionBartton"
-			android:src="@drawable/topmenu_cancel"
 			android:id="@+id/setting_goback"/>
 
 		<TextView
@@ -26,7 +25,6 @@
 			android:layout_weight="1.0"/>
 
 		<ImageButton
-			android:src="@drawable/topmenu_extmodule"
 			style="@style/actionBartton"
 			android:id="@+id/setting_extendmodule"
 			android:onClick="onClick"/>
@@ -80,7 +78,7 @@
 
 	</ScrollView>
 
-	<ListView
+	<!--ListView
 		android:layout_height="wrap_content"
 		android:layout_width="match_parent"
 		android:layout_weight="1.0"
@@ -98,7 +96,7 @@
 			android:layout_width="wrap_content"
 			android:id="@+id/setting_starthome"/>
 
-	</LinearLayout>
+	</LinearLayout-->
 
 </LinearLayout>
 

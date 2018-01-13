@@ -1,7 +1,5 @@
 package appforms;
 import android.graphics.Bitmap;
-import android.os.Bundle;
-import android.view.View;
 import android.webkit.*;
 import android.widget.ProgressBar;
 //import formevents.帐户登录;
@@ -10,12 +8,11 @@ import appforms.Login.WebLogin.LoginStatListener;
 import android.app.*;
 import java.util.*;
 import android.os.*;
+import android.os.Process;
 import android.content.*;
 import android.view.*;
 public class Login extends Activity1{
-	static Login This;
 	@Override protected void onCreate(Bundle savedInstanceState){
-		This=this;
 		addIdleHandler();
 		setResult(-5);
 		super.onCreate(savedInstanceState);
@@ -37,6 +34,13 @@ public class Login extends Activity1{
 	}
 	@Override public void onClick(View v){
 		if(v.getId()==id.login_goback)finish();
+	}
+
+	@Override protected void onDestroy() {
+		//w.destroy(); w=null; wl=null; p=null; pd=null;
+		System.err.println("----- Calling kill my process id... -----");
+		Process.killProcess(Process.myPid());
+		super.onDestroy();
 	}
 	/*public boolean onKeyDown(int keyCode, KeyEvent event) {
 		if(keyCode==4){
@@ -113,7 +117,7 @@ public class Login extends Activity1{
 			w.clearCache(true);
 			w.clearFormData();
 			CookieManager.getInstance().removeAllCookie();
-			Files.allDelete(This.getDir("webview",0));//Context.MODE_PRIVATE
+			Files.allDelete(simplebili.App.getContext().getDir("webview",0));//Context.MODE_PRIVATE
 		}
 		/*public boolean shouldOverrideUrlLoading(WebView w,String u){
 		 w.loadUrl(u);

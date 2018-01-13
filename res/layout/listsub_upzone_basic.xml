@@ -28,7 +28,7 @@
 			<ImageView
 				android:layout_height="match_parent"
 				android:layout_width="24dp"
-				android:src="@android:drawable/ic_menu_slideshow"/>
+				android:id="@+id/listsub_playcount"/>
 
 			<TextView
 				android:layout_height="wrap_content"
@@ -40,7 +40,7 @@
 			<ImageView
 				android:layout_height="match_parent"
 				android:layout_width="24dp"
-				android:src="@android:drawable/ic_menu_send"/>
+				android:id="@+id/listsub_danmakucount"/>
 
 			<TextView
 				android:layout_height="wrap_content"
@@ -76,10 +76,9 @@
 				android:layout_height="wrap_content"
 				android:text="1998-01-01"
 				android:textAppearance="?android:attr/textAppearanceSmall"
-				android:layout_width="match_parent"
+				android:layout_width="wrap_content"
 				android:id="@+id/listsub_submit_time"
-				android:gravity="right"
-				android:layout_weight="1.0"/>
+				android:gravity="right"/>
 
 		</LinearLayout>
 

@@ -38,14 +38,33 @@
 
 		</LinearLayout>
 
-		<TextView
+		<ImageView
 			android:layout_height="36dp"
-			android:text="X"
-			android:textAppearance="?android:attr/textAppearanceLarge"
 			android:layout_width="36dp"
-			android:gravity="center"
-			android:id="@+id/user_logout"
-			style="@style/viewBtn"/>
+			android:id="@+id/user_stared"
+			android:padding="6dp"/>
+
+		<View
+			android:layout_height="match_parent"
+			android:background="?android:attr/dividerHorizontal"
+			android:layout_width="1dp"
+			android:layout_margin="4.5dp"/>
+
+		<LinearLayout
+			android:layout_height="wrap_content"
+			android:layout_width="wrap_content"
+			android:orientation="horizontal"
+			android:background="#40ff0000"
+			android:id="@+id/user_logout_background">
+
+			<ImageView
+				android:layout_height="36dp"
+				android:layout_width="36dp"
+				android:id="@+id/user_logout"
+				style="@style/viewBtn"
+				android:padding="6dp"/>
+
+		</LinearLayout>
 
 	</LinearLayout>
 

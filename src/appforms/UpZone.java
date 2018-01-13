@@ -135,7 +135,7 @@ public class UpZone extends Activity1 implements OnClickListener,MessageQueue.Id
 					runOnUiThread(new Runnable(){public void run(){
 							new Msgbox("Error 1002",detail,"忽略错误并继续","复制错误信息"){
 								void onClick(int chose){
-									if(chose==1){ 复制文本(detail); tip("复制成功"); }
+									if(chose==vbno){ 复制文本(detail); tip("复制成功"); }
 								}
 							};
 							}});

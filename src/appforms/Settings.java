@@ -25,9 +25,13 @@ public class Settings extends Activity1 implements View.OnClickListener{
 	public boolean onIdle() {
 		switch(hasinit){
 			case 0: setContentView(layout.activity_settings); break;
-			case 1: loadUserView(); break;
-			case 2:
-				btnbind(id.setting_goback,id.setting_starthome,id.setting_addUser,id.setting_addcookie);
+			case 1:
+				seticon(fv(id.setting_goback),icon.nav_cancel);
+				seticon(fv(id.setting_extendmodule),icon.nav_plugin);
+				break;
+			case 2: loadUserView(); break;
+			case 3:
+				btnbind(id.setting_goback,id.setting_addUser,id.setting_addcookie);
 				loadSetsView();
 				//设置项_加载(new SettingListControl(this, (ListView)findViewById(R.id.setting_list)){
 				//	public void onItemClick(int idx, String itemtag) {设置项_单击(idx,itemtag,this);}
@@ -43,12 +47,28 @@ public class Settings extends Activity1 implements View.OnClickListener{
 			case id.setting_addUser:
 				startActivityForResult(new Intent(this,Login.class),1); //startActivity(new Intent(this,Login.class));
 				return;
+			case id.user_star:
+				if(v.getTag() instanceof Integer);else return;
+				final FSON su=user.getList("users").getObject((int)v.getTag());
+				new Msgbox("更改主帐户",
+					string("确定更改主帐户为 ",
+						su.get("n","神秘用户"),
+						" ？"),
+					"设为主帐户",
+					"取消"){
+					void onClick(int i){
+						if(i==vbyes){
+							userset(su.get("i",0));
+							loadUserView();
+						}
+					}
+				};return;
 			case id.setting_addcookie:
 				tip(useradd("Cookie: DedeUserID=8232068; DedeUserID__ckMd5=306a54f5179401e0; SESSDATA=a95d8f0a%2c1517515006%2cf867ae44; bili_jct=0a48d75fd66fee9bc98c14b0fd627f5e;"
 				)+"");
 				loadUserView(); return;
 			case id.listsub_bg: setsitem_onclick((String)v.getTag()); return; //设置项目
-			case id.setting_starthome: startActivity(new Intent(this,Main_Feeds.class)); return;
+			//case id.setting_starthome: startActivity(new Intent(this,Main_Feeds.class)); return;
 		}
 	}
 	boolean setschanged=false;
@@ -74,9 +94,9 @@ public class Settings extends Activity1 implements View.OnClickListener{
 	void retry(final String cok,final int reason){
 		new Msgbox("","由于某些原因登录失败，代码 "+reason+"\n要重试吗？","重试","否"){
 			void onClick(int i){
-				if(i==0){
+				if(i==vbyes){
 					i=useradd(cok);
-					if(i==0) loadUserView();
+					if(i==0) loadUserView();// 此处i==0意味着操作是否成功（即等于0，失败为负数）
 					else retry(cok,i);
 				}
 			}
@@ -90,16 +110,29 @@ public class Settings extends Activity1 implements View.OnClickListener{
 		for(int i=0,len=us.length();i<len;i++){
 			FSON u=us.getObject(i);
 			if(!u.get("l",false))continue;//“已删除”标记，为了方便覆盖
-			ViewGroup ni=(ViewGroup) LayoutInflater.from(this).inflate(
-				i==user.get("main",-1)?
+			boolean ismain=i==user.get("main",-1);//是否是主帐户
+			ViewGroup ni=(ViewGroup) LayoutInflater.from(this).inflate(// 判断帐户格局
+				ismain?
 					layout.listsub_user_main:
 					layout.listsub_user_secondary
 				,null);
-			((TextView)fv(ni,id.user_name)).setText(u.get("n","神秘用户"));
-			((TextView)fv(ni,id.user_expire)).setText(
+			((TextView)fv(ni,id.user_name)).setText(u.get("n","神秘用户"));// 赋值帐户名称
+			((TextView)fv(ni,id.user_expire)).setText(// 赋值过期信息
 				string("于 ",year_hour.format(u.get("d",0l)*1000),"时 过期"));
-			v.addView(ni);
-			btnbind(fv(ni,id.user_logout));
+			View switcher=fv(ni,ismain? id.user_stared: id.user_star);
+			seticon(switcher,ismain? icon.stared: icon.star);// 主次帐户星标图片
+			if(ismain) v.addView(ni,0); else v.addView(ni);// 主要/次要帐户排序
+			seticon(fv(ni,id.user_head),icon.user(u.get("i",0)));// 设置用户头像
+			if(u.get("i",0)==0){// 隐身模式-隐藏右侧删除按钮
+				fv(ni,id.user_logout_background).setVisibility(View.INVISIBLE);
+			}else{
+				seticon(fv(ni,id.user_logout),icon.nav_cancel);
+				btnbind(fv(ni,id.user_logout));
+			}
+			if(!ismain){
+				switcher.setTag(i);// 设定编号
+				btnbind(switcher);// 次要帐户绑定切换操作
+			}
 		}
 		//new Msgbox("",user.toString());
 	}

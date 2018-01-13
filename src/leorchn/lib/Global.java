@@ -94,23 +94,32 @@ public class Global {
 		return ExitDialog.result;
 	}
 	public static void 附加功能(Activity a){
-		int r=列表信息框(a,"启动附加功能","绿色弹幕辅助模块","社区温暖注册模块");
-		String cook=formevents.帐户数据.cookie();
+		String cook=Activity1.mcok;
+		if(cook==null)cook="";
+		tip("uid "+Activity1.muid+"\ncok "+cook);
+		int r=列表信息框(a,"启动附加功能","插件设置向导","绿色弹幕辅助模块","社区温暖注册模块","开发调试");
 		switch (r) {
 			case 0:
+				a.startActivity(new Intent(a, PermissionGuide.class)); break;
+			case 1:
 				if (cook.equals("")) {
 					tip("请先进入主界面登录后再使用此功能");
 				} else {
 					a.startService(new Intent(a, LiveUpgrade.class).putExtra("cookie", cook)); 
 				}break;
-			case 1:
+			case 2:
 				if (cook.equals("")) {
 					tip("请先进入主界面登录后再使用此功能");
 				} else {
 					a.startService(new Intent(a, GetAllowance.class).putExtra("cookie", "Cookie: "+cook)); 
 				}break;
+			case 3:
+				a.startService(new Intent(a, MemMonitor.class)); break;
+				
 		}
 	}
+	
+	
 	public static int 列表信息框(final Activity a,final String title,final String...options){
 		new t(){void r(){
 			ExitDialog.result=-1;

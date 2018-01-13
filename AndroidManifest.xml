@@ -69,6 +69,13 @@
 				<action android:name="appforms.GetAllowance"/>
 			</intent-filter>
 		</service>
+		<service android:name="appforms.MemMonitor"
+			android:allowBackup="true" android:persistent="true"
+			android:process=":service.Debugger">
+			<intent-filter>
+				<action android:name="appforms.Debugger"/>
+			</intent-filter>
+		</service>
     </application>
 
 </manifest>

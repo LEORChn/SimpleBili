@@ -10,6 +10,7 @@ import android.content.DialogInterface.OnClickListener;
 import com.LEORChn.SimpleBili.R;
 import simplebili.App;
 public abstract class Activity1 extends Activity implements MessageQueue.IdleHandler,Thread.UncaughtExceptionHandler,View.OnClickListener{
+	protected static Icon icon;
 	protected static R.id id;
 	protected static R.layout layout;
 	protected static R.drawable drawable,draw;//可以给 R 类定义快捷方式和多个别名而且不用额外声明，超爽
@@ -20,12 +21,13 @@ public abstract class Activity1 extends Activity implements MessageQueue.IdleHan
 	UA_mobilebili="Mozilla/5.0 BiliDroid/4.11.7 (bbcallen@gmail.com)";
 	
 	public static String DIR_cache=App.getContext().getCacheDir().getPath()+"/",
-	DIR_data=App.getContext().getFilesDir().getPath()+"/";
-	
+	DIR_data=App.getContext().getFilesDir().getPath()+"/",
+	DIR_cache_pic=DIR_cache+"pic/";
+//-----
 	public static FSON defSetting=new FSON(appforms.Settings.getDefaultSetting()),
 						sets=setsload(), user=userload();//顺序不能改，必须先初始化默认配置然后再加载用户配置
 	public static String setspath(){ return DIR_data+"app.setting"; }
-	public static FSON setsload(){
+	public static FSON setsload(){//from setting file
 		String s=Text.read(setspath());
 		FSON j=new FSON((s==null || s.isEmpty())?"{}":s),//载入当前配置
 			ds=defSetting;//载入默认配置
@@ -37,7 +39,8 @@ public abstract class Activity1 extends Activity implements MessageQueue.IdleHan
 		return j;
 	}
 	public static boolean setssave(){ return Text.write(sets.toString(),setspath(),"UTF8"); }
-	
+//-----
+	public static int muid;
 	public static String mcok;//="Cookie: ";
 	public static int useradd(String cok){//0=正常,-1=网络异常,-11=识别码错误,-12=识别码失效
 		try{
@@ -77,16 +80,54 @@ public abstract class Activity1 extends Activity implements MessageQueue.IdleHan
 			return -11;
 		}return 0;
 	}
-	public static boolean userset(int i){
-		return false;
-	}
 	public static boolean usersave(){ return Text.write(user.toString(),userpath(),"UTF8"); }
 	public static String userpath(){ return DIR_data+"user.info"; }
 	public static FSON userload(){
-		String s=Text.read(userpath());
-		return new FSON((s==null || s.isEmpty())?"{'main':0,'users':[]}":s);
+		String s=null;
+		if(new File(userpath()).exists())
+			s=Text.read(userpath());
+		else
+			muid=-1;//首次打开时就会这样，如果为-1则直接进入设置页面，进入设置页面后再设为隐身模式
+		FSON u=new FSON((s==null || s.isEmpty())?userdef():s),us;
+		if(!u.canRead()) u=new FSON(userdef());
+		us=u.getList("users");
+		if(muid > -1)//首次进入时不设置默认帐户为隐身模式，直接跳到设置页面
+			for(int i=0,len=us.length();i<len;i++){
+				FSON su=us.getObject(i);
+				icon.putusr(su.get("i",0),su.get("h",""));
+				if(u.get("main",0)==i) userset(su.get("i",0),u);//加载主帐户配置
+			}
+		return u;
 	}
-	
+	public static boolean userset(int uid){//加载主帐户配置，也可以用它切换主帐号。参数 ( uid )
+		return userset(uid,user);
+	}
+	private static boolean userset(int uid,FSON user){//初始化时使用的加载主帐户配置方法
+		FSON us=user.getList("users");
+		for(int i=0,len=us.length();i<len;i++){
+			FSON su=us.getObject(i);
+			if(su.get("i",0)==uid){
+				muid=uid;
+				mcok=su.get("c","");
+				user.set("main",i);
+				return true;
+			}
+		}
+		return false;
+	}
+	public static String userdef(){ return "{'main':0,'users':[{'u':true,'d':0,'c':'','n':'隐身模式','l':true,'h':'','i':0}]}";}
+	/*public static void userload(String s){//想的是如果没有隐身模式才用这个
+		FSON u=new FSON(s),us,dfu;
+		if(!u.canRead())return;
+		us=u.getList("users");
+		if(us==null)return;//防止我的意外
+		dfu=us.getObject(u.get("main",0));
+		if(dfu==null || dfu.get("c","").equals("")) mcok="";//默认帐户无效
+		if(dfu.get("c","").equals(""))return;
+		user=u;
+		
+	}*/
+//-----
 	protected String http(String method,String url,String param,String formdata){//每个activity都可用的http，需要在其他线程
 		return HttpRequest.http(method,url,param,formdata);
 	}
@@ -103,9 +144,13 @@ public abstract class Activity1 extends Activity implements MessageQueue.IdleHan
 		@Override protected void onPostExecute(String p){ fin(p); }
 		void fin(String data){}
 	}
+//-----
 	protected void btnbind(View...v){ for(View btnv:v)btnv.setOnClickListener(this); }//连续绑定多个【动态】view的点击事件到本activity
 	protected void btnbind(int...id){ for(int btnid:id)fv(btnid).setOnClickListener(this); }//连续绑定多个【静态】view的点击事件到本activity
 	abstract public void onClick(View v);//每个窗口应该都有按钮吧？
+	protected void seticon(View v,android.graphics.Bitmap i){
+		if(v instanceof ImageView){ ((ImageView)v).setImageBitmap(i); }
+	}
 	protected View fv(int id){return findViewById(id);}//查找当前activity唯一的
 	protected View fv(ViewGroup vg,int id){return vg.findViewById(id);}//查找列表子项中唯一的
 	protected void tip(String s){Toast.makeText(this,s,0).show();}
@@ -121,7 +166,7 @@ public abstract class Activity1 extends Activity implements MessageQueue.IdleHan
 	public boolean queueIdle(){return onIdle();}
 	//abstract protected void onCreate(Bundle sis);
 	abstract protected boolean onIdle();//每个窗口应该都用这个来初始化
-	
+//-----
 	protected static String string(Object...str){ return buildstring(str).toString(); }
 	protected static StringBuilder buildstring(Object...str){
 		StringBuilder bdr=new StringBuilder();
@@ -131,6 +176,7 @@ public abstract class Activity1 extends Activity implements MessageQueue.IdleHan
 		for(Object s:str) bdr.append(s);
 		return bdr;
 	}
+//-----
 	@Override public void uncaughtException(final Thread thread, final Throwable ex) {
 		rep = E.trace(ex);
 		new AfterException();//新建线程显示消息
@@ -155,6 +201,9 @@ public abstract class Activity1 extends Activity implements MessageQueue.IdleHan
 		}
 	}
 	protected class Msgbox extends AlertDialog.Builder implements DialogInterface.OnClickListener{
+		protected int vbyes=AlertDialog.BUTTON_POSITIVE,
+			vbno=AlertDialog.BUTTON_NEGATIVE,
+			vbmid=AlertDialog.BUTTON_NEUTRAL;
 		public Msgbox(String...msgs){
 			super(Activity1.this); 
 			for(int i=0,len=msgs.length;i<len;i++){
