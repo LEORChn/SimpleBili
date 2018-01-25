@@ -3,15 +3,16 @@ import android.os.AsyncTask;
 import java.io.*;
 import java.net.*;
 public abstract class Download extends AsyncTask<String,Integer,Object>{
+	protected Download(){}//如果要继承构造方法
 	public Download(String file,String method,String url,String header,String formdata){
 		executeOnExecutor(THREAD_POOL_EXECUTOR,file,method,url,header,formdata);
 	}
-	@Override protected Object doInBackground(String[]p) {
-		try{
+	@Override protected Object doInBackground(String[]p){
+		try{ pl("DLing file:",p[2]);
 			File f=new File(p[0]);
 			if(!f.getParentFile().exists())f.getParentFile().mkdirs();
-			boolean isupdate=!f.createNewFile();
-			long usable=f.getUsableSpace();
+			boolean isupdate=!f.createNewFile();//tag to prepare for update
+			long usable=f.getUsableSpace();pl("isupdate? "+isupdate);
 			if(usable==0)return new Exception("save path check fail:\npath: "+f.getAbsolutePath()+"\nusable space:"+usable);//fail: save path is not usable
 			InputStream s;
 			HttpURLConnection h=(HttpURLConnection)new URL(p[2]).openConnection();
@@ -59,9 +60,11 @@ public abstract class Download extends AsyncTask<String,Integer,Object>{
 	@Override protected void onPostExecute(Object f){ 
 		if(f instanceof Throwable) fail((Throwable)f);
 		else if(f instanceof File)done((File)f);
-		else ;
+		else pl("download.java - unknown object type: "+f);
+		pl("download.java - so this is download result");
 	}
 	void progress(int...p){}
 	abstract void done(File f)
 	abstract void fail(Throwable t)
+	private void pl(String...s){for(String st:s)System.out.println(st);}
 }

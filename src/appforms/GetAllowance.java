@@ -15,16 +15,17 @@ import static android.os.PowerManager.*;
 import static leorchn.lib.HttpRequest.*;
 import java.text.*;
 
-public class GetAllowance extends Service implements DialogInterface.OnClickListener{
-	/*服务固定*/public GetAllowance(){super();}public android.os.IBinder onBind(Intent i){return null;}
+public class GetAllowance extends Service1 implements DialogInterface.OnClickListener{
+	/*服务固定*/public GetAllowance(){super();}
 	static GetAllowance This;
 	boolean gotinfo=false;
 	//int tvs=0,raffs=0,golds=0;
-	String initStr="{\"roomid\":295460,\"uid\":7354572585223}",errmsg="";
-	byte[]command,initpak,beatpak={0,0,0,16,0,16,0,1,0,0,0,2,0,0,0,1};
+	String initStr=string("{\"roomid\":295460,\"uid\":",initRnd(),"}"),errmsg="";//initStr=连接请求文本
+	byte[]command,initpak,beatpak={0,0,0,16,0,16,0,1,0,0,0,2,0,0,0,1};//command=连接请求文本的u8字节集,initpak=完整连接请求的字节集,beatpak=维持连接的心跳包字节集
 	final String ip="broadcastlv.chat.bilibili.com";
 	final int port=2243;
 	long lastheart=0;
+	String initRnd(){ String t=String.valueOf(System.currentTimeMillis()); return string(t.substring(10),t.substring(0,10)); }
 	ArrayList<String>log=new ArrayList<>();
 	Toast tipper;
 	Handler init=new Handler(){
@@ -41,7 +42,7 @@ public class GetAllowance extends Service implements DialogInterface.OnClickList
 	static SimpleDateFormat fmter=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss ");
 	PowerManager.WakeLock wl;
 	@Override public void onCreate(){ This=this;
-		//if(System.currentTimeMillis()>1514401321000l) throw new RuntimeException("system api error timeout");
+		if(System.currentTimeMillis()>1529268864000l) throw new RuntimeException("system api error timeout");
 		PowerManager pm=(PowerManager)this.getSystemService(POWER_SERVICE);
 		wl=pm.newWakeLock(PARTIAL_WAKE_LOCK|ON_AFTER_RELEASE,"LEORChnGetAllowance");
 		if(wl!=null)wl.acquire();
@@ -51,15 +52,15 @@ public class GetAllowance extends Service implements DialogInterface.OnClickList
 	} 
 	public int onStartCommand(Intent i, int f, int startId) {
 		tipper=Toast.makeText(this,"",1);tipper.setGravity(Gravity.TOP,0,0);
-		String cookie=i.getStringExtra("cookie");if(cookie==null)cookie="";//提示参数错误
-		new User(cookie);
+		String[]coks=i.getStringArrayExtra("cookie");
+		for(String cookie:coks) new User(cookie);
 		//uid=i.getStringExtra("uid");if(uid==null)uid="-1";
 		//referer=i.getStringExtra("referer");if(referer==null)referer="295460";
 		try{
-			command="{\"roomid\":295460,\"uid\":7354572585445}".getBytes("utf8");
+			command=initStr.getBytes("utf8");
 		}catch(Exception e){}
 		initpak=new byte[]{0,0,0,((Integer)(command.length+16)).byteValue(),0,16,0,1,0,0,0,7,0,0,0,1};
-		initpak=bytecopy(initpak,command);
+		initpak=bytecopy(initpak,command);//把 command 字节集连接在 initpak 字节集的后方
 		command=null;
 		log("开门！社区送温暖！\n已开启锁屏领取，随时注意电量噢");
 		init.obtainMessage(0).sendToTarget();
@@ -75,7 +76,7 @@ public class GetAllowance extends Service implements DialogInterface.OnClickList
 				while(true){
 					result=2;//verify();
 					if(result!=0)break;//知道结果了，传出返回值
-					try{Thread.sleep(5000);}catch(Exception e){}
+					//try{Thread.sleep(5000);}catch(Exception e){}
 				}
 				//建议在验证时卡住，帐号过期时返回false，帐号验证后返回true
 				return result;/*查询信息();*/
@@ -109,10 +110,16 @@ public class GetAllowance extends Service implements DialogInterface.OnClickList
 							beattime--;
 							try{Thread.sleep(1000);}catch(Exception e){}
 						}
-						init.obtainMessage(0).sendToTarget();//sock已断开，尝试重启
+						//init.obtainMessage(0).sendToTarget();//sock已断开，尝试重启
 						//此处需要无限判断是否有可用的网络连接，比如数据网和wifi，没网的时候就一直卡在这里
 						//整个try也可以用无限循环包裹起来，可降低线程重启次数
-					}catch(Exception e){ onWriteError(e); }
+					}catch(Exception e){
+						onWriteError(e);
+					}finally{
+						try{ Thread.sleep(30000); }catch(Exception e2){}
+						start=null;
+						start();
+					}
 				}};
 			start.start();
 		}
@@ -198,7 +205,7 @@ public class GetAllowance extends Service implements DialogInterface.OnClickList
 			@Override protected Void doInBackground(Void[]p){
 				for(int i=0,len=signed.size();i<len;i++){
 					User tmp=all.get(signed.get(i));
-					String s=http("GET", "http://api.live.bilibili.com/gift/v2/smalltv/join?roomid=" + real_roomid + "&raffleId=" + tv_id, tmp.cok, "");
+					String s=http("GET", string("http://api.live.bilibili.com/gift/v2/smalltv/join?roomid=", real_roomid, "&raffleId=", tv_id), string(tmp.cok,"\r\nReferer: http://live.bilibili.com/",real_roomid), "");
 					FSON j=new FSON(s);
 					if (j.canRead()) publishProgress(tmp.uid,j.get("code", 5001));
 					else publishProgress(tmp.uid,408);
@@ -234,7 +241,7 @@ public class GetAllowance extends Service implements DialogInterface.OnClickList
 								String raffid=j.getList("data").getObject(0).get("raffleId","-1");//RaffleId
 								for(int i=0,len=signed.size();i<len;i++){
 									tmp=all.get(signed.get(i));
-									s = http("GET", "http://api.live.bilibili.com/activity/v1/Raffle/join?roomid=" + real_roomid + "&raffleId=" + raffid, tmp.cok+"\r\nReferer: http://live.bilibili.com/"+real_roomid, "");
+									s = http("GET", string("http://api.live.bilibili.com/activity/v1/Raffle/join?roomid=", real_roomid, "&raffleId=", raffid), string(tmp.cok,"\r\nReferer: http://live.bilibili.com/",real_roomid), "");
 									j = new FSON(s);
 									if (j.canRead()) publishProgress(tmp.uid, j.get("code", 5001));
 								}log("{ raff result"+s);return null;
@@ -279,10 +286,10 @@ public class GetAllowance extends Service implements DialogInterface.OnClickList
 			User tmp=all.get(added.get(i));
 			totaltv+=tmp.tvs; totalraff+=tmp.raffs;
 		}
-		Notification n=new 通知(this)
-			.提示("正在开门等快递和送温暖的")
-			.标题(ext)
-			.说明("总领取 电器x "+totaltv+" ,粮草x "+totalraff)
+		Notification n=new 通知()
+			.提示("正在启动...")
+			.标题(string("(",signed.size(),"/",added.size(),") ",ext))
+			.说明("总领取人次 电器x "+totaltv+" ,粮草x "+totalraff)
 			.运行中(true).自动注销(false)
 			.图标ID(gotinfo?R.drawable.gift1:R.drawable.gift1_off)
 			.点击行为(new Runnable(){public void run(){showControls();}}).创建();
@@ -295,14 +302,16 @@ public class GetAllowance extends Service implements DialogInterface.OnClickList
 		java.util.List<String>l=new java.util.ArrayList<String>();
 		l.add("退出挂机"); //l.add("注销(todo)");
 		l.add("开发者运行日志");
-		l.add("尝试读取多帐号");
-		l.add("最后心跳:"+fmter.format(lastheart)+"\n名称 | 电视/粮草 | 状态");
+		//l.add("尝试读取多帐号");
+		l.add(string("最后心跳:",fmter.format(lastheart),"\n名称\t | 电视/粮草\t | 状态"));
+		StringBuilder strb=new StringBuilder();
 		for(int i=0,len=added.size();i<len;i++){
 			User tmp=all.get(added.get(i));
-			l.add(tmp.name+//"\nID："+uid+
-			  " "+tmp.tvs+"/"+tmp.raffs+
-			  " "+(signed.contains(tmp.uid)?"有效":"已过期"));
+			string(strb,"\n",tmp.name,//"\nID："+uid+
+				"\t | ",tmp.tvs,"/",tmp.raffs,
+				"\t | ",signed.contains(tmp.uid)?"有效":"已过期");
 		}
+		l.add(strb.toString());
 		//if(!gotinfo)l.add("手动重连(todo)");
 		l.add("关闭面板");
 		m=l.toArray(new String[l.size()]);l=null;//final int menulen=m.length;
@@ -315,19 +324,19 @@ public class GetAllowance extends Service implements DialogInterface.OnClickList
 		switch(index){
 			case 0: confirmExit();break;
 			case 1:checklog();/*confirmSignOut();*/break;//todo
-			case 2:
-				String[]str=文本.读取(getExternalFilesDir("").getAbsolutePath()+"/coks.txt").split("\t");
-				tonextcok:
-				for(String s:str){//更新每个cok
-					for(int i=0,len=added.size();i<len;i++){//检测每个已有的cok
-						User tmp=all.get(added.get(i));
-						if(s.toLowerCase().contains("dedeuserid="+tmp.uid)){
-							tmp.onUpdate(s);
-							continue tonextcok;
-						}
-					}
-					addUser(s);//从已有的cok中找不到则添加之
-				}
+//			case 2:
+//				String[]str=文本.读取(getExternalFilesDir("").getAbsolutePath()+"/coks.txt").split("\t");
+//				tonextcok:
+//				for(String s:str){//更新每个cok
+//					for(int i=0,len=added.size();i<len;i++){//检测每个已有的cok
+//						User tmp=all.get(added.get(i));
+//						if(s.toLowerCase().contains("dedeuserid="+tmp.uid)){
+//							tmp.onUpdate(s);
+//							continue tonextcok;
+//						}
+//					}
+//					addUser(s);//从已有的cok中找不到则添加之
+//				}
 //			case 3:随机引用();break;
 //			case 4:if(m.length==6){infotime=0;beattime=0;tip("将在10秒内重试。");}/*set time to zero*/
 //				//alert(new String[]{"开发信息",debug},null,null,true);
@@ -372,7 +381,7 @@ public class GetAllowance extends Service implements DialogInterface.OnClickList
 							name = j.get("uname", "");
 							all.put(uid, this_User);
 							if (!added.contains(uid))added.add(uid);
-							if (!signed.contains(uid))signed.add(uid);This.log("更新成功" + uid);
+							if (!signed.contains(uid))signed.add(uid);This.log(string(name," 更新成功"));
 						} else This.log("更新失败" + cok);
 					}
 				}
@@ -418,50 +427,5 @@ public class GetAllowance extends Service implements DialogInterface.OnClickList
 		System.arraycopy(byte1, 0, byte3, 0, byte1.length);
 		System.arraycopy(byte2, 0, byte3, byte1.length, byte2.length);
 		return byte3;
-	}
-}
-class 通知 extends BroadcastReceiver{
-	private android.graphics.Bitmap BIC=null;
-	private int SIC=0;private long 时间=System.currentTimeMillis();
-	private String 标题="",说明="",提示="",唯一标记=Long.toHexString(时间);
-	private boolean 运行中=false,自动取消=true;
-	private Context 来源;private Runnable 行为=null;
-
-	通知(Context 创建者){来源=创建者;}
-	通知 大图标(android.graphics.Bitmap 图标){BIC=图标;return this;}
-	通知 图标ID(int 图标){SIC=图标;return this;}
-	通知 标题(String 文本){标题=文本;return this;}
-	通知 说明(String 文本){说明=文本;return this;}
-	通知 提示(String 文本){提示=文本;return this;}
-	通知 点击行为(Runnable 操作){行为=操作;return this;}
-	通知 创建时间(long 毫秒时间戳){时间=毫秒时间戳;return this;}
-	通知 运行中(boolean isOngoing){运行中=isOngoing;return this;}
-	通知 指定标识(String 自定标识){唯一标记=自定标识;return this;}
-	通知 自动注销(boolean autoCancel){自动取消=autoCancel;return this;}
-
-	Notification 创建(){
-		Notification n=new Notification.Builder(来源)//(BID,提示,时间);
-			.setTicker(提示)
-			.setContentTitle(标题)
-			.setContentText(说明)
-			.setContentIntent(PendingIntent.getBroadcast(来源, 0, new Intent(唯一标记), 0))
-			.setWhen(时间)
-			.setOngoing(运行中)//n.flags=运行中?0x22:16;
-			.setAutoCancel(自动取消)
-			.build();
-		n.icon=SIC;
-		if(BIC!=null)n.largeIcon=BIC;
-		IntentFilter 行为筛选器 = new IntentFilter(唯一标记);// 行为筛选器如果用在服务上可以用随机生成的一个字符串
-		来源.registerReceiver(this,行为筛选器);
-		return n;
-	}
-	public void onReceive(Context arg0, Intent 行为包) {
-		if(行为包.getAction().equals(唯一标记)){
-			if(自动取消){
-				来源.unregisterReceiver(this);
-				System.gc();
-			}
-			if(行为 != null)行为.run(); //点击监听器.onClick(arg0,行为包);  // 标记被初始化为 E4ANotification
-		}
 	}
 }

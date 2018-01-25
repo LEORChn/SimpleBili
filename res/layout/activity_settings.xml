@@ -61,10 +61,17 @@
 
 				<Button
 					android:layout_height="wrap_content"
+					android:text="排序..."
+					android:layout_width="wrap_content"
+					android:id="@+id/setting_orderUser"/>
+
+				<Button
+					android:layout_height="wrap_content"
 					style="?android:attr/buttonStyleSmall"
 					android:text="添加Cookie"
 					android:layout_width="wrap_content"
-					android:id="@+id/setting_addcookie"/>
+					android:id="@+id/setting_addcookie"
+					android:visibility="gone"/>
 
 			</LinearLayout>
 
@@ -77,26 +84,6 @@
 		</LinearLayout>
 
 	</ScrollView>
-
-	<!--ListView
-		android:layout_height="wrap_content"
-		android:layout_width="match_parent"
-		android:layout_weight="1.0"
-		android:id="@+id/setting_list"/>
-
-	<LinearLayout
-		android:layout_height="wrap_content"
-		android:layout_width="match_parent"
-		android:orientation="horizontal"
-		android:gravity="right">
-
-		<Button
-			android:layout_height="wrap_content"
-			android:text="保存并重启简哔 -&gt;"
-			android:layout_width="wrap_content"
-			android:id="@+id/setting_starthome"/>
-
-	</LinearLayout-->
 
 </LinearLayout>
 

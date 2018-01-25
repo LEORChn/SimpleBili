@@ -38,6 +38,7 @@ public class Login extends Activity1{
 
 	@Override protected void onDestroy() {
 		//w.destroy(); w=null; wl=null; p=null; pd=null;
+		wl.clean(w);
 		System.err.println("----- Calling kill my process id... -----");
 		Process.killProcess(Process.myPid());
 		super.onDestroy();
@@ -54,7 +55,7 @@ public class Login extends Activity1{
 	LoginStatListener l=new LoginStatListener(){
 		@Override public void onLogin(final String cok){
 			int res=useradd(cok);
-			setResult(res,new Intent().putExtra("Cookie",cok).putExtra("user",user.toString()));
+			setResult(res,new Intent().putExtra("Cookie",cok).putExtra("user",user.toString()));//由于多进程隔离原因，此处通过intent传递新的用户配置
 			finish();
 		}
 		@Override public void onLog(String text){

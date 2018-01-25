@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">简哔 0.5</string>
+    <string name="app_name">简哔 0.5 预备版</string>
     <string name="app_name_main">简哔</string>
 	<string name="app_name_settings">简哔设置</string>
 	<string name="service_name_liveupgrade">绿色弹幕辅助模块</string>

@@ -171,6 +171,13 @@ public class FSON {
 			return basearr.length();
 		}
 	}
+	public void remove(String key){
+		if(usable && baseisobj) baseobj.remove(key);
+	}
+	public void remove(int index){
+		if(usable && !baseisobj) basearr.remove(index);
+	}
+	
 	@Override public String toString() {
 		try{
 			if (baseisobj) {

@@ -23,8 +23,8 @@
 			android:icon="@drawable/ic_launcher"
 			android:configChanges="orientation|screenSize"
 			android:taskAffinity="appform.Main_Feeds"
-			android:launchMode="singleTask"
-			android:process=":Activity.Main"><!--
+			android:launchMode="singleTask"><!--
+			android:process=":Activity.Main"
 			android:taskAffinity="appform.Main_Feeds"
 			android:launchMode="singleTask"
 			android:process=":Activity.Main"-->
@@ -44,8 +44,8 @@
 			android:icon="@drawable/ic_settings"
 			android:configChanges="orientation|screenSize"
 			android:taskAffinity="appform.Settings"
-			android:launchMode="singleTask"
-			android:process=":Activity.Main"><!--
+			android:launchMode="singleTask"><!--
+			android:process=":Activity.Main"><!
 			android:taskAffinity="appform.Settings"
 			android:process=":Activity.Settings"-->
             <intent-filter>
@@ -54,24 +54,25 @@
             </intent-filter>
         </activity>
 		<activity android:name="appforms.Login" android:configChanges="orientation|screenSize" android:process=":Activity.WebView"/><!-- android:launchMode="singleInstance"/-->
+		<activity android:name="appforms.PermissionGuide" android:configChanges="orientation|screenSize"/>
 		
 		<service android:name="appforms.LiveUpgrade" android:label="@string/service_name_liveupgrade"
 			android:allowBackup="true" android:persistent="true"
-			android:process=":service.LiveUpgrade">
+			android:process=":Service.LiveUpgrade">
 			<intent-filter>
 				<action android:name="appforms.LiveUpgrade"/>
 			</intent-filter>
 		</service>
 		<service android:name="appforms.GetAllowance" android:label="@string/service_name_getallowance"
 			android:allowBackup="true" android:persistent="true"
-			android:process=":service.GetAllowance">
+			android:process=":Service.GetAllowance">
 			<intent-filter>
 				<action android:name="appforms.GetAllowance"/>
 			</intent-filter>
 		</service>
 		<service android:name="appforms.MemMonitor"
-			android:allowBackup="true" android:persistent="true"
-			android:process=":service.Debugger">
+			android:allowBackup="true" android:persistent="true"><!--
+			android:process=":Activity.Main"-->
 			<intent-filter>
 				<action android:name="appforms.Debugger"/>
 			</intent-filter>

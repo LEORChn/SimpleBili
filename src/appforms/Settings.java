@@ -21,6 +21,7 @@ public class Settings extends Activity1 implements View.OnClickListener{
 		
 		//startActivity(new Intent(this,TestChangeLayout.class));
 	}
+	AsyncTask<Void,Integer,Void> upgradetip;
 	int hasinit=0;
 	public boolean onIdle() {
 		switch(hasinit){
@@ -31,11 +32,19 @@ public class Settings extends Activity1 implements View.OnClickListener{
 				break;
 			case 2: loadUserView(); break;
 			case 3:
-				btnbind(id.setting_goback,id.setting_addUser,id.setting_addcookie);
+				btnbind(id.setting_goback,id.setting_addUser,id.setting_orderUser,id.setting_addcookie);
 				loadSetsView();
+				break;
 				//设置项_加载(new SettingListControl(this, (ListView)findViewById(R.id.setting_list)){
 				//	public void onItemClick(int idx, String itemtag) {设置项_单击(idx,itemtag,this);}
 				//});
+			case 4://case 5:
+				if(getIntent().getBooleanExtra("launchfromfeed",false)){
+					Toast t=Toast.makeText(simplebili.App.getContext(),"视频观看功能正在加班升级中！\n很快就会回来的\n应该吧...",1);
+						t.setGravity(Gravity.TOP,0,0);
+						t.show();
+				}
+				
 		}
 		hasinit++;
 		return hasinit<9;
@@ -49,23 +58,45 @@ public class Settings extends Activity1 implements View.OnClickListener{
 				return;
 			case id.user_star:
 				if(v.getTag() instanceof Integer);else return;
-				final FSON su=user.getList("users").getObject((int)v.getTag());
+				final int uid=user.getList("order").get((int)v.getTag(),0);
+				final FSON su=user.getObject("users").getObject(string(uid));
 				new Msgbox("更改主帐户",
-					string("确定更改主帐户为 ",
-						su.get("n","神秘用户"),
-						" ？"),
-					"设为主帐户",
-					"取消"){
+					string("确定更改主帐户为 ", su.get("n","神秘用户"), " ？"),
+					"设为主帐户", "取消"){
 					void onClick(int i){
 						if(i==vbyes){
-							userset(su.get("i",0));
+							userset(uid);
+							usersave();
 							loadUserView();
 						}
 					}
 				};return;
+			case id.user_logout:
+				if(v.getTag() instanceof Integer);else return;
+				final int ord=(int)v.getTag();
+				final int uid2=user.getList("order").get(ord,0);
+				final FSON su2=user.getObject("users").getObject(string(uid2));
+				new Msgbox("删除帐号",
+					string("确定删除帐号 ", su2.get("n","神秘用户"), " 的记录？"),
+					"删除帐号", "取消"){
+					void onClick(int i){
+						if(i==vbyes){
+							if(user.get("main",0)==ord)userset(0);//如果删除主帐户，设主帐户为0
+							else if(user.get("main",0)>ord)user.set("main",user.get("main",1)-1);
+							FSON neword=user.getList("order");
+							neword.remove(ord);
+							user.set("order",neword);
+							usersave();
+							loadUserView();
+						}else{
+							tip(string("main=",user.get("main",0),"ord=",ord));
+						}
+					}
+				};return;
+			case id.setting_orderUser: multip("排序功能以后开放"); break;
 			case id.setting_addcookie:
-				tip(useradd("Cookie: DedeUserID=8232068; DedeUserID__ckMd5=306a54f5179401e0; SESSDATA=a95d8f0a%2c1517515006%2cf867ae44; bili_jct=0a48d75fd66fee9bc98c14b0fd627f5e;"
-				)+"");
+				//tip(useradd("")+"");
+				//tip(user.toString());
 				loadUserView(); return;
 			case id.listsub_bg: setsitem_onclick((String)v.getTag()); return; //设置项目
 			//case id.setting_starthome: startActivity(new Intent(this,Main_Feeds.class)); return;
@@ -106,28 +137,33 @@ public class Settings extends Activity1 implements View.OnClickListener{
 	void loadUserView(){
 		ViewGroup v=(ViewGroup)fv(id.setting_usersViewGroup);
 		v.removeAllViews();
-		FSON us=user.getList("users");
-		for(int i=0,len=us.length();i<len;i++){
-			FSON u=us.getObject(i);
-			if(!u.get("l",false))continue;//“已删除”标记，为了方便覆盖
+		FSON us=user.getObject("users"),od=user.getList("order");
+		for(int i=0,len=od.length();i<len;i++){
+			int uid=od.get(i,0);
+			FSON su=us.getObject(string( uid ));
+			if(!su.get("l",false))continue;//“已删除”标记，为了方便覆盖
 			boolean ismain=i==user.get("main",-1);//是否是主帐户
 			ViewGroup ni=(ViewGroup) LayoutInflater.from(this).inflate(// 判断帐户格局
 				ismain?
 					layout.listsub_user_main:
 					layout.listsub_user_secondary
 				,null);
-			((TextView)fv(ni,id.user_name)).setText(u.get("n","神秘用户"));// 赋值帐户名称
+			((TextView)fv(ni,id.user_name)).setText(su.get("n","神秘用户"));// 赋值帐户名称
 			((TextView)fv(ni,id.user_expire)).setText(// 赋值过期信息
-				string("于 ",year_hour.format(u.get("d",0l)*1000),"时 过期"));
+				string("于 ",year_hour.format(su.get("d",0l)*1000),"时 过期"));
 			View switcher=fv(ni,ismain? id.user_stared: id.user_star);
 			seticon(switcher,ismain? icon.stared: icon.star);// 主次帐户星标图片
+			View headbox=fv(ni,id.user_head);
 			if(ismain) v.addView(ni,0); else v.addView(ni);// 主要/次要帐户排序
-			seticon(fv(ni,id.user_head),icon.user(u.get("i",0)));// 设置用户头像
-			if(u.get("i",0)==0){// 隐身模式-隐藏右侧删除按钮
+			if(uid==0){// 隐身模式-隐藏右侧删除按钮-使用内部图片
+				seticon(headbox,icon.user(0));
 				fv(ni,id.user_logout_background).setVisibility(View.INVISIBLE);
 			}else{
-				seticon(fv(ni,id.user_logout),icon.nav_cancel);
-				btnbind(fv(ni,id.user_logout));
+				new HeadLoader(uid, su.get("h", ""),headbox);
+				View logout=fv(ni,id.user_logout);
+				seticon(logout,icon.nav_cancel);
+				logout.setTag(i);
+				btnbind(logout);
 			}
 			if(!ismain){
 				switcher.setTag(i);// 设定编号

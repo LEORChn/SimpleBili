@@ -25,6 +25,7 @@ public class Main_Feeds extends Activity1 implements OnClickListener,OnKeyListen
 		This=this;
 		addIdleHandler();
         super.onCreate(savedInstanceState);
+		startActivity(new Intent(this,Settings.class).putExtra("launchfromfeed",true)); finish();
 	}
 	ImageView myhead;
 	TextView name,coin;

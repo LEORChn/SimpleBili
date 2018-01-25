@@ -26,25 +26,36 @@ public class MemMonitor extends Service1  {
 	boolean fwindow=true;
 	BroadcastReceiver rec=new BroadcastReceiver(){
 		public void onReceive(Context p1, Intent p2) {
-			new Msgbox("",dumpmsg(),"【继续】","退出",fwindow?"隐藏悬浮窗":"显示悬浮窗"){
+			new Msgbox("",dumpmsg(),"【继续】","退出"){
 				void onClick(int i){
-					if(i==1)This.stopSelf();
-					else if(i==2) setFwindowStat(!fwindow);
+					if(i==vbno)This.stopSelf();
+					else if(i==vbmid) setFwindowStat(!fwindow);
 				}
 			};
 		}
 	};
 	String dumpmsg(){
-		/*Debug.MemoryInfo dm=new Debug.MemoryInfo();
+		Debug.MemoryInfo dm=new Debug.MemoryInfo();
 		Debug.getMemoryInfo(dm);
-		dm.*/// api 23 later
+		int pvc=dm.getTotalPrivateClean(),
+			pvd=dm.getTotalPrivateDirty(),
+			pss=dm.getTotalPss(),
+			sps=dm.getTotalSwappablePss(),
+			sc=dm.getTotalSharedClean(),
+			sd=dm.getTotalSharedDirty();// api 23 later
 		return string(
 			"已加载类 ",Debug.getLoadedClassCount(),
-			"\n堆分配内存 ",Debug.getNativeHeapAllocatedSize(),
-			"\n堆可用内存 ",Debug.getNativeHeapFreeSize(),
-			"\n堆大小 ",Debug.getNativeHeapSize(),
 			//"运行时状态表 ",Debug.getRuntimeStats(),// api 23 later
-			"",
+			"\n私有 ",pvc,
+			"\n私有脏 ",pvd,
+			"\npss ",pss,
+			"\n交换pss ",sps,
+			"\n共享 ",sc,
+			"\n共享脏 ",sd,
+			"\n总计 ",pvc+pvd+pss+sps+sc+sd,
+			"\n堆分配 ",Debug.getNativeHeapAllocatedSize(),
+			"\n堆可用 ",Debug.getNativeHeapFreeSize(),
+			"\n堆大小 ",Debug.getNativeHeapSize(),
 			"\nCPU用率 ",Debug.threadCpuTimeNanos()
 		);
 	}
