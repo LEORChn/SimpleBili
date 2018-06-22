@@ -10,7 +10,6 @@ import leorchn.lib.*;
 import simplebili.lib.*;
 
 import static leorchn.lib.Global.*;
-import static leorchn.lib.WidgetOverride.*;
 import android.view.ViewTreeObserver.*;
 
 public class UpZone extends Activity1 implements OnClickListener,MessageQueue.IdleHandler ,OnGenericMotionListener,OnScrollChangedListener,AbsListView.OnScrollListener,Follow.OnFollowListener{
@@ -116,7 +115,7 @@ public class UpZone extends Activity1 implements OnClickListener,MessageQueue.Id
 		if(uid==null || uid.isEmpty())return 1003;//1003=程序内部错误
 		new AsyncTask<Void,FSON,Object>(){
 			@Override protected Object doInBackground(Void[]v){
-				String data=http("POST","http://space.bilibili.com/ajax/member/GetInfo",contenttype+referer+cookie,"mid="+uid);
+				String data=http("POST","https://space.bilibili.com/ajax/member/GetInfo",contenttype+referer+cookie,"mid="+uid);
 				if(data.isEmpty())return 1000;
 				FSON j=new FSON(data);
 				if(!(j.canRead()&&j.isObject()))return 1001;
@@ -134,7 +133,7 @@ public class UpZone extends Activity1 implements OnClickListener,MessageQueue.Id
 					final String detail=E.trace(nfe)+j.toString();
 					runOnUiThread(new Runnable(){public void run(){
 							new Msgbox("Error 1002",detail,"忽略错误并继续","复制错误信息"){
-								void onClick(int chose){
+								protected void onClick(int chose){
 									if(chose==vbno){ 复制文本(detail); tip("复制成功"); }
 								}
 							};
@@ -146,7 +145,7 @@ public class UpZone extends Activity1 implements OnClickListener,MessageQueue.Id
 				FSON n=f[0];
 				name.setText(n.get("name","(信息错误)"));
 				FSON li=n.getObject("level_info");
-				int lvl=li.get("current_level",0),cur=li.get("current_exp",0),min=li.get("current_min",0),max=li.get("next_exp",cur);//max默认值为1是为了防止除以零错误
+				int lvl=li.get("current_level",0),cur=li.get("current_exp",0),min=li.get("current_min",-1),max=li.get("next_exp",cur);//max默认值为1是为了防止除以零错误
 				ul.setText("Lv."+lvl);
 				exp.setText(cur+(lvl<6 && lvl>0?"/"+max+" ("+((cur-min)*100/(max-min))+"%)":""));
 				int[]lvc={color.ul0,color.ul1,color.ul2,color.ul3,color.ul4,color.ul5,color.ul6};
@@ -213,10 +212,10 @@ public class UpZone extends Activity1 implements OnClickListener,MessageQueue.Id
 			//runOnUiThread(new Runnable(){public void run(){ l.refresh(); }});
 		}catch(Exception nfe){//NumberFormatException
 			final String detail=runtime+"ran times:"+E.trace(nfe)+j.toString();
-			runOnUiThread(new Runnable(){public void run(){
+			/*runOnUiThread(new Runnable(){public void run(){
 				int chose=信息框2(This,"Error 1002",detail,"忽略错误并继续","复制错误信息");
 				if(chose==1){ 复制文本(detail); tip("复制成功"); }
-			}});
+			}});*/
 			return 10020;
 		}
 		return 0;

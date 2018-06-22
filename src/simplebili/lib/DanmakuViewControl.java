@@ -13,7 +13,7 @@ import javax.xml.parsers.*;
 import java.io.*;
 import android.os.*;
 import static leorchn.lib.HttpRequest.*;
-//import static leorchn.lib.*;
+import static leorchn.lib.Activity1.*;
 import leorchn.lib.*;
 //usage://setContentView( new DanmakuViewControl(this,R.layout.,R.id.,50).getBackRootView() );
 public class DanmakuViewControl {
@@ -122,7 +122,7 @@ public class DanmakuViewControl {
 					}
 					timelist.add(0xffffffffffl);//最后一个时间点永远不允许被超越！！
 					timepool=timelist.toArray(new Long[timelist.size()]);
-				}catch(Exception e){ return e; }
+				}catch(Throwable e){ return e; }
 				return timepool.length;
 			}
 			@Override protected void onPostExecute(Object o){
@@ -131,7 +131,7 @@ public class DanmakuViewControl {
 				switch(clscase){ 
 					case 1:
 						log("弹幕数据格式错误。");
-						error(4,new StringBuilder(filllocation[0]).append(" :location\n").append(E.trace((Exception)o)).append(content).toString());
+						error(4,string(filllocation[0]," :location\n",E.trace((Exception)o),content));
 						if(!false) break;//强行装填开关
 					case 0:
 						Arrays.sort(timepool);
@@ -139,24 +139,25 @@ public class DanmakuViewControl {
 						log((((int)o)-2)+" 条弹幕已装填完毕。");//-2是因为第一条是提示有多少弹幕，最后一条是无法被超越的时间点
 						completed(); break;
 					default:
-						error(4,new StringBuilder(filllocation[0]).append(" :location\n").append(E.trace((Exception)o)).toString());
+						error(4,string(filllocation[0]," :location\n",E.trace((Throwable)o)));
 				}
 			}
 		}.execute(x);
 	}
 	long addtopool(double time,String mode,String color,String text){
 		long serial=((long)(time*100))*10000+pool.size();
-		StringBuilder str=new StringBuilder(mode).append(split).append(color).append(split).append(text);
+		StringBuilder str=buildstring(mode,split,color,split,text);
 		pool.put(serial,str.toString());//反编译时发现上一行创建了4个StringBuffer
 		return serial;
 	}
 	String formatDanmakuText(String s){//规范化每一条弹幕的文本
+		//if(s==null||s.isEmpty()) return"";
 		if(Activity1.sets.get("danmakushortly",0)!=0){
 			char cur='\u0000';
-			StringBuilder str=new StringBuilder(s);//反编译时发现整个方法创建至少3个StringBuffer（循环1倍增长）
-			str.append(" ").append(split);//空格在前面可以使空文本不造成错误，而且或许还能让左侧不残留文本
+			StringBuilder str=buildstring(s,//反编译时发现整个方法创建至少3个StringBuffer（循环1倍增长）
+			" ",split);//空格在前面可以使空文本不造成错误，而且或许还能让左侧不残留文本
 			for(int i=0,len=str.toString().split(desplit)[0].length(),tms=1;i<len;i++){
-				char next=s.charAt(i);
+				char next=str.charAt(i);
 				if(cur==next) tms++; else{ cur=next; tms=1; }
 				if(tms<3)str.append(cur);
 			}

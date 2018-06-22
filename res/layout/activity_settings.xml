@@ -26,6 +26,12 @@
 
 		<ImageButton
 			style="@style/actionBartton"
+			android:id="@+id/setting_ano_help"
+			android:onClick="onClick"
+			android:src="@drawable/ic_ano"/>
+
+		<ImageButton
+			style="@style/actionBartton"
 			android:id="@+id/setting_extendmodule"
 			android:onClick="onClick"/>
 

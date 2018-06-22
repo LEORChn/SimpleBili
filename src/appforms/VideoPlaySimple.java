@@ -7,14 +7,11 @@ import android.net.*;
 import android.os.*;
 import android.view.*;
 import android.widget.*;
-import com.LEORChn.SimpleBili.*;
-import static com.LEORChn.SimpleBili.R.id.*;
 import java.lang.reflect.*;
 import java.util.*;
 import leorchn.lib.*;
 
 import leorchn.lib.CrashHandlerReg;
-import static leorchn.lib.WidgetOverride.*;
 import static android.media.MediaPlayer.*;
 import static leorchn.lib.Global.*;
 import leorchn.lib.*;
@@ -24,41 +21,43 @@ import java.text.*;
 import simplebili.lib.*;
 
 //This Class Only For Online Video!!!
-public class VideoPlaySimple extends Activity1 implements View.OnClickListener,View.OnTouchListener,MessageQueue.IdleHandler,OnErrorListener,OnPreparedListener,OnBufferingUpdateListener,OnCompletionListener,DanmakuViewControl.OnDanmakuLogListener {
+public class VideoPlaySimple extends Activity1 implements View.OnTouchListener,MessageQueue.IdleHandler,OnErrorListener,OnPreparedListener,OnBufferingUpdateListener,OnCompletionListener,DanmakuViewControl.OnDanmakuLogListener {
 	VideoPlaySimple This; public Activity getContext(){return This;}
-	String path="",title="",partname="",vid="",cid="",cookie="",
+	String path="",title="",partname="",vid="",cid="",
 	referer="Referer: http://www.bilibili.com/video/\r\n",
-	useragent="USER-AGENT: Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/43.0.2357.134 Safari/537.36\r\n";
+	useragent="User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/43.0.2357.134 Safari/537.36\r\n";
 	int hasinit=0; DanmakuViewControl dvc;
 	boolean allowhistory=false,readyplay=false,readyinfo=false;int readydanmaku=0;//0=准备加载，1=不开启弹幕，2=弹幕错误，3=弹幕完成
 	protected void onCreate(Bundle sis){
 		super.onCreate(sis);
 		This=this; if(sets==null)setsload();
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) 
+            //透明状态栏
+			getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
 		retryplay();//Looper.myQueue().addIdleHandler(this);
 	}
 	public boolean onIdle(){
 		switch(hasinit){
 			case 0://初始化界面
-				dvc=new DanmakuViewControl(this,R.layout.activity_video_play_simple,R.id.vplay_danmakuview,50);
+				dvc=new DanmakuViewControl(this,layout.activity_video_play_simple,id.vplay_danmakuview,50);
 				setContentView(dvc.getBackRootView());
-				btnbind(vplay_endplay,vplay_backward15,vplay_replay,vplay_panelhide,vplay_nextpart,vplay_frameplay);
-				vp=(VideoView)fv(vplay_player);
-				inf=(TextView)fv(vplay_timeinfo);
-				totaltime=(TextView)fv(vplay_totaltime);
-				pb=(ProgressBar)fv(vplay_progress);
-				panelfin=fv(vplay_panelfinish); visible(panelfin,false);
-				preload=fv(vplay_preload);
-				playdbg=(TextView)fv(vplay_playerdbg); 
-				dandbg=(TextView)fv(vplay_dandbg); dvc.setOnDanmakuLogListener(this);
-				scltip=(TextView)fv(vplay_scrolldisplay);
-				itv=(ImageView)fv(vplay_animtv);//加载电视动画
-				itv.setBackgroundResource(R.drawable.anim_bilitv);//设置为动态
+				btnbind(id.vplay_endplay,id.vplay_backward15,id.vplay_replay,id.vplay_panelhide,id.vplay_nextpart,id.vplay_frameplay);
+				vp=(VideoView)fv(id.vplay_player);
+				inf=(TextView)fv(id.vplay_timeinfo);
+				totaltime=(TextView)fv(id.vplay_totaltime);
+				pb=(ProgressBar)fv(id.vplay_progress);
+				panelfin=fv(id.vplay_panelfinish); visible(panelfin,false);
+				preload=fv(id.vplay_preload);
+				playdbg=(TextView)fv(id.vplay_playerdbg); 
+				dandbg=(TextView)fv(id.vplay_dandbg); dvc.setOnDanmakuLogListener(this);
+				scltip=(TextView)fv(id.vplay_scrolldisplay);
+				itv=(ImageView)fv(id.vplay_animtv);//加载电视动画
+				itv.setBackgroundResource(drawable.anim_bilitv);//设置为动态
 				AnimationDrawable bg=(AnimationDrawable)itv.getBackground();
 				bg.start();
 				path=getIntent().getStringExtra("path");
 				vid=getIntent().getStringExtra("vid");
 				cid=getIntent().getStringExtra("cid");
-				cookie=getIntent().getStringExtra("cookie");
 				allowhistory=getIntent().getBooleanExtra("history",false);
 				//loadStringParam(new String[]{path,title,partname,vid,cid,cookie},"path,title,partname,vid,cid,cookie".split(","));
 				//clearStringNull(title,partname,vid,cid,cookie);
@@ -80,14 +79,17 @@ public class VideoPlaySimple extends Activity1 implements View.OnClickListener,V
 					tip("被B站限制缓冲速度 "+sp+" kb");
 				}catch(Exception e){plog("B站限速信息读取异常。\n");}
 				mhead=new HashMap<String,String>();
-				if(android.os.Build.VERSION.SDK_INT >20){
+				int sdk=android.os.Build.VERSION.SDK_INT;
+				if(sdk >26){
+					mhead.put("Referer",referer.split(": ")[1]);
+					mhead.put("User-Agent",useragent.split(": ")[1]);
+				}else if(sdk >20){
 					mhead.put("Referer",referer.split(": ")[1]);
 					mhead.put("USER-AGENT",useragent.split(": ")[1]);
-					setVideoURI(Uri.parse(path),mhead);
 				}else{
 					mhead.put("USER-AGENT",useragent.split(": ")[1]+referer);
-					setVideoURI(Uri.parse(path),mhead);
 				}
+				setVideoURI(Uri.parse(path),mhead);
 				//if(false){ entertempdownplay(mhead); hasinit++; return false; }
 				plog("在线播放环境初始化完成，正在缓冲...\n");
 				break;
@@ -112,7 +114,7 @@ public class VideoPlaySimple extends Activity1 implements View.OnClickListener,V
 	//监听器 开始
 	Map<String,String>mhead; //boolean reseturl_android5=false;
 	public boolean onError(MediaPlayer p1, int what, int extra) { 
-		plog("播放器错误，按菜单键重试...what="+what+",extra="+extra);
+		plog("播放器错误，按菜单键重试... what="+what+",extra="+extra);
 		return true;
 	} final int progbarAccurate=5;//进度条精度
 	public void onPrepared(MediaPlayer p1){//开始播放视频！
@@ -128,15 +130,15 @@ public class VideoPlaySimple extends Activity1 implements View.OnClickListener,V
 	}
 	public void onCompletion(MediaPlayer p1){
 		visible(panelfin,true);
-		signHistory(vid,cid,-1,cookie);
+		signHistory(vid,cid,-1);
 	}
 	public void onClick(View v){switch(v.getId()){
-		case vplay_endplay: finish(); break;
-		case vplay_backward15: seekto(vp.getDuration()-15000); visible(panelfin,false); vp.start(); break;
-		case vplay_replay: seekto(0); visible(panelfin,false); vp.start(); break;
-		case vplay_panelhide: visible(panelfin,false); break;
-		case vplay_nextpart: break; //TODO
-		case vplay_frameplay: if(vp.getCurrentPosition()>0)try{ vp.start(); Thread.sleep(45); vp.pause();}catch(Exception e){} break;
+		case id.vplay_endplay: finish(); break;
+		case id.vplay_backward15: seekto(vp.getDuration()-15000); visible(panelfin,false); vp.start(); break;
+		case id.vplay_replay: seekto(0); visible(panelfin,false); vp.start(); break;
+		case id.vplay_panelhide: visible(panelfin,false); break;
+		case id.vplay_nextpart: break; //TODO
+		case id.vplay_frameplay: if(vp.getCurrentPosition()>0)try{ vp.start(); Thread.sleep(45); vp.pause();}catch(Exception e){} break;
 	}}
 	GestureDetector ges; int scrolltype=0,sclreal=0; double scrollval=0;//0=并无滚动。1=滚动进度条。2=滚动亮度。3=滚动音量
 	float volume=1;
@@ -264,7 +266,7 @@ public class VideoPlaySimple extends Activity1 implements View.OnClickListener,V
 		pb.setSecondaryProgress(buffprog*progbarAccurate);
 		inf.setText(Formater.format( playpos ));
 		if(readydanmaku==3)dvc.updateDanmaku( playpos ); //弹幕完成时才能updated
-		if(pb.getProgress()/progbarAccurate<99)signHistory(vid,cid,playpos/1000,cookie);//观看进度小于99%才能写入时间，这样不至于把-1也就是“已看完”覆盖掉
+		if(pb.getProgress()/progbarAccurate<99)signHistory(vid,cid,playpos/1000);//观看进度小于99%才能写入时间，这样不至于把-1也就是“已看完”覆盖掉
 	}
 	Thread updatethread=new Thread(){public void run(){
 		Runnable updaterun=new Runnable(){public void run(){progressupdate();}};
@@ -306,8 +308,7 @@ public class VideoPlaySimple extends Activity1 implements View.OnClickListener,V
 	final int menuidx=Menu.FIRST;
 	public boolean onCreateOptionsMenu(Menu menu) {
 		String[]menus="重试,启动附加功能...".split(",");
-		int[]menuicons={R.drawable.topmenu_refresh, R.drawable.topmenu_extmodule};
-		enableMenuIcon(menu);
+		int[]menuicons={drawable.topmenu_refresh, drawable.topmenu_extmodule};
 		for(int i=0;i<menus.length;i++)
 			menu.add(0,menuidx+i,0,menus[i]).setIcon(menuicons[i]);
 		return super.onCreateOptionsMenu(menu);
@@ -357,27 +358,21 @@ public class VideoPlaySimple extends Activity1 implements View.OnClickListener,V
 		Looper.myQueue().addIdleHandler(this);
 	}
 	long lastSignHistory=System.currentTimeMillis();
-	void signHistory(final String aid,final String cid,final int second,final String cookie){//历史记录:秒数为-1即"已看完"
+	void signHistory(String aid,String cid,int second){//历史记录:秒数为-1即"已看完"
 		if(allowhistory && (second==-1 || (lastSignHistory+30000<System.currentTimeMillis() && second>30))){//如果需要记录的时间为“已看完”，那么不需要判断上次是在什么时候记录的
 			lastSignHistory = System.currentTimeMillis();
-			new AsyncTask<Object,Integer,Integer>(){
-				protected void onPreExecute() {}
-				@Override protected Integer doInBackground(Object[] p1){
-					//check cookie
-					if (!(cookie.contains("DedeUserID=") && cookie.contains("SESSDATA=")))return 1;
-					//check prepared
-					String data=http("POST", "http://api.bilibili.com/x/report/web/heartbeat", cookie, "aid="+aid+"&cid="+cid+"&played_time="+second);
-					return new FSON(data).canRead() ?0: 2;
-				}
-				@Override protected void onPostExecute(Integer r) {
-					switch (r) {
-						case 1:
-							tip("历史记录失败（1）：\nCookie参数不足。"); break;
-						case 2:
-							tip("历史记录失败（2）：\n网络传输错误，请检查网络或更新简哔。"); break;
+			//检查 cookie
+			if (!(mcok.contains("DedeUserID=") && mcok.contains("SESSDATA="))){
+				tip("历史记录失败（1）：\nCookie参数不足。");
+				return;
+			}
+			new Http("POST", "http://api.bilibili.com/x/report/web/heartbeat", mcok, "aid="+aid+"&cid="+cid+"&played_time="+second){
+				@Override protected void onload(String data){
+					if(!new FSON(data).canRead()){
+						tip("历史记录失败（2）：\n网络传输错误，请检查网络或更新简哔。");
 					}
 				}
-			}.execute();
+			};
 		}
 	}
 }

@@ -14,6 +14,7 @@ import com.LEORChn.SimpleBili.R;
 import static android.os.PowerManager.*;
 import static leorchn.lib.HttpRequest.*;
 import java.text.*;
+import java.net.*;
 
 public class GetAllowance extends Service1 implements DialogInterface.OnClickListener{
 	/*服务固定*/public GetAllowance(){super();}
@@ -72,23 +73,17 @@ public class GetAllowance extends Service1 implements DialogInterface.OnClickLis
 		gotinfo=false; 生成通知("正在重新联网");
 		task=new AsyncTask<Void,Void,Integer>(){
 			@Override protected Integer doInBackground(Void[]p){
-				int result=0;
 				while(true){
-					result=2;//verify();
-					if(result!=0)break;//知道结果了，传出返回值
-					//try{Thread.sleep(5000);}catch(Exception e){}
+					if(start==null)break;//知道结果了，传出返回值
+					start=null;
+					try{Thread.sleep(1000);}catch(Exception e){}
 				}
 				//建议在验证时卡住，帐号过期时返回false，帐号验证后返回true
-				return result;/*查询信息();*/
+				return 2;/*查询信息();*/
 			}
 			@Override protected void onPostExecute(Integer p){
-				switch(p){
-					case 1://帐号验证过期
-						//onLogout(); break;
-					case 2://帐号验证完成
-						start();
-						gotinfo=true; 生成通知("正在享受社区温暖"); break;
-				}
+				gotinfo=true;
+				start();
 				//try{ Thread.sleep(3000); }catch(Exception e){}
 				task=null;//解除单次调用锁
 			}
@@ -99,12 +94,15 @@ public class GetAllowance extends Service1 implements DialogInterface.OnClickLis
 		if(start==null||!start.isAlive()){
 			start=new Thread(){public void run(){//连接的建立与保持 线程
 					try{ 
+						log("连接中...");
 						sok=SocketChannel.open(new InetSocketAddress(ip,port));
 						sok.configureBlocking(false);
 						Selector sel=Selector.open();
 						sok.register(sel, SelectionKey.OP_READ);
 						reading=new Listener(sel);//与本类相链接以防回收
+						reading.start();
 						sok.write(ByteBuffer.wrap(initpak));
+						log("大概已连接。"); 生成通知("正在享受社区温暖");
 						while(sok.isOpen()){//连接打开时无限心跳包
 							if(beattime<=0){sok.write(ByteBuffer.wrap(beatpak)); beattime=23; }
 							beattime--;
@@ -113,12 +111,15 @@ public class GetAllowance extends Service1 implements DialogInterface.OnClickLis
 						//init.obtainMessage(0).sendToTarget();//sock已断开，尝试重启
 						//此处需要无限判断是否有可用的网络连接，比如数据网和wifi，没网的时候就一直卡在这里
 						//整个try也可以用无限循环包裹起来，可降低线程重启次数
+					}catch(UnresolvedAddressException e){
+						log(E.trace(e));
+						log("建立连接错误：\n网络原因，解析IP失败。");
 					}catch(Exception e){
 						onWriteError(e);
+						log("连接时发生未知错误\n\n详情查看日志");
 					}finally{
-						try{ Thread.sleep(30000); }catch(Exception e2){}
-						start=null;
-						start();
+						try{ Thread.sleep(15000); }catch(Exception e2){}
+						init.obtainMessage(0).sendToTarget();
 					}
 				}};
 			start.start();
@@ -140,25 +141,37 @@ public class GetAllowance extends Service1 implements DialogInterface.OnClickLis
 		}else state=0;
 		return state;
 	}*/
+	int pakchoise=1;
+	int paksize=2^pakchoise*1024;
 	class Listener extends Thread{//监听 线程//事实上这里面我自己只做了略微修改
 		Selector s;
-		public Listener(Selector sel){s=sel; this.start();}
+		public Listener(Selector sel){s=sel;}
 		public void run() {
 			try {
 				while (s.select() > 0)
 					for (SelectionKey sk : s.selectedKeys()) {//遍历每个有可用IO操作Channel对应的SelectionKey
 						if (sk.isReadable()) {//如果该SelectionKey对应的Channel中有可读的数据
 							SocketChannel sc = (SocketChannel) sk.channel();// 使用NIO读取Channel中的数据
-							ByteBuffer buffer = ByteBuffer.allocate(1024);
+							ByteBuffer buffer = ByteBuffer.allocate(2048);
 							int len=sc.read(buffer);//len=已取出数据包的大小，如果过大则为-1
-							buffer.flip();
-							byte[]b=new byte[len];
-							System.arraycopy(buffer.array(),0,b,0,len);
-							onReceive(b,b.length);//将接收到的完整数据包发出
+							if(len<1){
+								byte[]c=buffer.array();
+								len=c.length;
+								for(int i=len;i>0;i--) if(c[i-1]>0)break; else len--;
+								log(string("遇到神秘乱流 ",len," byte"));
+							}else{
+								buffer.flip();
+								byte[]b=new byte[len];
+								System.arraycopy(buffer.array(),0,b,0,len);
+								onReceive(b,b.length);//将接收到的完整数据包发出
+							}
 							sk.interestOps(SelectionKey.OP_READ);//为下一次读取作准备
 						}
 						s.selectedKeys().remove(sk);//删除正在处理的SelectionKey
 					}
+			}catch(SocketException ex){
+				onReadError(ex);
+				log("连接错误：\n连接被断开，稍后自动重试。");
 			}catch(Exception ex){ onReadError(ex); }//ReadError会使用主动关闭连接，然后使上线程走出循环并结束
 		}
 	}
@@ -198,7 +211,7 @@ public class GetAllowance extends Service1 implements DialogInterface.OnClickLis
 		if(log.size()>49) log.remove(49);
 		//生成通知(); 
 		if(!s.startsWith("{")) //阻止调试信息
-		init.obtainMessage(9,s).sendToTarget();
+		init.obtainMessage(9,string("低保-",s)).sendToTarget();
 	}
 	public void joinTV(final int real_roomid,final String tv_id){//仅限由handler进入
 		new AsyncTask<Void,Integer,Void>(){
@@ -225,32 +238,40 @@ public class GetAllowance extends Service1 implements DialogInterface.OnClickLis
 						tip("电视领取功能可能已经失效");
 				}
 			}
-		}.execute();
+		}.executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
 	}
 	public void joinRaff(final int real_roomid){//仅限由handler进入
 		new AsyncTask<Void,Integer,Void>(){
 			@Override protected Void doInBackground(Void[]p){
 				if(signed.size()==0)return null;
-				User tmp=all.get(signed.get(0));
-				String s=http("GET", "http://api.live.bilibili.com/activity/v1/Raffle/check?roomid="+real_roomid, tmp.cok, "");
-				FSON j=new FSON(s);
-				if(j.canRead())
-					switch(j.get("code",5001)){//判断第一次返回的状态码，比如登录凭证过期等
-						case 0://正常
+				for(int urNo=signed.size()-1;urNo>=0;urNo--){//帐号循环
+					User tmp=all.get(signed.get(urNo));
+					String s=http("GET", string("http://api.live.bilibili.com/activity/v1/Raffle/check?roomid=",real_roomid), tmp.cok, "");
+					FSON j=new FSON(s);
+					if(j.canRead())
+						if(j.get("code",5001)==0){//判断第一次返回的状态码，比如登录凭证过期等
+							//正常
 							try{//获取抽奖id时可能会报空指针？
-								String raffid=j.getList("data").getObject(0).get("raffleId","-1");//RaffleId
-								for(int i=0,len=signed.size();i<len;i++){
-									tmp=all.get(signed.get(i));
-									s = http("GET", string("http://api.live.bilibili.com/activity/v1/Raffle/join?roomid=", real_roomid, "&raffleId=", raffid), string(tmp.cok,"\r\nReferer: http://live.bilibili.com/",real_roomid), "");
+								FSON ls=j.getList("data");
+								for(int idx=0,idxlen=ls.length();idx<idxlen;idx++){//抽奖编号循环
+									FSON singleRaff=ls.getObject(idx);
+									if(singleRaff.get("status",0)!=1) continue; //表示这个已经抽过
+									String raffid=singleRaff.get("raffleId","-1");//RaffleId
+									s = http("GET", string("http://api.live.bilibili.com/activity/v1/Raffle/join?roomid=", real_roomid, "&raffleId=", raffid),
+											 string(tmp.cok,"\r\nReferer: http://live.bilibili.com/",real_roomid), "");
 									j = new FSON(s);
 									if (j.canRead()) publishProgress(tmp.uid, j.get("code", 5001));
-								}log("{ raff result"+s);return null;
+									else idx--;
+									log("{ raff result "+s);
+								}continue;
 							}catch(Exception e){}
-							publishProgress(tmp.uid, 5002);return null;
-						default:
-							publishProgress(tmp.uid, j.get("code",5001));return null;
-					}
-				publishProgress(tmp.uid, 4081);return null;
+							publishProgress(tmp.uid, 5002); continue;
+						}else{
+							publishProgress(tmp.uid, j.get("code",5001)); continue;
+						}
+					publishProgress(tmp.uid, 4081);
+				}
+				return null;
 			}
 			@Override protected void onProgressUpdate(Integer[]s){
 				User tmp=all.get(s[0]);
@@ -260,15 +281,16 @@ public class GetAllowance extends Service1 implements DialogInterface.OnClickLis
 					case -401://登录信息过期
 						tmp.onLogout();break;
 					case 4081://网络超时
-						tip("网络超时，领祭典失败啦"); break;
-					case 5001://api过期
-						tip("祭典领取功能可能已经失效"); break;
+						tip("网络超时，粮草领取失败"); break;
 					case 5002://api错误
-						tip("api运行错误");
+						tip("api运行错误");break;
+					case 5001://api过期
+					default:
+						tip("粮草领取功能可能已经失效");
 				}
 
 			}
-		}.execute();
+		}.executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
 	}
 	String[]giftname={"电器x1","粮草x1"};
 	void onJoinSuccessful(int what){
@@ -278,22 +300,34 @@ public class GetAllowance extends Service1 implements DialogInterface.OnClickLis
 	/*void onLogout(){
 		生成通知("登录凭证失效");
 	}*/
+	SimpleDateFormat getday=new SimpleDateFormat("dd");//应某人而生的“每日次数”
+	String checkday=null;//应某人而生的“每日次数”
 	static final int NotificationID=0xf7a12b1b;//getHashCRC32("appforms.GetAllowance".getBytes());
 	void 生成通知(){ 生成通知(""); }
 	void 生成通知(String ext){
-		int totaltv=0,totalraff=0;
+		String today=getday.format(System.currentTimeMillis());
+		if(!today.equals(checkday)){ checkday=today; movecount(); }//应某人而生的“每日次数”
+		int totaltv=0,totalraff=0,todaytv=0,todayraff=0;
 		for(int i=0,len=added.size();i<len;i++){
 			User tmp=all.get(added.get(i));
-			totaltv+=tmp.tvs; totalraff+=tmp.raffs;
-		}
+			todaytv+=tmp.tvs; todayraff+=tmp.raffs;
+			totaltv+=tmp.tvst; totalraff+=tmp.raft;
+		} totaltv+=todaytv; totalraff+=todayraff;
 		Notification n=new 通知()
 			.提示("正在启动...")
 			.标题(string("(",signed.size(),"/",added.size(),") ",ext))
-			.说明("总领取人次 电器x "+totaltv+" ,粮草x "+totalraff)
+			.说明(string("总领取人次 电器x ",totaltv," ,粮草x ",totalraff," (今 ",todaytv," / ",todayraff,")"))
 			.运行中(true).自动注销(false)
 			.图标ID(gotinfo?R.drawable.gift1:R.drawable.gift1_off)
 			.点击行为(new Runnable(){public void run(){showControls();}}).创建();
 		this.startForeground(NotificationID,n);//
+	}
+	void movecount(){//“每日次数”
+		for(int i=0,len=added.size();i<len;i++){
+			User tmp=all.get(added.get(i));
+			tmp.tvst+=tmp.tvs; tmp.tvs=0;
+			tmp.raft+=tmp.raffs; tmp.raffs=0;
+		}log("已移除");
 	}
 	boolean alreadyShowControls=false;
 	String[]m;
@@ -303,7 +337,7 @@ public class GetAllowance extends Service1 implements DialogInterface.OnClickLis
 		l.add("退出挂机"); //l.add("注销(todo)");
 		l.add("开发者运行日志");
 		//l.add("尝试读取多帐号");
-		l.add(string("最后心跳:",fmter.format(lastheart),"\n名称\t | 电视/粮草\t | 状态"));
+		l.add(string("最后心跳: ",fmter.format(lastheart),"\n名称\t | 电视/粮草\t | 状态"));
 		StringBuilder strb=new StringBuilder();
 		for(int i=0,len=added.size();i<len;i++){
 			User tmp=all.get(added.get(i));
@@ -348,7 +382,7 @@ public class GetAllowance extends Service1 implements DialogInterface.OnClickLis
 		alert(this,true,"确认退出？","",
 			new String[]{"是","取消"},
 			new Runnable(){public void run(){
-				This.stopSelf();
+				android.os.Process.killProcess(android.os.Process.myPid());
 			}});
 	}
 	void checklog(){
@@ -366,11 +400,11 @@ public class GetAllowance extends Service1 implements DialogInterface.OnClickLis
 	static class User{
 		public User(String cookie){ onUpdate(cookie); }
 		String cok,name; User this_User=this;
-		int uid=0,tvs=0,raffs=0;
+		int uid=0,tvs=0,raffs=0, tvst=0,raft=0;
 		public void check(){
 			new AsyncTask<Void,Void,String>(){
 				@Override protected String doInBackground(Void[]p){
-					return http("GET","http://api.live.bilibili.com/live_user/v1/UserInfo/get_info_in_room?roomid=3",cok,"");
+					return http("GET","http://api.live.bilibili.com/live_user/v1/UserInfo/get_info_in_room?roomid=3",cok,"");//完全忘了为什么选3号来进行查询
 				}
 				@Override protected void onPostExecute(String s){
 					FSON j=new FSON(s);

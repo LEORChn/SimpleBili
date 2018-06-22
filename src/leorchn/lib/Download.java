@@ -63,7 +63,7 @@ public abstract class Download extends AsyncTask<String,Integer,Object>{
 		else pl("download.java - unknown object type: "+f);
 		pl("download.java - so this is download result");
 	}
-	void progress(int...p){}
+	protected void progress(int...p){}
 	abstract void done(File f)
 	abstract void fail(Throwable t)
 	private void pl(String...s){for(String st:s)System.out.println(st);}

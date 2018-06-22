@@ -3,7 +3,6 @@
 	xmlns:android="http://schemas.android.com/apk/res/android"
 	android:layout_width="fill_parent"
 	android:layout_height="fill_parent"
-	
 	android:orientation="vertical">
 
 	<LinearLayout
@@ -54,33 +53,37 @@
 			android:layout_weight="1.0"
 			android:id="@+id/main_searchbox"/>
 
-		<ImageButton
+		<ImageView
 			style="@style/actionBartton"
 			android:src="@drawable/topmenu_search"
 			android:id="@+id/main_search"/>
 
-		<ImageButton
+		<ImageView
 			style="@style/actionBartton"
 			android:src="@drawable/topmenu_downloads"
 			android:id="@+id/main_download"/>
 
-		<ImageButton
+		<ImageView
 			style="@style/actionBartton"
 			android:src="@drawable/topmenu_setting"
 			android:id="@+id/main_gosetting"/>
 
 	</LinearLayout>
 
-	
+	<ScrollView
+		android:id="@+id/main_feedlist"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:layout_marginLeft="5dp"
+		android:layout_marginRight="5dp"
+		android:layout_weight="1.0">
 
-		<ListView
-			android:id="@+id/main_feedlist"
+		<LinearLayout
+			android:layout_height="wrap_content"
 			android:layout_width="match_parent"
-			android:layout_height="match_parent"
-			android:layout_marginLeft="5dp"
-			android:layout_marginRight="5dp"
-			android:layout_weight="1.0"/>
+			android:orientation="vertical"/>
 
+	</ScrollView>
 
 	<LinearLayout
 		android:layout_height="46dp"
@@ -89,14 +92,14 @@
 		android:background="#000000"
 		style="?android:attr/actionBarStyle">
 
-		<ImageButton
+		<ImageView
 			style="@style/standBtn"
 			android:layout_width="match_parent"
 			android:src="@drawable/topmenu_menu"
 			android:layout_weight="1.0"
 			android:id="@+id/main_menu"/>
 
-		<ImageButton
+		<ImageView
 			style="@style/standBtn"
 			android:layout_width="match_parent"
 			android:src="@drawable/topmenu_refresh"

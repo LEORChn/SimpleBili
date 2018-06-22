@@ -4,7 +4,6 @@
 	android:layout_width="fill_parent"
 	android:layout_height="wrap_content"
 	android:orientation="vertical"
-	android:paddingBottom="10dp"
 	android:paddingTop="10dp"
 	android:id="@+id/listsub_videofeeds"
 	android:background="@drawable/btn_top">
@@ -12,73 +11,99 @@
 	<LinearLayout
 		android:layout_height="wrap_content"
 		android:layout_width="match_parent"
-		android:orientation="vertical">
+		android:orientation="horizontal"
+		android:gravity="center_vertical">
 
-		<LinearLayout
-			android:layout_height="wrap_content"
-			android:layout_width="match_parent"
-			android:orientation="horizontal">
+		<ImageView
+			android:layout_height="32dp"
+			android:layout_width="32dp"
+			desc="@android:drawable/ic_menu_report_image"
+			android:id="@+id/listsub_auth_img"/>
 
-			<TextView
-				android:layout_height="match_parent"
-				android:text="某UP主"
-				android:textAppearance="?android:attr/textAppearanceMedium"
-				android:layout_width="wrap_content"
-				android:id="@+id/listsub_auth_name"
-				android:textColor="#FB7299"/>
-
-			<TextView
-				android:layout_height="wrap_content"
-				android:text="XX分钟前 投稿"
-				android:textAppearance="?android:attr/textAppearanceMedium"
-				android:layout_width="match_parent"
-				android:id="@+id/listsub_submit_time"
-				android:textColor="#FB7299"
-				android:paddingBottom="15dp"
-				android:gravity="right"
-				android:layout_weight="1.0"/>
-
-		</LinearLayout>
+		<TextView
+			android:layout_height="match_parent"
+			android:text="视频发布者"
+			android:textAppearance="?android:attr/textAppearanceMedium"
+			android:layout_width="wrap_content"
+			android:id="@+id/listsub_auth_name"
+			android:textColor="#FB7299"/>
 
 		<TextView
 			android:layout_height="wrap_content"
-			android:text="Title Sample Text"
-			android:textAppearance="?android:attr/textAppearanceMedium"
+			android:text="XX分钟前 投稿"
 			android:layout_width="match_parent"
-			android:id="@+id/listsub_v_title"/>
+			android:id="@+id/listsub_submit_time"
+			android:textColor="#FB7299"
+			android:paddingBottom="15dp"
+			android:gravity="right"
+			android:layout_weight="1.0"/>
+
+	</LinearLayout>
+
+	<LinearLayout
+		android:layout_height="wrap_content"
+		android:layout_width="match_parent"
+		android:orientation="horizontal">
+
+		<viewproxy.ImageView
+			android:layout_height="80dp"
+			android:layout_width="160dp"
+			desc="@android:drawable/ic_menu_report_image"
+			android:id="@+id/listsub_v_img"/>
 
 		<LinearLayout
-			android:layout_height="wrap_content"
-			android:layout_width="wrap_content"
-			android:orientation="horizontal">
-
-			<ImageView
-				android:layout_height="match_parent"
-				android:layout_width="wrap_content"
-				android:src="@android:drawable/ic_menu_slideshow"/>
+			android:layout_height="match_parent"
+			android:layout_width="match_parent"
+			android:orientation="vertical">
 
 			<TextView
 				android:layout_height="wrap_content"
-				android:text="0"
-				android:textAppearance="?android:attr/textAppearanceSmall"
-				android:layout_width="wrap_content"
-				android:id="@+id/listsub_v_played"/>
+				android:text="Title Sample Text"
+				android:textAppearance="?android:attr/textAppearanceMedium"
+				android:layout_width="match_parent"
+				android:id="@+id/listsub_v_title"/>
 
-			<ImageView
+			<LinearLayout
 				android:layout_height="match_parent"
 				android:layout_width="wrap_content"
-				android:src="@android:drawable/ic_menu_send"/>
+				android:orientation="horizontal"
+				android:gravity="bottom">
 
-			<TextView
-				android:layout_height="wrap_content"
-				android:text="0"
-				android:textAppearance="?android:attr/textAppearanceSmall"
-				android:layout_width="wrap_content"
-				android:id="@+id/listsub_v_dan"/>
+				<ImageView
+					android:layout_height="24dp"
+					android:layout_width="wrap_content"
+					android:id="@+id/listsub_ic_slideshow"/>
+
+				<TextView
+					android:layout_height="wrap_content"
+					android:text="0"
+					android:textAppearance="?android:attr/textAppearanceSmall"
+					android:layout_width="wrap_content"
+					android:id="@+id/listsub_v_played"/>
+
+				<ImageView
+					android:layout_height="24dp"
+					android:layout_width="wrap_content"
+					android:id="@+id/listsub_ic_send"/>
+
+				<TextView
+					android:layout_height="wrap_content"
+					android:text="0"
+					android:textAppearance="?android:attr/textAppearanceSmall"
+					android:layout_width="wrap_content"
+					android:id="@+id/listsub_v_dan"/>
+
+			</LinearLayout>
 
 		</LinearLayout>
 
 	</LinearLayout>
+
+	<View
+		android:layout_height="1dp"
+		android:background="?android:attr/dividerVertical"
+		android:layout_width="match_parent"
+		android:layout_marginTop="10dp"/>
 
 </LinearLayout>
 

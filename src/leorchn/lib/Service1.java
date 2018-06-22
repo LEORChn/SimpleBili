@@ -3,9 +3,15 @@ import android.app.*;
 import android.os.*;
 import android.content.*;
 import android.view.*;
+import java.io.*;
+import com.LEORChn.SimpleBili.R;
 
-public class Service1 extends Service {
+public class Service1 extends Service implements Thread.UncaughtExceptionHandler{
 	@Override public IBinder onBind(Intent p1){ return null; }
+	
+	protected static R.id id;
+	protected static R.layout layout;
+	protected static R.drawable drawable,draw;
 	
 	protected static String string(Object...str){ return buildstring(str).toString(); }
 	protected static StringBuilder buildstring(Object...str){
@@ -39,7 +45,7 @@ public class Service1 extends Service {
 		public void onClick(DialogInterface p1,int p2){ onClick(p2); }
 		void onClick(int i){}
 	}
-	protected class 通知 extends BroadcastReceiver{
+	protected class 通知 extends BroadcastReceiver implements Runnable{
 		private android.graphics.Bitmap BIC=null;
 		private int SIC=0;private long 时间=System.currentTimeMillis();
 		private String 标题="",说明="",提示="",唯一标记=Long.toHexString(时间);
@@ -71,7 +77,7 @@ public class Service1 extends Service {
 			n.icon=SIC;
 			if(BIC!=null)n.largeIcon=BIC;
 			IntentFilter 行为筛选器 = new IntentFilter(唯一标记);// 行为筛选器如果用在服务上可以用随机生成的一个字符串
-			if(行为 instanceof Runnable)来源.registerReceiver(this,行为筛选器);
+			来源.registerReceiver(this,行为筛选器);
 			return n;
 		}
 		public void onReceive(Context arg0, Intent 行为包) {
@@ -81,7 +87,48 @@ public class Service1 extends Service {
 					System.gc();
 				}
 				if(行为 != null)行为.run(); //点击监听器.onClick(arg0,行为包);  // 标记被初始化为 E4ANotification
+				run(); onclick();
 			}
+		}
+		public void run(){};
+		void onclick(){};
+	}
+	static Service1 This;
+	public Service1(){
+		super(); This=this;
+		Thread.setDefaultUncaughtExceptionHandler(this);
+	}
+	@Override public void uncaughtException(final Thread thread, final Throwable ex) {
+		rep = E.trace(ex);
+		new AfterException();//新建线程显示消息
+		//startActivity(new Intent(this,ExceptionReport.class).putExtra("info",errRep));
+		//defUeh.uncaughtException(thread,ex);
+	}
+	private String rep; private AlertDialog excad=null;
+	private class AfterException extends Thread implements DialogInterface.OnClickListener{
+		public AfterException(){ this.start(); }
+		public void run(){
+			savelog();
+			Looper.prepare();
+			if(excad!=null)onClick(null,10);
+			excad=new AlertDialog.Builder(This).setTitle("温和的错误提示")
+				.setMessage("程序发生了错误并即将退出。以下信息已自动保存。\n"+rep)
+				.setNeutralButton("关闭", this)
+				.create();
+			excad.getWindow().setType(WindowManager.LayoutParams.TYPE_SYSTEM_ALERT);
+			excad.show();
+			Looper.loop();
+		}
+		public void onClick(DialogInterface p1, int p2) {
+			System.exit(10);
+		}
+		void savelog(){
+			try{
+				File log=new File(Activity1.DIR_cache_log);
+				log.mkdirs();
+				log=log.createTempFile(string(System.currentTimeMillis(),"_"),".log",log);
+				Text.write(rep,log.getPath(),"utf-8");
+			}catch(Exception e){}
 		}
 	}
 }

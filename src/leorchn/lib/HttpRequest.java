@@ -9,7 +9,6 @@ import android.content.*;
 import android.net.*;
 import android.os.*;
 import appforms.*;
-import formevents.*;
 import java.io.*;
 import java.net.*;
 import java.util.*;
@@ -90,7 +89,7 @@ public class HttpRequest {
 	public static void 下载文件(String 网络文件,String 文件名,Runnable 下载完成时执行){下载文件(网络文件,文件名,下载完成时执行,true);}
 	public static void 下载文件(String 网络文件,String 文件名,Runnable 下载完成时执行,boolean 覆盖文件){
 		try{
-			Context c=Main_Feeds.getContext();//创建下载任务
+			Context c=simplebili.App.getContext();//创建下载任务
 			java.io.File f=c.getExternalCacheDir();f.mkdir();
 			DownloadManager.Request request = new DownloadManager.Request(Uri.parse(网络文件));
 			request.setAllowedOverRoaming(false);//指定下载路径和下载文件名
@@ -144,10 +143,10 @@ public class HttpRequest {
 			outputStream.close();
 			return new String(output, "UTF-8");
 		}catch(Exception e){
-			return Arrays.toString(e.getStackTrace());
+			return E.trace(e);
 		}
     }
-	static void tip(String s){Toast.makeText(Main_Feeds.getContext(),s,0).show();}
+	static void tip(String s){Toast.makeText(simplebili.App.getContext(),s,0).show();}
 	abstract static class t{
 		abstract void r();
 		public t(){

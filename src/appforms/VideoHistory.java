@@ -74,7 +74,7 @@ public class VideoHistory extends Activity1 implements OnClickListener,MessageQu
 	void nextHistory(int page){
 		
 		Http h1=new Http("GET","http://api.bilibili.com/x/v2/history?ps=20&pn="+page, cookie, ""){
-			void fin(String data){
+			@Override protected void onload(String data){
 				FSON j=new FSON(data);
 				if(!j.canRead())return;
 					int runtime=0;
@@ -118,8 +118,8 @@ public class VideoHistory extends Activity1 implements OnClickListener,MessageQu
 				}catch(Exception nfe){//NumberFormatException
 					final String detail=runtime+"ran times:"+E.trace(nfe)+j.toString();
 					//runOnUiThread(new Runnable(){public void run(){
-					int chose=信息框2(This,"Error 1002",detail,"忽略错误并继续","复制错误信息");
-					if(chose==1){ 复制文本(detail); tip("复制成功"); }
+					//int chose=信息框2(This,"Error 1002",detail,"忽略错误并继续","复制错误信息");
+					//if(chose==1){ 复制文本(detail); tip("复制成功"); }
 					//		}});
 					
 				}

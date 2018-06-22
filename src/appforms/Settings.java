@@ -27,8 +27,8 @@ public class Settings extends Activity1 implements View.OnClickListener{
 		switch(hasinit){
 			case 0: setContentView(layout.activity_settings); break;
 			case 1:
-				seticon(fv(id.setting_goback),icon.nav_cancel);
-				seticon(fv(id.setting_extendmodule),icon.nav_plugin);
+				seticon(fv(id.setting_goback),ic_sys(d.topmenu_cancel));
+				seticon(fv(id.setting_extendmodule),ic_sys(d.topmenu_extmodule));
 				break;
 			case 2: loadUserView(); break;
 			case 3:
@@ -56,17 +56,20 @@ public class Settings extends Activity1 implements View.OnClickListener{
 			case id.setting_addUser:
 				startActivityForResult(new Intent(this,Login.class),1); //startActivity(new Intent(this,Login.class));
 				return;
+			case id.setting_ano_help:
+				new Msgbox("隐身模式去哪了？","以隐身模式播放视频能够临时禁用历史记录功能。\n去视频详情页面长按播放键后选择“隐身播放”就可以使用啦！","ok");
+				return;
 			case id.user_star:
 				if(v.getTag() instanceof Integer);else return;
-				final int uid=user.getList("order").get((int)v.getTag(),0);
-				final FSON su=user.getObject("users").getObject(string(uid));
+				final int uid=user.getUid((int)v.getTag());
+				final String un=user.getName(uid);
 				new Msgbox("更改主帐户",
-					string("确定更改主帐户为 ", su.get("n","神秘用户"), " ？"),
+					string("确定更改主帐户为 ", un, " ？"),
 					"设为主帐户", "取消"){
-					void onClick(int i){
+					protected void onClick(int i){
 						if(i==vbyes){
-							userset(uid);
-							usersave();
+							user.set(uid);
+							user.save();
 							loadUserView();
 						}
 					}
@@ -74,28 +77,50 @@ public class Settings extends Activity1 implements View.OnClickListener{
 			case id.user_logout:
 				if(v.getTag() instanceof Integer);else return;
 				final int ord=(int)v.getTag();
-				final int uid2=user.getList("order").get(ord,0);
-				final FSON su2=user.getObject("users").getObject(string(uid2));
+				final int uid2=user.getUid(ord);
+				final String un2=user.getName(uid2);
 				new Msgbox("删除帐号",
-					string("确定删除帐号 ", su2.get("n","神秘用户"), " 的记录？"),
+					string("确定删除帐号 ", un2, " 的记录？"),
 					"删除帐号", "取消"){
-					void onClick(int i){
+					@Override protected void onClick(int i){
 						if(i==vbyes){
-							if(user.get("main",0)==ord)userset(0);//如果删除主帐户，设主帐户为0
-							else if(user.get("main",0)>ord)user.set("main",user.get("main",1)-1);
+							user.logout(user.getUid(ord));
+							//boolean reset=user.getUid()==user.getUid(ord);//如果删除主帐户
+							
+							/*else if(user.get("main",0)>ord)user.set("main",user.get("main",1)-1);
 							FSON neword=user.getList("order");
 							neword.remove(ord);
-							user.set("order",neword);
-							usersave();
+							user.set("order",neword);*/
+							user.save();
 							loadUserView();
 						}else{
-							tip(string("main=",user.get("main",0),"ord=",ord));
+							tip(string("main=",user.getUid(),"ord=",ord));
 						}
 					}
 				};return;
-			case id.setting_orderUser: multip("排序功能以后开放"); break;
+			case id.setting_orderUser:
+				multip("排序功能以后开放");
+				String p=getExternalCacheDir().getPath()+"/cookie.txt";
+				if(new File(p).exists()){
+					String[]us=Text.read(p).replaceAll("\r","").split("\n");
+					for(String u:us){
+						final String fu=u;
+						new Msgbox("ready",fu,"ok"){
+							@Override protected void onClick(int i2){
+								tip(""+user.add(string("Cookie: ",fu,";")));
+								loadUserView();
+								user.save();
+							}
+						};
+					}
+				}
+				p=getExternalCacheDir().getPath()+"/user.info";
+				File f=new File(p);
+				if(f.exists()){
+					Text.write( Text.read(p), DIR_data+"/user.info", "utf-8");
+				}
+				break;
 			case id.setting_addcookie:
-				//tip(useradd("")+"");
 				//tip(user.toString());
 				loadUserView(); return;
 			case id.listsub_bg: setsitem_onclick((String)v.getTag()); return; //设置项目
@@ -111,24 +136,29 @@ public class Settings extends Activity1 implements View.OnClickListener{
 		super.onActivityResult(reqCode, resCode, data);
 		if(reqCode==1){//表示是从登录窗口返回的
 			switch(resCode){//0=已登录,-1=网络异常,-5=用户取消,-11=识别码错误,-12=识别码失效
-				case 0://在登录完成自动返回时更新
-					user=new FSON(data.getStringExtra("user"));
-					usersave();//由于进程隔离，所以需要从浏览器进程拿信息来本进程保存，以保证现有信息同步
+				case 1://在登录完成自动返回时更新
+					user.load(data.getStringExtra("user"));
+					user.save();//由于进程隔离，所以需要从浏览器进程拿信息来本进程保存，以保证现有信息同步
 					loadUserView();
 					break;
-				case -5: tip("您已取消登录"); break;//用户取消登录
-				default:
+				case -1://网络错误
 					retry(data.getStringExtra("Cookie"),resCode);
+					break;
+				case -5: tip("您已取消登录"); break;//用户取消登录
+				case -11://cookie格式无效
+				case -12://cookie失效、验证失败
+				default:
+					new Msgbox("意外操作 "+resCode,"WTF？你刚刚有在登录吗？\n系统意外调用了登录返回，幸好这个bug已经被阻止了。","继续使用");
+					return;
 			}
 		}
 	}
 	void retry(final String cok,final int reason){
 		new Msgbox("","由于某些原因登录失败，代码 "+reason+"\n要重试吗？","重试","否"){
-			void onClick(int i){
+			protected void onClick(int i){
 				if(i==vbyes){
-					i=useradd(cok);
-					if(i==0) loadUserView();// 此处i==0意味着操作是否成功（即等于0，失败为负数）
-					else retry(cok,i);
+					User.UserAddResult r=user.add(cok);
+					onActivityResult(1,r.status,new Intent().putExtra("Cookie",cok).putExtra("user",r.users.toString()));
 				}
 			}
 		};
@@ -137,34 +167,28 @@ public class Settings extends Activity1 implements View.OnClickListener{
 	void loadUserView(){
 		ViewGroup v=(ViewGroup)fv(id.setting_usersViewGroup);
 		v.removeAllViews();
-		FSON us=user.getObject("users"),od=user.getList("order");
-		for(int i=0,len=od.length();i<len;i++){
-			int uid=od.get(i,0);
-			FSON su=us.getObject(string( uid ));
-			if(!su.get("l",false))continue;//“已删除”标记，为了方便覆盖
-			boolean ismain=i==user.get("main",-1);//是否是主帐户
+		int[]od=user.getUids();
+		for(int i=0,len=od.length;i<len;i++){
+			int uid=od[i];
+			//if(!su.get("l",false))continue;//“已删除”标记，为了方便覆盖
+			boolean ismain=user.getUid(i)==user.getUid();//是否是主帐户
 			ViewGroup ni=(ViewGroup) LayoutInflater.from(this).inflate(// 判断帐户格局
 				ismain?
 					layout.listsub_user_main:
 					layout.listsub_user_secondary
 				,null);
-			((TextView)fv(ni,id.user_name)).setText(su.get("n","神秘用户"));// 赋值帐户名称
+			((TextView)fv(ni,id.user_name)).setText(user.getName(uid));// 赋值帐户名称
 			((TextView)fv(ni,id.user_expire)).setText(// 赋值过期信息
-				string("于 ",year_hour.format(su.get("d",0l)*1000),"时 过期"));
+				string("于 ",year_hour.format(user.getExpire(uid)*1000),"时 过期"));
 			View switcher=fv(ni,ismain? id.user_stared: id.user_star);
-			seticon(switcher,ismain? icon.stared: icon.star);// 主次帐户星标图片
+			seticon(switcher,ismain? ic_sys(d.topmenu_stared): ic_sys(d.topmenu_star));// 主次帐户星标图片
 			View headbox=fv(ni,id.user_head);
 			if(ismain) v.addView(ni,0); else v.addView(ni);// 主要/次要帐户排序
-			if(uid==0){// 隐身模式-隐藏右侧删除按钮-使用内部图片
-				seticon(headbox,icon.user(0));
-				fv(ni,id.user_logout_background).setVisibility(View.INVISIBLE);
-			}else{
-				new HeadLoader(uid, su.get("h", ""),headbox);
-				View logout=fv(ni,id.user_logout);
-				seticon(logout,icon.nav_cancel);
-				logout.setTag(i);
-				btnbind(logout);
-			}
+			setUserHead(headbox,uid);
+			View logout=fv(ni,id.user_logout);
+			seticon(logout,ic_sys(d.topmenu_cancel));
+			logout.setTag(i);
+			btnbind(logout);
 			if(!ismain){
 				switcher.setTag(i);// 设定编号
 				btnbind(switcher);// 次要帐户绑定切换操作

@@ -9,6 +9,8 @@ public class App extends Application {
 	public void onCreate(){ super.onCreate();
 		//setMainCookie();
 		c=getApplicationContext();
+		System.out.println("application loaded");
+		if(com.LEORChn.SimpleBili.BuildConfig.DEBUG) startService(new Intent(this,appforms.MemMonitor.class));
 	}
 	static Context c;
 	public static Context getContext(){return c;}

@@ -6,61 +6,62 @@ import android.net.*;
 import android.os.*;
 import android.view.*;
 import android.view.View.*;
-import android.webkit.*;
 import android.widget.*;
-import com.LEORChn.SimpleBili.*;
-import formevents.*;
 import leorchn.lib.*;
 import simplebili.lib.*;
 
 import static leorchn.lib.Global.*;
-import static leorchn.lib.WidgetOverride.*;
-//import static formevents.程序事件.*;
-public class Main_Feeds extends Activity1 implements OnClickListener,OnKeyListener,OnGenericMotionListener,AbsListView.OnScrollListener{
-    FeedListControl flc;
-    WebView w;
-	ImageView h;
-	static Activity This; public static Activity getContext(){return This;}
-    protected void onCreate(Bundle savedInstanceState) {
-		This=this;
+
+public class Main_Feeds extends Activity1 implements OnClickListener,OnKeyListener{//},OnGenericMotionListener{//},AbsListView.OnScrollListener{
+	protected void onCreate(Bundle savedInstanceState) {
 		addIdleHandler();
-        super.onCreate(savedInstanceState);
-		startActivity(new Intent(this,Settings.class).putExtra("launchfromfeed",true)); finish();
+		super.onCreate(savedInstanceState);
+		//startActivity(new Intent(this,Settings.class).putExtra("launchfromfeed",true)); finish();
 	}
-	ImageView myhead;
-	TextView name,coin;
 	int hasinit=0;
+
+	@Override protected void onResume(){
+		super.onResume();
+		if(hasinit==0)return;
+		setText(fv(id.main_myname),user.getName());
+		setUserHead(fv(id.main_myhead),user.getUid());
+	}
 	@Override protected boolean onIdle() {
 		switch(hasinit){
-			case 0: setContentView(R.layout.activity_main); break;
+			case 0: setContentView(layout.activity_main); break;
 			case 1:
-				if(mcok==null){//检测到帐户无效，打开设置界面重设帐户
-					startActivity(new Intent(this,Settings.class));
-					finish();
-					return false;
-				}
-				ListView vl=(ListView)fv(id.main_feedlist);//提取动态列表组件
-				vl.setOnScrollListener(this); //允许用手指刷动态
-				vl.setOnGenericMotionListener(this); //允许用鼠标滚轮刷动态
+				onResume();
+				sv=new ScrollViewV((ScrollView)fv(id.main_feedlist)){
+					@Override public void onScroll(int from,int to){
+						onScrolling(from,to);
+					}
+				};//提取动态列表组件
 				
-				flc=new FeedListControl(this,vl,mcok);
-				myhead=(ImageView)fv(id.main_myhead);
-				name=(TextView)fv(id.main_myname);
 				coin=(TextView)fv(id.main_mycoin);
 				
-				btnbind(id.main_search,id.main_download,id.main_gosetting,id.main_menu,id.main_refreshfromfirstpage);
 				userinf=fv(id.main_userinfo);
 				searchbox=(EditText)fv(id.main_searchbox);
 				searchbox.setOnKeyListener(this);
 				visible(searchbox,false);
+				if(false&&mcok==null){//强行阻止，检测到帐户无效，打开设置界面重设帐户
+					startActivity(Settings.class);
+					return false;
+				}
+				btnbind(id.main_search,id.main_download,id.main_gosetting,id.main_menu,id.main_refreshfromfirstpage);
 				break;
 			case 3:
-				
+				seticon(fv(id.main_search),ic_sys(d.topmenu_search));
+				seticon(fv(id.main_download),ic_sys(d.topmenu_downloads));
+				seticon(fv(id.main_gosetting),ic_sys(d.topmenu_setting));
+				seticon(fv(id.main_menu),ic_sys(d.topmenu_menu));
+				seticon(fv(id.main_refreshfromfirstpage),ic_sys(d.topmenu_refresh));
+				getVideoUpdates(1);
 		}
 		hasinit++;
 		return hasinit<9;
 	}
-	View userinf;EditText searchbox;
+	View userinf;EditText searchbox; TextView name,coin;
+	ScrollViewV sv;
 	//监听器 开始
 	public void onClick(View v){ switch(v.getId()){
 		case id.main_search:
@@ -69,97 +70,78 @@ public class Main_Feeds extends Activity1 implements OnClickListener,OnKeyListen
 				visible(searchbox,true);//已修BUG:输入框出现时，请自动获取焦点
 				searchbox.setText("");
 				searchbox.setFocusableInTouchMode(true);
-				new Handler(Looper.getMainLooper()).postDelayed(new Runnable(){public void run(){
+				searchbox.postDelayed(new Runnable(){public void run(){
 					searchbox.requestFocus();
 				}},1000);
 			}else visible(searchbox,false);
 			break;
 		case id.main_download: tip("下载功能以后开放...");break;
-		case id.main_gosetting: startActivity(new Intent(This,Settings.class)); break;
+		case id.main_gosetting: startActivity(Settings.class); break;
 		case id.main_menu: this.openOptionsMenu();break;
-		case id.main_refreshfromfirstpage: if(!feedupdating){ flc.clear(); getVideoUpdates(1); } break;
+		case id.main_refreshfromfirstpage: if(!feedupdating){ sv.clear(); getVideoUpdates(1); } break;
+		case id.listsub_videofeeds:
+			startActivity(new Intent(this,VideoDetail.class).putExtra("vid",(String)v.getTag())); break;
+		case id.listsub_auth_name:
+			startActivity(new Intent(this,UpZone.class).putExtra("space",(String)v.getTag())); break;
+			
 	}}
 	int tms=0; boolean loadover=false;
-	public boolean onGenericMotion(View v,MotionEvent et){//响应鼠标滚轮更新列表
-		if((v instanceof AbsListView) && //instanceof:确保是动态列表的操作。getAction:确保是鼠标滚轮。getAxisValue<0:确保是向下滚动
-			et.getAction()==et.ACTION_SCROLL && et.getAxisValue(et.AXIS_VSCROLL)<0f)
-				onScrollStateChanged((AbsListView)v,0);
-		return super.onGenericMotionEvent(et);
-	}
-	public void onScrollStateChanged(final AbsListView p1, int p2){//响应手指滑动更新列表
-		if(p2==0 && (p1.getLastVisiblePosition()+5)>p1.getCount()){
-			getVideoUpdates((p1.getCount()/20)+1);
-		}
-	} //switch(p2){case 0:case 1:};//0=stop; 1=scrolling; 2=fastscrolling
-	public void onScroll(AbsListView p1, int p2, int p3, int p4) {}//if((p2+p3+5)>p4){}//刷新动态((p4/20)+1);//刷出下一页动态
 	public boolean onKey(View p1, int p2, KeyEvent p3) {
-		if(p2==p3.KEYCODE_ENTER || p2==p3.KEYCODE_DPAD_CENTER){
-			Intent it=new Intent(this,VideoDetail.class)
-				.putExtra("vid",searchbox.getText().toString())
-				.putExtra("cookie",mcok);
-			this.startActivity(it);
-		}
+		if(p2==p3.KEYCODE_ENTER || p2==p3.KEYCODE_DPAD_CENTER)
+			startActivity(new Intent(this,VideoDetail.class).putExtra("vid",searchbox.getText().toString()));
 		return false;
 	}
+	void onScrolling(int f,int t){
+		int listheight=sv.getMaxScroll(),
+			windowheight=sv.getWindowHeight();
+		if(t > listheight- 1.5*windowheight)
+			getVideoUpdates(sv.getInner().getChildCount()/20+1);
+		//multip("from "+f+" scroll to: "+t+"\nlistheight: "+listheight+" windowheight:"+windowheight);
+	}
 
-	
 	//监听器 结束
-	AsyncTask updater;
+	Http updater;
 	boolean feedupdating=false;
 	void getVideoUpdates(final int page){
-		if(updater==null || updater.getStatus()==AsyncTask.Status.FINISHED)
-			getFeeds(page);
-	}
-	void getFeeds(final int page){
-		updater=new AsyncTask<Void,FSON,Integer>(){
-			@Override protected Integer doInBackground(Void[] p1) {
-				String data=http("GET","http://api.bilibili.com/x/web-feed/feed?ps=20&pn="+page,mcok,"");
-				FSON j=new FSON(data);
-				if(j.canRead()){
-					//int runtime=0;
-				
-					int execResult=j.get("code",1002);//read the new video update
-					if(execResult !=0)return execResult;//data wrong, for example -101
-					FSON j2=j.getList("data");
-					if(j2!=null){
-						for(int i=0,len=j2.length();i<len;i++) {
-							final FSON d=j2.getObject(i).getObject("archive"),
-								d2=d.getObject("stat");
-							publishProgress(d, d2);
-							//runtime=i;
-							//	列表封面(vid,d.get("pic",""));//ˉ↓
-						}
-						publishProgress(null);
-					}
-					//}catch(Exception nfe){//NumberFormatException
-					/*final String detail=runtime+"ran times:"+j.toString()+java.util.Arrays.toString(nfe.getStackTrace());
-					mainhandler.obtainMessage(2,new Runnable(){public void run(){
-								int chose=信息框2("Error 1002",detail,"忽略错误并继续","复制错误信息");
-								if(chose==1){ 复制文本(detail); tip("复制成功"); }
-							}}).sendToTarget();
-					return 1002;*/
-					return 0;
+		if(updater!=null) return;
+		updater=new Http("GET","http://api.bilibili.com/x/web-feed/feed?ps=20&pn="+page,string(UA,UA_win,"\r\n",mcok),""){
+			@Override protected void onload(String data){
+				FSON j=new FSON(data),j2;
+				if(!j.canRead()){
+					multip("网络连接失败，请再试一次"); return;
 				}
-				return 1001;
-			}
-			@Override protected void onProgressUpdate(FSON[]d){
-				if(d==null) flc.refresh();
-				else{
-					flc.additem(d[0].getObject("owner").get("name","UP主信息错误"),
-								时间.动态时间差(d[0].get("pubdate",0)),
-								d[0].get("title","标题信息错误"),
-								d[0].get("pic",""),
-								d[1].get("view","0"),
-								d[1].get("danmaku","0"),
-								d[0].getObject("owner").get("mid","-1"),
-								d[0].get("aid","-1"));
+				if(j.get("code",1002)!=0){
+					multip("数据读取错误，请检查帐号状况"); return;
 				}
-			}
-			@Override protected void onPostExecute(Integer i){
-				
-			}
-		}.execute();
-		
+				if((j2=j.getList("data"))==null){
+					multip("翻到底了哟，没有更多数据"); return;
+				}
+				for(int i=0,len=j2.length();i<len;i++) {
+					final FSON d=j2.getObject(i).getObject("archive"),
+						d2=d.getObject("stat"),
+						owninfo=d.getObject("owner");
+					ViewGroup sub=inflateView(layout.listsub_video_feeds_basic);
+					sub.setTag(d.get("aid","-1"));
+					TextView owner=(TextView)fv(sub,id.listsub_auth_name);
+					setText(owner,owninfo.get("name","UP主信息错误"));
+					owner.setTag(owninfo.get("mid","-1"));
+					setText(fv(sub,id.listsub_submit_time),时间.动态时间差(d.get("pubdate",0)));
+					setText(fv(sub,id.listsub_v_title),d.get("title","标题信息错误"));
+					setText(fv(sub,id.listsub_v_played),d2.get("view","0"));
+					setText(fv(sub,id.listsub_v_dan),d2.get("danmaku","0"));
+					//((ImageView)fv(sub,id.listsub_auth_img)).setImageBitmap(ic_sys(draw.img_def));
+					//((ImageView)fv(sub,id.listsub_v_img)).setImageBitmap(ic_sys(draw.img_def));
+					icon.user(fv(sub,id.listsub_auth_img),owninfo.get("face",""));
+					//icon.cover(fv(sub,id.listsub_v_img),d.get("pic",""));
+					((viewproxy.ImageView)fv(sub,id.listsub_v_img)).loadCover(d.get("pic",""));
+					seticon(fv(sub,id.listsub_ic_slideshow),ic_sys(draw.ic_menu_slideshow));
+					seticon(fv(sub,id.listsub_ic_send),ic_sys(draw.ic_menu_send));
+					btnbind(sub,owner);
+					sv.addView(sub);
+				}
+				updater=null;
+			}//update ui here
+		};
 	}
 	
 	long lastReqExit=0;
@@ -171,38 +153,20 @@ public class Main_Feeds extends Activity1 implements OnClickListener,OnKeyListen
 			}
 		return false;//super.onKeyDown(keyCode, event);
 	}
-	final int menuidx=Menu.FIRST;
-	public boolean onCreateOptionsMenu(Menu menu) {
-		String[]menus="我的收藏,历史记录,关注的人,关于简哔".split(",");
-		int[]menuicons={drawable.topmenu_stared, drawable.topmenu_history, drawable.topmenu_people,drawable.topmenu_about};
-		enableMenuIcon(menu);
-		for(int i=0;i<menus.length;i++)
-			menu.add(0,menuidx+i,0,menus[i]).setIcon(menuicons[i]);
-		return super.onCreateOptionsMenu(menu);
+	public boolean onCreateOptionsMenu(Menu m) {
+		getMenuInflater().inflate(menu.main_nav,m);
+		return super.onCreateOptionsMenu(m);
 	}
 	public boolean onOptionsItemSelected(MenuItem item) {
-		switch(item.getItemId()-menuidx){
-			//case 0: break;
-			case 1: startActivity(new Intent(this,VideoHistory.class).putExtra("cookie",mcok)); break;
-			case 3: this.closeOptionsMenu();
-				int chose=列表信息框(this,"关于简哔","小瑞的空间","GitHub");
-				switch(chose){
-					case 0: startActivity(new Intent(this,UpZone.class).putExtra("space","3084436").putExtra("cookie",mcok)); break;
-					case 1: startActivity(new Intent(Intent.ACTION_VIEW,Uri.parse("https://github.com/LEORChn/SimpleBili"))); break;
-					case -1:
-				}
-				break;
-			default: tip("此功能以后开放..."); break;
+		switch(item.getItemId()){
+			case id.menuitem_history: startActivity(VideoHistory.class); break;
+			case id.menuitem_downloads: tip("下载功能以后开放..."); break;
+			case id.menuitem_stars:
+			case id.menuitem_follows:
+				tip("此功能以后开放...");break;
+			case id.menuitem_leorchn: startActivity(new Intent(this,UpZone.class).putExtra("space","3084436")); break;
+			case id.menuitem_github: startActivity(new Intent(Intent.ACTION_VIEW,Uri.parse("https://github.com/LEORChn/SimpleBili"))); break;
+				
 		}return super.onOptionsItemSelected(item);
-	}
-	static int 宽度(View 可视块){
-		int ms=View.MeasureSpec.makeMeasureSpec(0,0);
-		可视块.measure(ms,ms);
-		return 可视块.getMeasuredWidth();
-	}
-	static int 高度(View 可视块){
-		int ms=View.MeasureSpec.makeMeasureSpec(0,0);
-		可视块.measure(ms,ms);
-		return 可视块.getMeasuredHeight();
 	}
 }

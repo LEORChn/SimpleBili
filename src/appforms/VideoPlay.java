@@ -12,9 +12,20 @@ import leorchn.lib.*;
 
 import leorchn.lib.CrashHandlerReg;
 import static leorchn.lib.Global.*;
-import static leorchn.lib.WidgetOverride.*;
 
-public class VideoPlay extends Activity implements MessageQueue.IdleHandler{
+public class VideoPlay extends Activity1 implements MessageQueue.IdleHandler {
+
+	@Override
+	public void onClick(View v) {
+		// TODO: Implement this method
+	}
+
+	@Override
+	protected boolean onIdle() {
+		// TODO: Implement this method
+		return false;
+	}
+	
 	Activity This; public Activity getContext(){return This;}
 	String path="",title="",partname="",vid="",cid="",cookie="",
 	referer="Referer: http://www.bilibili.com/video/\n",
@@ -70,7 +81,6 @@ public class VideoPlay extends Activity implements MessageQueue.IdleHandler{
 		Uri.Builder i=new Uri.Builder();
 
 	}
-	View fv(int id){return findViewById(id);}
 	void clearStringNull(String...s){for(String s2:s)if(s2==null)s2="";}
 	void loadStringParam(String[]s,String[]id){for(int i=0,sl=s.length;i<sl;i++)s[i]=getIntent().getStringExtra(id[i]);}
 }

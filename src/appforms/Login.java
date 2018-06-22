@@ -54,8 +54,9 @@ public class Login extends Activity1{
 	}*/
 	LoginStatListener l=new LoginStatListener(){
 		@Override public void onLogin(final String cok){
-			int res=useradd(cok);
-			setResult(res,new Intent().putExtra("Cookie",cok).putExtra("user",user.toString()));//由于多进程隔离原因，此处通过intent传递新的用户配置
+			simplebili.lib.User.UserAddResult r=user.add(cok);
+			int res=r.status;
+			setResult(res,new Intent().putExtra("Cookie",cok).putExtra("user",r.users.toString()));//由于多进程隔离原因，此处通过intent传递新的用户配置
 			finish();
 		}
 		@Override public void onLog(String text){
@@ -88,8 +89,8 @@ public class Login extends Activity1{
 		};
 		public void onPageStarted(WebView w,String u,Bitmap icon){
 			if(tms<1 && u.contains("m.bilibili.com")){
-				w.setVisibility(View.GONE);
-				l.onLog("加载帐户信息...");//可能会覆盖下方
+				//w.setVisibility(View.GONE);
+				l.onLog("正在完成登录...");//可能会覆盖下方
 			}
 		}
 		int tms=0;

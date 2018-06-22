@@ -18,19 +18,19 @@ public class Global {
 	static int statheight;
 	public static void multip(String s){mainhandler.obtainMessage(1000,s).sendToTarget();}
 	public static void tip(String s){mainhandler.obtainMessage(1001,s).sendToTarget();}
-	public static void enableMenuIcon(Menu menu){
+	/*public static void enableMenuIcon(Menu menu){
 		if(android.os.Build.VERSION.SDK_INT<14)return;
 		try {
 			Class clz=Class.forName("com.android.internal.view.menu.MenuBuilder");
 			Method m=clz.getDeclaredMethod("setOptionalIconsVisible", boolean.class);
 			m.setAccessible(true); m.invoke(menu, true);
 		} catch (Exception e) {}
-	}
+	}*/
 	public static void 复制文本(String s){
 		ClipboardManager cm=(ClipboardManager)getContext().getSystemService(Context.CLIPBOARD_SERVICE);
 		cm.setPrimaryClip(ClipData.newPlainText("Label",s));
 	}
-	public static int 取状态栏高度(){
+	/*public static int 取状态栏高度(){
 		try {
 			Class C=Class.forName("com.android.internal.R$dimen");
 			if(statheight==0)statheight=
@@ -73,9 +73,9 @@ public class Global {
 		pd=ProgressDialog.show(Main_Feeds.getContext(),"",msg,true,false);
 	}
 	public static void 关闭进度对话框(){if(pd !=null)pd.dismiss();pd=null;}
-	static void ExitDialog(final int i){new t(){void r(){ throw new ExitDialog(i); }};}
+	*/static void ExitDialog(final int i){new t(){void r(){ throw new ExitDialog(i); }};}
 	static class ExitDialog extends RuntimeException{static int result=0;ExitDialog(int r){result=r;}ExitDialog(){}}
-	
+	/*
 	
 	
 	public static int 信息框2(String title,String msg,String oktext,String canceltext){return 信息框2(Main_Feeds.getContext(),title,msg,oktext,canceltext);}
@@ -93,7 +93,7 @@ public class Global {
 			Looper.getMainLooper(); Looper.loop();
 		}catch(ExitDialog e){}
 		return ExitDialog.result;
-	}
+	}*/
 	
 	
 	public static int 列表信息框(final Activity a,final String title,final String...options){
