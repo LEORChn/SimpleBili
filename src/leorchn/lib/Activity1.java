@@ -179,6 +179,12 @@ public abstract class Activity1 extends Activity implements MessageQueue.IdleHan
 	}
 	protected View fv(int id){return findViewById(id);}//查找当前activity唯一的
 	protected View fv(ViewGroup vg,int id){return vg.findViewById(id);}//查找列表子项中唯一的
+	protected View extractView(View v){
+		try{
+			((ViewGroup)v.getParent()).removeView(v);
+			return v;
+		}catch(Throwable e){ return null; }
+	}
 	protected ViewGroup inflateView(int id){return(ViewGroup)LayoutInflater.from(this).inflate(id,null);}
 	protected void setText(View v,String s){((TextView)v).setText(s);}
 	protected void startActivity(Class<?>c){startActivity(new Intent(this,c));}
@@ -193,6 +199,12 @@ public abstract class Activity1 extends Activity implements MessageQueue.IdleHan
 		Thread.setDefaultUncaughtExceptionHandler(this);
 		
 	}
+	@Override protected void onCreate(Bundle sis){
+		super.onCreate(sis);
+		oncreate();
+		addIdleHandler();
+	}
+	abstract protected void oncreate();
 	public void addIdleHandler(){ Looper.myQueue().addIdleHandler(this); }//添加一个初始化或空闲行为，大多数在Activity.onCreate使用
 	public boolean queueIdle(){return onIdle();}
 	//abstract protected void onCreate(Bundle sis);
@@ -335,16 +347,25 @@ public abstract class Activity1 extends Activity implements MessageQueue.IdleHan
 
 	// 以下-----系统事件覆盖区
 	@Override public boolean onCreateOptionsMenu(Menu menu) {
-		do{
-			if(Sys.apiLevel()<14) break; // 系统在4.0以下时禁用
-			if(menu.hasVisibleItems() && menu.getItem(0).getIcon()==null) break; // 检测到第一个菜单项的图标无效时禁用
-			try{
-				Class clz=Class.forName("com.android.internal.view.menu.MenuBuilder");
-				java.lang.reflect.Method m=clz.getDeclaredMethod("setOptionalIconsVisible", boolean.class);
-				m.setAccessible(true);
-				m.invoke(menu, true);
-			}catch(Throwable e){}
-		}while(false);
+		PopupMenuCompat.exec(menu);
 		return super.onCreateOptionsMenu(menu);
+	}
+	@Override public boolean onOptionsItemSelected(MenuItem item) {
+		switch(item.getItemId()){
+			case id.menuitem_leorchn: startActivity(new Intent(this,UpZone.class).putExtra("space","3084436")); break;
+			case id.menuitem_share_this_app:
+				Intent i2=new Intent(Intent.ACTION_SEND)
+					.setType("text/plain")
+					.putExtra(Intent.EXTRA_TEXT,"推荐一个有趣的软件【简哔】，是B站第三方安卓客户端，占用低还有各种黑科技，来试用一下呀。")
+					.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+				startActivity(i2); break;
+			case id.menuitem_github: openurl("https://github.com/LEORChn/SimpleBili"); break;
+			case id.menuitem_donate: openurl("https://leorchn.github.io/?about"); break;
+			case id.menuitem_review: openurl("market://details?id="+getPackageName()); break;
+
+		}return super.onOptionsItemSelected(item);
+	}
+	void openurl(String url){
+		startActivity(new Intent(Intent.ACTION_VIEW,android.net.Uri.parse(url)));
 	}
 }

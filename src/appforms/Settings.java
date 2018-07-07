@@ -4,7 +4,6 @@ import android.app.*;
 import android.os.*;
 import android.view.*;
 import android.widget.*;
-import com.LEORChn.SimpleBili.*;
 import java.io.*;
 import leorchn.lib.*;
 import simplebili.lib.*;
@@ -15,10 +14,7 @@ import java.text.*;
 import java.util.*;
 
 public class Settings extends Activity1 implements View.OnClickListener{
-    protected void onCreate(Bundle savedInstanceState) {
-		addIdleHandler();
-        super.onCreate(savedInstanceState);
-		
+    protected void oncreate() {
 		//startActivity(new Intent(this,TestChangeLayout.class));
 	}
 	AsyncTask<Void,Integer,Void> upgradetip;

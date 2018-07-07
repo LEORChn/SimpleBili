@@ -13,9 +13,7 @@ import simplebili.lib.*;
 import static leorchn.lib.Global.*;
 
 public class Main_Feeds extends Activity1 implements OnClickListener,OnKeyListener{//},OnGenericMotionListener{//},AbsListView.OnScrollListener{
-	protected void onCreate(Bundle savedInstanceState) {
-		addIdleHandler();
-		super.onCreate(savedInstanceState);
+	@Override protected void oncreate(){
 		//startActivity(new Intent(this,Settings.class).putExtra("launchfromfeed",true)); finish();
 	}
 	int hasinit=0;
@@ -47,6 +45,7 @@ public class Main_Feeds extends Activity1 implements OnClickListener,OnKeyListen
 					startActivity(Settings.class);
 					return false;
 				}
+				popupMenu=new PopupMenuCompat(this,fv(id.main_menu),menu.main_nav);
 				btnbind(id.main_search,id.main_download,id.main_gosetting,id.main_menu,id.main_refreshfromfirstpage);
 				break;
 			case 3:
@@ -60,6 +59,7 @@ public class Main_Feeds extends Activity1 implements OnClickListener,OnKeyListen
 		hasinit++;
 		return hasinit<9;
 	}
+	PopupMenu popupMenu;
 	View userinf;EditText searchbox; TextView name,coin;
 	ScrollViewV sv;
 	//监听器 开始
@@ -77,7 +77,7 @@ public class Main_Feeds extends Activity1 implements OnClickListener,OnKeyListen
 			break;
 		case id.main_download: tip("下载功能以后开放...");break;
 		case id.main_gosetting: startActivity(Settings.class); break;
-		case id.main_menu: this.openOptionsMenu();break;
+		case id.main_menu: popupMenu.show(); break;//this.openOptionsMenu();break;
 		case id.main_refreshfromfirstpage: if(!feedupdating){ sv.clear(); getVideoUpdates(1); } break;
 		case id.listsub_videofeeds:
 			startActivity(new Intent(this,VideoDetail.class).putExtra("vid",(String)v.getTag())); break;
@@ -132,8 +132,7 @@ public class Main_Feeds extends Activity1 implements OnClickListener,OnKeyListen
 					//((ImageView)fv(sub,id.listsub_auth_img)).setImageBitmap(ic_sys(draw.img_def));
 					//((ImageView)fv(sub,id.listsub_v_img)).setImageBitmap(ic_sys(draw.img_def));
 					icon.user(fv(sub,id.listsub_auth_img),owninfo.get("face",""));
-					//icon.cover(fv(sub,id.listsub_v_img),d.get("pic",""));
-					((viewproxy.ImageView)fv(sub,id.listsub_v_img)).loadCover(d.get("pic",""));
+					//((viewproxy.ImageView)fv(sub,id.listsub_v_img)).loadCover(d.get("pic",""));
 					seticon(fv(sub,id.listsub_ic_slideshow),ic_sys(draw.ic_menu_slideshow));
 					seticon(fv(sub,id.listsub_ic_send),ic_sys(draw.ic_menu_send));
 					btnbind(sub,owner);
@@ -153,20 +152,18 @@ public class Main_Feeds extends Activity1 implements OnClickListener,OnKeyListen
 			}
 		return false;//super.onKeyDown(keyCode, event);
 	}
-	public boolean onCreateOptionsMenu(Menu m) {
-		getMenuInflater().inflate(menu.main_nav,m);
-		return super.onCreateOptionsMenu(m);
+	@Override public boolean onPrepareOptionsMenu(Menu menu) {
+		popupMenu.show();
+		return !super.onPrepareOptionsMenu(menu);//这里一个感叹号阻止 OptionMenu 转而使用自定义的 PopupMenu
 	}
-	public boolean onOptionsItemSelected(MenuItem item) {
+	@Override public boolean onOptionsItemSelected(MenuItem item) {
 		switch(item.getItemId()){
 			case id.menuitem_history: startActivity(VideoHistory.class); break;
-			case id.menuitem_downloads: tip("下载功能以后开放..."); break;
-			case id.menuitem_stars:
+			case id.menuitem_stars: startActivity(MyFavorite.class); break;
 			case id.menuitem_follows:
 				tip("此功能以后开放...");break;
-			case id.menuitem_leorchn: startActivity(new Intent(this,UpZone.class).putExtra("space","3084436")); break;
-			case id.menuitem_github: startActivity(new Intent(Intent.ACTION_VIEW,Uri.parse("https://github.com/LEORChn/SimpleBili"))); break;
-				
+			case id.menuitem_downloads: tip("下载功能以后开放..."); break;
+			case id.menuitem_setting:
 		}return super.onOptionsItemSelected(item);
 	}
 }

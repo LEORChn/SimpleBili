@@ -14,7 +14,7 @@ import leorchn.lib.CrashHandlerReg;
 import static leorchn.lib.Global.*;
 
 public class VideoPlay extends Activity1 implements MessageQueue.IdleHandler {
-
+	@Override protected void oncreate(){}
 	@Override
 	public void onClick(View v) {
 		// TODO: Implement this method

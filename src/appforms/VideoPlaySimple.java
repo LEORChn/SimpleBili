@@ -11,7 +11,6 @@ import java.lang.reflect.*;
 import java.util.*;
 import leorchn.lib.*;
 
-import leorchn.lib.CrashHandlerReg;
 import static android.media.MediaPlayer.*;
 import static leorchn.lib.Global.*;
 import leorchn.lib.*;
@@ -28,8 +27,7 @@ public class VideoPlaySimple extends Activity1 implements View.OnTouchListener,M
 	useragent="User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/43.0.2357.134 Safari/537.36\r\n";
 	int hasinit=0; DanmakuViewControl dvc;
 	boolean allowhistory=false,readyplay=false,readyinfo=false;int readydanmaku=0;//0=准备加载，1=不开启弹幕，2=弹幕错误，3=弹幕完成
-	protected void onCreate(Bundle sis){
-		super.onCreate(sis);
+	protected void oncreate(){
 		This=this; if(sets==null)setsload();
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) 
             //透明状态栏

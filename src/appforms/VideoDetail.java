@@ -4,13 +4,10 @@ import android.app.*;
 import android.os.*;
 import android.view.*;
 import android.widget.*;
-import com.LEORChn.SimpleBili.*;
-import static com.LEORChn.SimpleBili.R.id;
 import java.io.*;
 import leorchn.lib.*;
 import simplebili.lib.*;
 import static leorchn.lib.Global.*;
-import leorchn.lib.*;
 import android.content.*;
 import java.util.*;
 import static android.R.drawable.*;
@@ -20,20 +17,23 @@ import java.security.*;
 import java.math.*;
 import java.text.*;
 public class VideoDetail extends Activity1 implements OnClickListener{
-	Activity This; public Activity getContext(){return This;}
-	String vid="-1",uid="",cookie="";
-    protected void onCreate(Bundle sis) {
-		This=this;
-		addIdleHandler();
-        super.onCreate(sis);
-	}
+	String vid="-1",uid="";
+    protected void oncreate(){}
 	@Override public boolean onIdle(){ switch(hasinit){
 			case 0:
-				setContentView(R.layout.activity_video_detail);
-				vid=getIntent().getStringExtra("vid"); if(vid==null)vid="-1";
-				setText(fv(id.videodetail_v_id),"av"+vid);
+				setContentView(layout.activity_video_detail);
 				break;
 			case 1:
+				Intent i=getIntent();
+				vid=i.getStringExtra("vid"); if(vid==null)vid="-1";
+				setText(fv(id.videodetail_v_id),"av"+vid);
+				setText(fv(id.videodetail_v_title),i.getStringExtra("title"));
+				setText(fv(id.videodetail_v_desc),i.getStringExtra("desc"));
+				setText(fv(id.videodetail_auth_name),i.getStringExtra("name"));
+				setText(fv(id.videodetail_plays),i.getStringExtra("plays"));
+				setText(fv(id.videodetail_danmaku_count),i.getStringExtra("danmaku"));
+				break;
+			case 2:
 				btnbind(id.videodetail_goback,id.videodetail_refresh,id.videodetail_gosetting, id.videodetail_goupzone,
 						id.videodetail_like,id.videodetail_coin,id.videodetail_star,id.videodetail_download,id.videodetail_share,
 						id.videodetail_review,id.videodetail_playfirst);
@@ -56,7 +56,7 @@ public class VideoDetail extends Activity1 implements OnClickListener{
 					initVideoInfo();
 				}
 				break;
-			case id.videodetail_gosetting: startActivity(new Intent(This,Settings.class)); break;
+			case id.videodetail_gosetting: startActivity(new Intent(this,Settings.class)); break;
 			case id.videodetail_goupzone:
 				tip("准备加载 space"+uid);
 				startActivity(new Intent(this,UpZone.class).putExtra("space",uid)); break;
@@ -220,7 +220,7 @@ public class VideoDetail extends Activity1 implements OnClickListener{
 			case 1://播放
 				switch(sets.get("playeronline",0)){
 					case 0:
-						startActivity(new Intent(This,VideoPlaySimple.class).putExtra("path",url).putExtra("vid",vid).putExtra("cid",cid).putExtra("history",true));
+						startActivity(new Intent(this,VideoPlaySimple.class).putExtra("path",url).putExtra("vid",vid).putExtra("cid",cid).putExtra("history",true));
 						getIntent().putExtra("partprog",cid);//此处写入播放进度，重载activity时使用
 						break;
 					case 2: startActivity(new Intent(Intent.ACTION_VIEW,Uri.parse(url))); break;//todo: send url

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="fill_parent"
+	android:layout_height="fill_parent"
+	android:orientation="vertical">
+
+	<LinearLayout
+		android:layout_height="56dp"
+		android:layout_width="match_parent"
+		android:background="#FB7299"
+		android:orientation="horizontal"
+		android:gravity="center_vertical">
+
+		<ImageView
+			style="@style/actionBartton"
+			android:src="@drawable/topmenu_back"
+			android:id="@+id/favorite_goback"/>
+
+		<Spinner
+			android:layout_height="wrap_content"
+			android:layout_width="wrap_content"
+			android:gravity="right"
+			android:id="@+id/favorite_userswitch"/>
+
+		<TextView
+			android:layout_height="wrap_content"
+			android:layout_width="wrap_content"
+			android:text="的收藏夹 "
+			android:textAppearance="?android:attr/textAppearanceMedium"/>
+
+		<TextView
+			android:layout_height="wrap_content"
+			android:layout_width="match_parent"
+			android:textAppearance="?android:attr/textAppearanceMedium"
+			android:layout_weight="1.0"
+			android:ellipsize="end"
+			android:id="@+id/favorite_currentpagename"/>
+
+		<ImageView
+			style="@style/actionBartton"
+			android:src="@drawable/topmenu_edit"
+			android:id="@+id/favorite_edit"/>
+
+	</LinearLayout>
+
+	<viewproxy.ViewPager
+		android:layout_height="match_parent"
+		android:layout_width="match_parent"
+		android:id="@+id/favorite_viewpager">
+		
+		<viewproxy.ListView
+			android:layout_height="wrap_content"
+			android:layout_width="wrap_content"
+			android:id="@+id/favorite_folderlist"
+			android:divider="@null"/>
+		
+		<viewproxy.ListView
+			android:layout_height="wrap_content"
+			android:layout_width="wrap_content"
+			android:id="@+id/favorite_videolist"
+			android:divider="@null"/>
+
+	</viewproxy.ViewPager>
+	
+</LinearLayout>
+

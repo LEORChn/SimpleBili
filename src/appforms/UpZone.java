@@ -11,16 +11,15 @@ import simplebili.lib.*;
 
 import static leorchn.lib.Global.*;
 import android.view.ViewTreeObserver.*;
+import java.util.*;
 
 public class UpZone extends Activity1 implements OnClickListener,MessageQueue.IdleHandler ,OnGenericMotionListener,OnScrollChangedListener,AbsListView.OnScrollListener,Follow.OnFollowListener{
 	Activity This; public Activity getContext(){return This;}
 	String uid="",cookie="",
 		contenttype="Content-Type: application/x-www-form-urlencoded\r\n",
 		referer="Referer: http://space.bilibili.com/\r\n";
-	protected void onCreate(Bundle savedInstanceState) {
+	protected void oncreate() {
 		This=this;
-		addIdleHandler();
-		super.onCreate(savedInstanceState);
 	}
 	protected void onStop() {
 		Follow.removeOnFollowListener(this);//如果不remove可能会造成内存泄漏
@@ -221,4 +220,82 @@ public class UpZone extends Activity1 implements OnClickListener,MessageQueue.Id
 		return 0;
 	}
 	SimpleDateFormat formater=new SimpleDateFormat("yyyy-MM-dd");
+	/*class Bean{
+		static final int LAYOUT=layout.listsub_favorite_video;
+		int type, //常量表示。决定页面item类型
+		count, //表示文件夹视频数量，也表示视频播放次数
+		danmaku, //表示视频弹幕量
+		token; //表示文件夹的id，也表示视频的id
+		int reply, //仅用于视频列表 - 回复数
+		like, //仅用于视频列表 - 赞数
+		dislike; //仅用于视频列表 - 踩数
+		String imageUrl, //表示文件夹或视频的封面url
+		title, //表示文件夹的名称，也表示视频的标题
+		upname; //表示视频上传者的名称
+	}
+	class FavoriteListControl extends BaseAdapter{
+		ArrayList<Bean>a=new ArrayList<>();
+		int listItemCount;
+		public void add(Bean b){ a.add(b); listItemCount++; }
+		public void clear(){ a.clear(); listItemCount=0; refresh(); }
+		public void refresh(){ notifyDataSetChanged(); }
+		public Bean get(int p){ return a.get(p); }
+		@Override public int getCount(){ return listItemCount; }
+		@Override public Object getItem(int p){ return null; }
+		@Override public long getItemId(int p){ return 0; }
+		@Override public View getView(int p, View v, ViewGroup p3){
+			Bean b=get(p);
+			Holder d;
+			int style=b.type;
+			if(v==null){
+				v=This.inflateView(
+					(style&Bean.TYPE_VIDEO)==0?
+					Bean.LAYOUT_FOLDER:
+					Bean.LAYOUT_VIDEO);
+				ViewGroup w=(ViewGroup)v;
+				d=new Holder();
+				d.type=b.type;
+				d.vtitle=fv(w,id.listsub_title);
+				d.vvisible_vupname=fv(w,id.listsub_auth_name);
+				d.vcount=fv(w,id.listsub_playcount);
+				d.vcount_danmaku=fv(w,id.listsub_danmakucount);
+				d.vimage=fv(w,id.listsub_v_img);
+				v.setTag(d);
+				if((style&Bean.TYPE_VIDEO)>0){
+					seticon(fv(w,id.listsub_ic_slideshow),ic_sys(draw.ic_menu_slideshow));
+					seticon(fv(w,id.listsub_ic_send),ic_sys(draw.ic_menu_send));
+				}
+			}else{
+				d=(Holder)v.getTag();
+			}
+			setText(d.vtitle,b.title); // 文件夹名字 或者 视频名字
+			setText(d.vvisible_vupname,(style&Bean.TYPE_VIDEO)>0? // 文件夹可见模式 或者 视频主播名字
+					b.upname:
+					((style&Bean.TYPE_USER)==0?
+					"由系统创建，":
+					"")+
+					((style&Bean.TYPE_PRIVATE)>0?
+					"私享":
+					"公开"));
+			setText(d.vcount,String.valueOf(b.count)); // 文件夹视频数量 或者 视频播放次数
+			setText(d.vcount_danmaku,String.valueOf(b.danmaku)); // 文件夹视频数量（覆盖在封面上） 或者 视频弹幕数量
+
+			//此处设置图片链接
+			if((style&Bean.TYPE_VIDEO)>0){ //以及视频列表上的更多数据
+
+			}
+			return v;
+		}
+	}
+	class Holder{
+		int type;
+		View vtitle,
+		vvisible_vupname,
+		vcount,
+		vcount_danmaku,
+		vimage;
+		View reply,
+		like,
+		dislike;
+	}*/
 }

@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_height="wrap_content"
+	android:layout_width="wrap_content"
+	android:orientation="vertical"
+	android:padding="5dp">
+
+	<LinearLayout
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:orientation="horizontal"
+		android:padding="5dp"
+		android:background="#40808080">
+
+		<FrameLayout
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content">
+
+			<ImageView
+				android:src="@drawable/img_def"
+				android:layout_width="160dp"
+				android:layout_height="90dp"
+				android:id="@+id/listsub_v_img"/>
+
+			<TextView
+				android:layout_width="50dp"
+				android:layout_height="90dp"
+				android:text="999"
+				android:textAppearance="?android:attr/textAppearanceMedium"
+				android:layout_gravity="right|center_vertical"
+				android:gravity="center"
+				android:background="#40000000"
+				android:id="@+id/listsub_danmakucount"/>
+
+		</FrameLayout>
+
+		<LinearLayout
+			android:orientation="vertical"
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			android:padding="5dp">
+
+			<TextView
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:text="Title"
+				android:textAppearance="?android:attr/textAppearanceMedium"
+				android:id="@+id/listsub_title"/>
+
+			<View
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_weight="1.0"/>
+
+			<LinearLayout
+				android:orientation="horizontal"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:gravity="bottom">
+
+				<TextView
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:text="999"
+					android:textAppearance="?android:attr/textAppearanceMedium"
+					android:id="@+id/listsub_playcount"/>
+
+				<TextView
+					android:layout_height="wrap_content"
+					android:text=" 个视频"
+					android:layout_width="wrap_content"
+					android:layout_weight="1.0"/>
+
+				<TextView
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:text="公开"
+					android:id="@+id/listsub_auth_name"/>
+
+			</LinearLayout>
+
+		</LinearLayout>
+
+	</LinearLayout>
+
+</LinearLayout>
+

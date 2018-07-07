@@ -35,6 +35,7 @@
 		<activity android:name="appforms.VideoDetail" android:configChanges="orientation|screenSize"/>
 		<activity android:name="appforms.VideoPlaySimple" android:configChanges="orientation|screenSize" android:screenOrientation="landscape"/>
 		<activity android:name="appforms.VideoHistory" android:configChanges="orientation|screenSize"/>
+		<activity android:name="appforms.MyFavorite" android:configChanges="orientation|screenSize"/>
 		<activity android:name="appforms.UpZone" android:configChanges="orientation|screenSize"/>
 		<activity android:name="appforms.TestChangeLayout" android:configChanges="orientation|screenSize"/>
 		<activity android:name="appforms.Settings"

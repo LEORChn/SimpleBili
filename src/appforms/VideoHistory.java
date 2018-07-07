@@ -1,36 +1,28 @@
 package appforms;
 
 import android.app.*;
-import android.os.*;
 import android.view.*;
 import android.view.View.*;
 import android.widget.*;
-import com.LEORChn.SimpleBili.*;
 import leorchn.lib.*;
 
 import static leorchn.lib.Global.*;
 import simplebili.lib.*;
 
-public class VideoHistory extends Activity1 implements OnClickListener,MessageQueue.IdleHandler ,OnGenericMotionListener,AbsListView.OnScrollListener{
-	Activity This; public Activity getContext(){return This;}
-	String cookie="";
-	protected void onCreate(Bundle sis) {
-        super.onCreate(sis);
-		This=this;
-		addIdleHandler();
-	}
+public class VideoHistory extends Activity1 implements OnClickListener ,OnGenericMotionListener,AbsListView.OnScrollListener{
+	
+	@Override protected void oncreate(){}
 	int hasinit=0;
 	@Override public boolean onIdle() {
 		switch(hasinit){case 0:
-				setContentView(R.layout.activity_history);
-				cookie=getIntent().getStringExtra("cookie"); if(cookie==null)cookie="";
+				setContentView(layout.activity_history);
 				break;
 			case 1:
-				ListView vl=(ListView)fv(R.id.history_list);
+				ListView vl=(ListView)fv(id.history_list);
 				vl.setOnScrollListener(this); //允许用手指刷动态
 				vl.setOnGenericMotionListener(this); //允许用鼠标滚轮刷动态
-				hl=new HistoryListControl(this,vl,cookie);
-				btnbind(R.id.history_goback,R.id.history_refreshfromfirstpage);
+				hl=new HistoryListControl(this,vl,"");
+				btnbind(id.history_goback,id.history_refreshfromfirstpage);
 				getMoreHistory(1);
 		}
 		hasinit++;
@@ -39,8 +31,8 @@ public class VideoHistory extends Activity1 implements OnClickListener,MessageQu
 //监听器 开始
 	@Override
 	public void onClick(View v) {switch(v.getId()){
-		case R.id.history_goback: finish();break;
-		case R.id.history_refreshfromfirstpage: if(listupdating)return;hl.clear();getMoreHistory(1); break;
+		case id.history_goback: finish();break;
+		case id.history_refreshfromfirstpage: if(listupdating)return;hl.clear();getMoreHistory(1); break;
 	}}
 	
 	public boolean onGenericMotion(View v,MotionEvent et){//响应鼠标滚轮更新列表
@@ -73,7 +65,7 @@ public class VideoHistory extends Activity1 implements OnClickListener,MessageQu
 	}
 	void nextHistory(int page){
 		
-		Http h1=new Http("GET","http://api.bilibili.com/x/v2/history?ps=20&pn="+page, cookie, ""){
+		Http h1=new Http("GET","http://api.bilibili.com/x/v2/history?ps=20&pn="+page, mcok, ""){
 			@Override protected void onload(String data){
 				FSON j=new FSON(data);
 				if(!j.canRead())return;

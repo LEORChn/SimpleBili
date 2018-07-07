@@ -1,9 +1,9 @@
 package viewproxy;
 import android.content.*;
-import android.util.*;
 import android.graphics.*;
-import leorchn.lib.*;
+import android.util.*;
 import android.view.*;
+import leorchn.lib.*;
 
 public class ImageView extends android.widget.ImageView implements Runnable{
 	public ImageView(Context c){ super(c); }
@@ -59,7 +59,7 @@ public class ImageView extends android.widget.ImageView implements Runnable{
 	//以上 系统事件控制
 	//以下 劫持宿主事件
 	@Override public void setImageBitmap(Bitmap bm){
-		if(bm==null && using!=null) using.recycle();
+		if(bm==null && using!=null) using.recycle(); // 这种代码只适合一次性使用bitmap，如果该bitmap有多个引用则会造成问题
 		super.setImageBitmap(bm);
 		imageSeted=bitmapUsable(bm); // 如果以后有其他的加载方式，就覆盖其他的方法并加上这个
 		using=bm;

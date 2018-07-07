@@ -9,11 +9,7 @@ import static simplebili.App.getContext;
 import android.net.*;
 public class PermissionGuide extends Activity1 {
 
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		addIdleHandler();
-		super.onCreate(savedInstanceState);
-	} 
+	@Override protected void oncreate(){} 
 	@Override public void onClick(View v) {
 		// TODO: Implement this method
 	}

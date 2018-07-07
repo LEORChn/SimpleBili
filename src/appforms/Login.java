@@ -2,20 +2,16 @@ package appforms;
 import android.graphics.Bitmap;
 import android.webkit.*;
 import android.widget.ProgressBar;
-//import formevents.帐户登录;
 import leorchn.lib.*;
 import appforms.Login.WebLogin.LoginStatListener;
 import android.app.*;
 import java.util.*;
-import android.os.*;
 import android.os.Process;
 import android.content.*;
 import android.view.*;
 public class Login extends Activity1{
-	@Override protected void onCreate(Bundle savedInstanceState){
-		addIdleHandler();
+	@Override protected void oncreate(){
 		setResult(-5);
-		super.onCreate(savedInstanceState);
 	}
 	WebView w; WebLogin wl; ProgressBar p; ProgressDialog pd;
 	int hasinit=0;
@@ -78,9 +74,10 @@ public class Login extends Activity1{
 			w.setWebViewClient(this);
 			HashMap<String,String>extHeader=new HashMap<String,String>();
 			extHeader.put("User-Agent",UA_android);
-			extHeader.put("Referer", "http://m.bilibili.com/space.html");
+			extHeader.put("Referer", retrylink);
 			w.loadUrl("https://passport.bilibili.com/login", extHeader);
-		}ProgressBar pb;LoginStatListener l;
+		}
+		ProgressBar pb;LoginStatListener l;
 		WebChromeClient wcc=new WebChromeClient(){
 			public void onProgressChanged(WebView w,int p){
 				pb.setVisibility(p<100?View.VISIBLE:View.INVISIBLE);
@@ -88,22 +85,23 @@ public class Login extends Activity1{
 			}
 		};
 		public void onPageStarted(WebView w,String u,Bitmap icon){
-			if(tms<1 && u.contains("m.bilibili.com")){
+			if(tms<1 && u.contains("link.bilibili.com")){
 				//w.setVisibility(View.GONE);
 				l.onLog("正在完成登录...");//可能会覆盖下方
 			}
 		}
+		String retrylink="https://link.bilibili.com/p/center/index";//当此处更改时，还有两处String.contain中的值需要更新
 		int tms=0;
-		static final String[]verifyitem={"DedeUserID=","DedeUserID__ckMd5=","SESSDATA=","bili_jct="};
+		static final String[]verifyitem={"DedeUserID=","DedeUserID__ckMd5=","SESSDATA=","bili_jct=","_dfcaptcha="};
 		public void onPageFinished(WebView w,String u){
-			if(u.contains("bilibili.com/space")){
+			if(u.contains("bilibili.com/p")){
 				//判断cookie完整性
 				CookieManager cm=CookieManager.getInstance();
 				String cok=cm.getCookie("bilibili.com");
 				for(String each:verifyitem)
 					if(!cok.contains(each)){ 
 						l.onLog(each+"未找到，重试中 _"+tms); tms++;
-						w.loadUrl("http://m.bilibili.com/space.html");
+						w.loadUrl(retrylink);
 						return;
 					}
 				w.loadUrl("about:blank");
