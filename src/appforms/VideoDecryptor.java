@@ -84,8 +84,11 @@ public class VideoDecryptor extends Activity1 {
 	}
 	void handleTheError(FSON j){
 		if(j==null || !j.canRead() || j.get("code", 0)==0) return;
-		switch(Error.getErrorByCode(j.get("code", 0))){
+		Error errtype=Error.getErrorByCode(j.get("code", 0));
+		if(errtype != null) log(string("===== ", errtype.msgcn));
+		switch(errtype){
 			case INVALID_SIGNATURE:
+			case INVALID_APPKEY:
 				key=Key.getNextKey(key);
 				log(string("尝试切换到密钥：", key.name()));
 				if(key != Key.FINAL) tries++;
@@ -100,12 +103,17 @@ public class VideoDecryptor extends Activity1 {
 		return true;
 	}
 }
-enum Key{
-	TV("4409e2ce8ffd12b8", "59b43e04ad6965f34319062b478f83dd"),
-	FINAL("iVGUTjsxvpLeuDCf", "aHRmhWMLkdeMuILqORnYZocwMBpMEOdt");
-	public final String appkey, seckey;
+enum Key{ // 要确保谷歌搜不到代码里包含的 key 才行
+	OLD("84 95 65 60 bc 02 8e b7", "94 ab a5 4a f9 06 5f 71 de 72 f5 50 8f 1c d4 2e"), // 版本未知，19年2月失效，具体时间不记得
+	UNK1("f3 bb 20 8b 3d 08 1d c8", "1c 15 88 8d c3 16 e0 5a 15 fd d0 a0 2e d6 58 4f"), // 版本未知，来源丢失
+	NORMAL_411007("c1 b1 07 42 8d 33 79 28", "ea 85 62 4d fc f1 2d 7c c7 b2 b3 a9 4f ac 1f 2c"), // 普通版v4.11.7
+	NORMAL_519000("1d 8b 6e 7d 45 23 34 36", "56 0c 52 cc d2 88 fe d0 45 85 9e d1 8b ff d9 73"), // 普通版v5.19甚至v5.27还在用
+	TV("44 09 e2 ce 8f fd 12 b8", "59 b4 3e 04 ad 69 65 f3 43 19 06 2b 47 8f 83 dd"), // TV版，版本未知，来源 https://blog.kaaass.net/archives/947
+	FINAL("iV GU Tj sx vp Le uD Cf", "aH Rm hW ML kd eM uI Lq OR nY Zo cw MB pM EO dt"); // 版本未知，来源 you-get
+	public final String appkey, seckey, name;
 	Key(String appkey, String seckey){
-		this.appkey=appkey; this.seckey=seckey;
+		this.appkey=appkey.replaceAll("\\s",""); this.seckey=seckey.replaceAll("\\s","");
+		this.name=new StringBuilder(name()).append(String.format("(%s)", appkey.substring(0,4))).toString();
 	}
 	public static Key getNextKey(Key prev){
 		boolean pickthis=false;
@@ -114,7 +122,9 @@ enum Key{
 	}
 }
 enum Error{
-	INVALID_SIGNATURE(10002, "Invalid signature parameter.", "签名参数无效/计算错误。");
+	INVALID_SIGNATURE(10002, "Invalid signature parameter.", "签名参数无效或计算错误，或此签名无权解析此视频。"),
+	INVALID_APPKEY   (10003, "Invalid appkey parameter.",    "公钥无效或不存在。"),
+	VIDEO_IS_HIDDEN  (10004, "Video is hidden.",             "视频已经被隐藏，无法解析。");
 	public final int code;
 	public final String message, msgcn;
 	Error(int code, String message, String cn){
