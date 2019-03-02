@@ -22,7 +22,7 @@ public class UpZoneListControl implements View.OnClickListener{
 	public UpZoneListControl/*Edit*/(Activity Ths,ScrollView imp,String cok){
 		l=imp; Super=Ths; This=this; cookie=cok;
 		String[]compName=null;int[]compId=null;int layout=0;
-		root=(LinearLayout)l.findViewById(R.id.ScrollViewRoot);
+		//root=(LinearLayout)l.findViewById(R.id.ScrollViewRoot);
 		infoarea=(ViewGroup) LayoutInflater.from(Super).inflate(R.layout.listsub_upzone_info,null);
 		root.addView(infoarea);
 //		switch(0){

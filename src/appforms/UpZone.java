@@ -10,71 +10,85 @@ import leorchn.lib.*;
 import simplebili.lib.*;
 
 import static leorchn.lib.Global.*;
-import android.view.ViewTreeObserver.*;
+import viewproxy.ListView;
 import java.util.*;
 
-public class UpZone extends Activity1 implements OnClickListener,MessageQueue.IdleHandler ,OnGenericMotionListener,OnScrollChangedListener,AbsListView.OnScrollListener,Follow.OnFollowListener{
-	Activity This; public Activity getContext(){return This;}
-	String uid="",cookie="",
+public class UpZone extends Activity1 implements ListView.OnListNeedsUpdateListener,AbsListView.OnItemClickListener,Follow.OnFollowListener{
+	String uid="",
 		contenttype="Content-Type: application/x-www-form-urlencoded\r\n",
 		referer="Referer: http://space.bilibili.com/\r\n";
-	protected void oncreate() {
-		This=this;
-	}
-	protected void onStop() {
+	@Override protected void oncreate(){}
+	@Override protected void onStop() {
 		Follow.removeOnFollowListener(this);//如果不remove可能会造成内存泄漏
 		super.onStop();
 	}
-	public boolean onIdle(){
+	@Override public boolean onIdle(){
 		switch(hasinit){
 			case 0:
 				setContentView(layout.activity_up_zone);
 				uid=getIntent().getStringExtra("space"); if(uid==null || uid.isEmpty()){ finish();return false; }//没传进up主id还看个屁的空间？果断结束activity
-				cookie=getIntent().getStringExtra("cookie"); if(cookie==null)cookie="";
 				break;
 			case 1:
 				infoarea=fv(id.upzone_infoarea);
-				sv=(ScrollView)fv(id.upzone_vlist);
-				sv.getViewTreeObserver().addOnScrollChangedListener(this);
-				//vl.setOnScrollListener(this); //允许用手指刷
-				sv.setOnGenericMotionListener(this); //允许用鼠标滚轮刷
-				l=new UpZoneListControl(this,sv,cookie);
+				l2=(ListView)fv(id.upzone_vlist);
+				l2.setOnListNeedsUpdateListener(this);
+				l2.setAdapter(inflateView(layout.listsub_upzone_info),lc);
+				l2.setOnItemClickListener(this);
 				
 				name=(TextView)fv(id.upzone_upname);
 				ul=(TextView)fv(id.upzone_upul);
-				exp=(TextView)fv(id.upzone_upexp);
 				subs=(TextView)fv(id.upzone_subs);
 				fans=(TextView)fv(id.upzone_fans);
 				vcount=(TextView)fv(id.upzone_videocount);
 				desc=(TextView)fv(id.upzone_desc);
 				addsubs=(Button)fv(id.upzone_addsubs); //visible(addsubs,false);//主动隐藏（请在布局里隐藏）
-				btnbind(id.upzone_goback,id.upzone_msgp2p, id.upzone_addsubs,id.upzone_subs,id.upzone_fans);
+				btnbind(id.upzone_goback,id.upzone_skiptodate,id.upzone_msgp2p,
+					id.upzone_addsubs,id.upzone_subs,id.upzone_fans);
 				break;
 			case 2:
 				Follow.addOnFollowListener(this);
 				loadUpzone(uid);
 				loadUpzoneVideo(1);
-				Follow.check(uid,-1,cookie);
+				Follow.check(uid,-1,mcok);
 				break;
 		}
 		hasinit++;
 		return hasinit<9;
 	}
 	int hasinit=0,followstat=0;
-	ScrollView sv;
-	UpZoneListControl l;
+	ListView l2;
+	UserSpaceListControl lc=new UserSpaceListControl();
 	Button addsubs;
 //监听器 开始
-	public void onClick(View v) {switch(v.getId()){
+	DateVideoSkipper ds;
+	@Override public void onClick(View v) {switch(v.getId()){
 		case id.upzone_goback: finish(); break;
+		case id.upzone_skiptodate:
+			if(ds != null && !ds.isFinished()){
+				ds.cancel();
+				return;
+			}
+			final Calendar c=Calendar.getInstance();
+			new DatePickerDialog(this,
+				new DatePickerDialog.OnDateSetListener(){
+					@Override public void onDateSet(DatePicker p,int y,int m,int d){
+						c.set(y,m,d,0,0);
+						ds=new DateVideoSkipper(c.getTimeInMillis()/1000+86400);//增加一天时间，这样比较靠近当天24点的视频显示在上方，靠近0点的视频在下方
+					}
+				},
+				c.get(c.YEAR),
+				c.get(c.MONTH),
+				c.get(c.DAY_OF_MONTH)
+			).show();
+			break;
 		case id.upzone_msgp2p: tip("此功能暂未开放"); return;//私信功能todo
 		case id.upzone_addsubs: //加关注or取消关注
 			if(followstat==0){
-				if(!Follow.follow(uid,cookie))multip("先休息一下好不好？");
+				if(!Follow.follow(uid,mcok))multip("先休息一下好不好？");
 				else addsubs.setText("操作中");
 			}else{ String[]opt=new String[50]; for(int i=0;i<50;i++)opt[i]=String.valueOf(i);
 				if(列表信息框(this,"取消关注此人？请选择 32",opt)==32)
-				if(!Follow.unfollow(uid,cookie))multip("先休息一下好不好？");
+				if(!Follow.unfollow(uid,mcok))multip("先休息一下好不好？");
 				else addsubs.setText("操作中");
 			}
 			break;
@@ -88,152 +102,175 @@ public class UpZone extends Activity1 implements OnClickListener,MessageQueue.Id
 			addsubs.setText(stat?"已关注":"+关注");
 		}
 	}
-	public boolean onGenericMotion(View v,MotionEvent et){//响应鼠标滚轮更新列表
-		if((v instanceof AbsListView) && //instanceof:确保是动态列表的操作。getAction:确保是鼠标滚轮。getAxisValue<0:确保是向下滚动
-		   et.getAction()==et.ACTION_SCROLL && et.getAxisValue(et.AXIS_VSCROLL)<0f)
-			onScrollStateChanged((AbsListView)v,0);
-		return super.onGenericMotionEvent(et);
+	@Override public void onListNeedsUpdate(ListView lsv,BaseAdapter ba){
+		if(ba.getCount()%20==0) loadUpzoneVideo(Math.round(ba.getCount()/20f)+1);
 	}
-	public void onScrollChanged(){
-		if(sv.getScrollY()>sv.getChildAt(0).getHeight()-1.5*sv.getHeight())
-			if(l.getCount()%20==0) loadUpzoneVideo(l.getCount()/20+1);
+	@Override public void onItemClick(AdapterView<?> p1, View p2, int p3, long p4){
+		Bean b=lc.get(p3-1);//因为头部也占一个索引，因此
+		startActivity(new android.content.Intent(this,VideoDetail.class)
+			.putExtra("vid",b.token)
+			.putExtra("title",b.title)
+			.putExtra("plays",b.count)
+			.putExtra("danmaku",b.danmaku)
+			);
 	}
-	public void onScrollStateChanged(AbsListView p1, int p2){//响应手指滑动更新列表
-		//if(p2==0)visible(infoarea,firstvisibleitem==0);//这个位置有一点不好，就是向上滚轮时即使到第一个也不会显示顶部信息，需要再向下滚轮一次才显示
-		multip("last:"+p1.getLastVisiblePosition()+"\ntotal:"+p1.getCount());
-		if(p2==0 && (p1.getLastVisiblePosition()+5)>p1.getCount()){
-			//有些人的空间读到最后一页时就不够20个了，这会导致重复加载最后一页。此问题已修复
-			if(p1.getCount()%20==0) loadUpzoneVideo(p1.getCount()/20+1);
-		}
-	} int firstvisibleitem=0;//switch(p2){case 0:case 1:};//0=stop; 1=scrolling; 2=fastscrolling
-	public void onScroll(AbsListView p1, int p2, int p3, int p4) { firstvisibleitem = p2; }
 //监听器 结束
 	View infoarea;
-	TextView name,ul,exp,subs,fans,vcount,desc;
-	int loadUpzone(final String uid){
+	TextView name,ul,subs,fans,vcount,desc;
+	int loadUpzone(String uid){
 		if(uid==null || uid.isEmpty())return 1003;//1003=程序内部错误
-		new AsyncTask<Void,FSON,Object>(){
-			@Override protected Object doInBackground(Void[]v){
-				String data=http("POST","https://space.bilibili.com/ajax/member/GetInfo",contenttype+referer+cookie,"mid="+uid);
-				if(data.isEmpty())return 1000;
+		new Http("POST","https://space.bilibili.com/ajax/member/GetInfo",string(contenttype,referer,mcok),"mid="+uid){
+			@Override protected void onload(String data){
 				FSON j=new FSON(data);
-				if(!(j.canRead()&&j.isObject()))return 1001;
+				if(!j.canRead())return;
 				try{
 					boolean execResult=j.get("status",false);
-					if(!execResult)return 10011;//data wrong, for example -101
-					publishProgress(j.getObject("data"));
-					//cut-cut-cut-cut-cut-
-					data=http("GET","http://api.bilibili.com/x/relation/stat?vmid="+uid,"","");
-					j=new FSON(data);
-					if(!(j.canRead()&&j.isObject()))return 1001;
-					int eres=j.get("code",10012); if(eres != 0)return eres;
-					return j.getObject("data");
-				}catch(Exception nfe){//NumberFormatException
-					final String detail=E.trace(nfe)+j.toString();
-					runOnUiThread(new Runnable(){public void run(){
-							new Msgbox("Error 1002",detail,"忽略错误并继续","复制错误信息"){
-								protected void onClick(int chose){
-									if(chose==vbno){ 复制文本(detail); tip("复制成功"); }
-								}
-							};
-							}});
-					return 1002;
+					if(!execResult)return;//data wrong, for example -101
+					j=j.getObject("data");
+					FSON li=j.getObject("level_info");
+					int lvl=li.get("current_level",0);//max默认值为1是为了防止除以零错误
+					int[]lvc={color.ul0,color.ul1,color.ul2,color.ul3,color.ul4,color.ul5,color.ul6};
+					ul.setBackgroundResource(lvc[lvl]);
+					setText(name,j.get("name","(信息错误)"));
+					setText(ul,"Lv."+lvl);
+					setText(desc,j.get("sign","(信息错误)"));
+				}catch(Throwable e){//NumberFormatException
 				}
 			}
-			@Override protected void onProgressUpdate(FSON[]f){
-				FSON n=f[0];
-				name.setText(n.get("name","(信息错误)"));
-				FSON li=n.getObject("level_info");
-				int lvl=li.get("current_level",0),cur=li.get("current_exp",0),min=li.get("current_min",-1),max=li.get("next_exp",cur);//max默认值为1是为了防止除以零错误
-				ul.setText("Lv."+lvl);
-				exp.setText(cur+(lvl<6 && lvl>0?"/"+max+" ("+((cur-min)*100/(max-min))+"%)":""));
-				int[]lvc={color.ul0,color.ul1,color.ul2,color.ul3,color.ul4,color.ul5,color.ul6};
-				ul.setBackgroundResource(lvc[lvl]);
-				exp.setBackgroundResource(lvc[lvl]);
-				desc.setText(n.get("sign","(信息错误)"));
-			}
-			@Override protected void onPostExecute(Object o){
-				if(o instanceof FSON){
-					FSON m=(FSON)o;
+		};
+		loadUserRelation(uid);
+		return 0;
+	}
+	void loadUserRelation(String uid){
+		new Http("get","https://api.bilibili.com/x/relation/stat?vmid="+uid,"",""){
+			@Override protected void onload(String data){
+				FSON m=new FSON(data);
+				if(m.canRead() && m.get("code",-1)==0){
+					m=m.getObject("data");
 					subs.setText("关注 "+m.get("following",0));
 					fans.setText("粉丝 "+m.get("follower",0));
-				}else if(o instanceof Integer){
-					
+				}else{
+					subs.setText("关注数:失败");
+					fans.setText("粉丝数:失败");
 				}
 			}
-		}.execute();
-			
-		return 0;
+		};
 	}
-	boolean listupdating=false;
-	void loadUpzoneVideo(final int page){
-		if(!listupdating){ /*debug tips*/Toast t=Toast.makeText(this,System.currentTimeMillis()+" load page "+page+"\nlist count "+l.getCount(),0);t.setGravity(3|48,0,0);t.show();
-			listupdating=true;
-			new Thread(){public void run(){
-					nextpage(page);
-					try{Thread.sleep(1000);}catch(Exception e){}//读取数据之后，给1秒时间更新界面，1秒之后才能读取下一页动态
-					listupdating=false;//现在可以请求读取下一页数据了
-				}}.start();
-		}
-	}
-	int nextpage(int page){
-		String data=http("GET","http://space.bilibili.com/ajax/member/getSubmitVideos?pagesize=20&page="+page+"&mid="+uid,cookie, "");
-		if(data.isEmpty())return 1000;
-		FSON j=new FSON(data);
-		if(!(j.canRead() && j.isObject())){
-			new Msgbox("1001",data,"ok");return 1001;
-		} int runtime=0;
-		try{
-			boolean execResult=j.get("status",false);//read the new video update
-			if(!execResult)return 10021;//data wrong, for example -101
-			j=j.getObject("data");
-			final String vcountText="视频 "+j.get("count",0);
-			if(j.get("pages",0)<page)return 0;//页数超出允许范围，在此处阻止读取
-			FSON j2=j.getList("vlist");
-			for(int i=0,len=j2.length();i<len;i++){
-				final FSON d=j2.getObject(i);
-				final String vid=d.get("aid","-1");
-				runOnUiThread(new Runnable(){public void run(){
-					vcount.setText(vcountText);
-					l.additem(
-						d.get("length", ""),
-						formater.format(1000l*d.get("created",0)),
-						d.get("title", "标题信息错误"),
-						d.get("pic", ""),
-						d.get("play", "0"),
-						d.get("video_review", "0"),
-						d.get("comment", "0"),
-						vid);
-					}});
-				runtime=i;
-				//	列表封面(vid,d.get("pic",""));//ˉ↓
+	Http UserSpaceVideoListLoader;
+	void loadUpzoneVideo(int page){
+		if(page==1){ //加载第一页时
+			lc.clear(); //刷新视频列表页，但是旋转圈可见
+			if(UserSpaceVideoListLoader!=null) //可能之前有未加载完的网络请求
+				UserSpaceVideoListLoader.cancel(true); //添加一个取消标签防止它之后更改界面
+		}else if(UserSpaceVideoListLoader != null) return;
+		UserSpaceVideoListLoader=new Http("GET",string("http://space.bilibili.com/ajax/member/getSubmitVideos?pagesize=20&page=",page,"&mid=",uid),mcok, ""){
+			@Override protected void onload(String data){
+				FSON j=new FSON(data);
+				if(!j.canRead())return;
+				if(!j.get("status",false))return;//data wrong, for example -101
+				j=j.getObject("data");
+				setText(vcount,"视频 "+j.get("count",0));
+				
+				j=j.getList("vlist");
+				for(int i=0,len=j.length();i<len;i++){
+					FSON d=j.getObject(i);
+					Bean b=new Bean();
+					b.title=d.get("title", "标题信息错误");
+					b.count=d.get("play", 0);
+					b.danmaku=d.get("video_review", 0);
+					b.reply=d.get("comment", 0);
+					b.length=d.get("length", "");
+					b.date_int=d.get("created",0);
+					b.date=formater.format(1000l*b.date_int);
+					b.imageUrl=d.get("pic", "");
+					b.token=d.get("aid",-1);
+					lc.add(b);
+				}
+				lc.refresh();
+				UserSpaceVideoListLoader=null;
 			}
-			//runOnUiThread(new Runnable(){public void run(){ l.refresh(); }});
-		}catch(Exception nfe){//NumberFormatException
-			final String detail=runtime+"ran times:"+E.trace(nfe)+j.toString();
-			/*runOnUiThread(new Runnable(){public void run(){
-				int chose=信息框2(This,"Error 1002",detail,"忽略错误并继续","复制错误信息");
-				if(chose==1){ 复制文本(detail); tip("复制成功"); }
-			}});*/
-			return 10020;
+		};
+	}
+	static SimpleDateFormat formater=new SimpleDateFormat("yyyy-MM-dd");
+	//自动把空间里的视频 翻页到指定时间
+	class DateVideoSkipper implements MessageQueue.IdleHandler,Runnable {
+		String base="正在根据日期翻页中，\n如需取消请再按一次",
+			cancel_sys="没有更多数据，自动取消翻页",
+			cancel_user="您已取消翻页。",
+			finishd="已翻到指定页面。";
+		Toast t=Toast.makeText(UpZone.this,base,1);
+		long s;
+		int start;
+		boolean found;
+		public DateVideoSkipper(long second){
+			s=second;
+			t.setGravity(Gravity.CENTER,0,0);
+			Looper.myQueue().addIdleHandler(this);
 		}
-		return 0;
+		public boolean isFinished(){ return found; }
+		public void cancel(){
+			found=true; t.setText(cancel_user); t.show();
+		}//这里有个bug，无法取消操作
+		@Override public boolean queueIdle(){
+			if(found)return false;
+			t.setText(base);
+			t.show();
+			for(int len=lc.getCount();start<len;start++){
+				Bean b=lc.get(start);
+				if(b.date_int<s){
+					found=true;
+					int first=l2.getFirstVisiblePosition();
+					/*	start > first  如果是向上翻就直接定位吧，向下就另说
+						Count - start  总项目数减去第一个匹配的项目的索引，小于单屏时平滑滚动，大于时直接定位
+						LastVisible - FirstVisible  单屏幕的可见项目数
+					*/
+					if(start>first && lc.getCount()-start<l2.getLastVisiblePosition()-first){
+						l2.setSelection(start);
+						l2.smoothScrollToPosition(start+1);
+					}else
+						l2.setSelection(start+1);
+					t.setText(finishd);
+					t.show(); //到这里时，实际上已经完成了操作
+				}
+				if(found)return false; //已取消操作
+			}
+			l2.setSelection(start);
+			l2.smoothScrollToPosition(start+1);
+			found |= (l2.getCount()%20)>1;
+			if(found){
+				t.setText(cancel_sys);
+				t.show();
+			}
+			return !found;
+		}
+		@Override public void run(){//这段是用来监听滚动中时，如果用户取消滚动，则停止滚动的
+			/*now=l2.getScrollY();
+			if(last!=0){ //数据记录
+				if(canceled){
+					if(last==now) return; //取消后看起来好像不再滚动了，退出
+					l2.scrollTo(
+				}
+			}
+			last=now; //覆写上次检测结果
+			l2.postDelayed(this,1000);*/
+		}
 	}
-	SimpleDateFormat formater=new SimpleDateFormat("yyyy-MM-dd");
-	/*class Bean{
-		static final int LAYOUT=layout.listsub_favorite_video;
-		int type, //常量表示。决定页面item类型
-		count, //表示文件夹视频数量，也表示视频播放次数
-		danmaku, //表示视频弹幕量
-		token; //表示文件夹的id，也表示视频的id
-		int reply, //仅用于视频列表 - 回复数
-		like, //仅用于视频列表 - 赞数
-		dislike; //仅用于视频列表 - 踩数
+	class Bean{
+		static final int LAYOUT=layout.listsub_upzone_basic;
+		int count, //表示视频播放次数
+			danmaku, //表示视频弹幕量
+			reply, //视频回复数
+			like, //视频赞数
+			dislike, //视频踩数
+			token; //表示视频的id
+		long date_int;
 		String imageUrl, //表示文件夹或视频的封面url
-		title, //表示文件夹的名称，也表示视频的标题
-		upname; //表示视频上传者的名称
+			title, //表示视频的标题
+			upname, //表示视频上传者的名称
+			length, //视频长度
+			date; //表示视频上传日期
 	}
-	class FavoriteListControl extends BaseAdapter{
+	class UserSpaceListControl extends BaseAdapter{
 		ArrayList<Bean>a=new ArrayList<>();
 		int listItemCount;
 		public void add(Bean b){ a.add(b); listItemCount++; }
@@ -246,56 +283,41 @@ public class UpZone extends Activity1 implements OnClickListener,MessageQueue.Id
 		@Override public View getView(int p, View v, ViewGroup p3){
 			Bean b=get(p);
 			Holder d;
-			int style=b.type;
 			if(v==null){
-				v=This.inflateView(
-					(style&Bean.TYPE_VIDEO)==0?
-					Bean.LAYOUT_FOLDER:
-					Bean.LAYOUT_VIDEO);
+				v=inflateView(Bean.LAYOUT);
 				ViewGroup w=(ViewGroup)v;
 				d=new Holder();
-				d.type=b.type;
 				d.vtitle=fv(w,id.listsub_title);
-				d.vvisible_vupname=fv(w,id.listsub_auth_name);
 				d.vcount=fv(w,id.listsub_playcount);
-				d.vcount_danmaku=fv(w,id.listsub_danmakucount);
+				d.vdanmaku=fv(w,id.listsub_danmakucount);
+				d.vlength=fv(w,id.listsub_videolength);
+				d.vdate=fv(w,id.listsub_submit_time);
 				d.vimage=fv(w,id.listsub_v_img);
 				v.setTag(d);
-				if((style&Bean.TYPE_VIDEO)>0){
-					seticon(fv(w,id.listsub_ic_slideshow),ic_sys(draw.ic_menu_slideshow));
-					seticon(fv(w,id.listsub_ic_send),ic_sys(draw.ic_menu_send));
-				}
+				seticon(fv(w,id.listsub_ic_slideshow),ic_sys(draw.ic_menu_slideshow));
+				seticon(fv(w,id.listsub_ic_send),ic_sys(draw.ic_menu_send));
 			}else{
 				d=(Holder)v.getTag();
 			}
-			setText(d.vtitle,b.title); // 文件夹名字 或者 视频名字
-			setText(d.vvisible_vupname,(style&Bean.TYPE_VIDEO)>0? // 文件夹可见模式 或者 视频主播名字
-					b.upname:
-					((style&Bean.TYPE_USER)==0?
-					"由系统创建，":
-					"")+
-					((style&Bean.TYPE_PRIVATE)>0?
-					"私享":
-					"公开"));
-			setText(d.vcount,String.valueOf(b.count)); // 文件夹视频数量 或者 视频播放次数
-			setText(d.vcount_danmaku,String.valueOf(b.danmaku)); // 文件夹视频数量（覆盖在封面上） 或者 视频弹幕数量
+			setText(d.vtitle,b.title); // 视频名字
+			setText(d.vcount,String.valueOf(b.count)); // 视频播放次数
+			setText(d.vdanmaku,String.valueOf(b.danmaku)); // 视频弹幕数量
+			setText(d.vlength,b.length);
+			setText(d.vdate,b.date);
 
 			//此处设置图片链接
-			if((style&Bean.TYPE_VIDEO)>0){ //以及视频列表上的更多数据
-
-			}
 			return v;
 		}
 	}
 	class Holder{
-		int type;
 		View vtitle,
-		vvisible_vupname,
-		vcount,
-		vcount_danmaku,
-		vimage;
+			vdate,
+			vcount,
+			vdanmaku,
+			vlength,
+			vimage;
 		View reply,
-		like,
-		dislike;
-	}*/
+			like,
+			dislike;
+	}
 }

@@ -166,7 +166,7 @@ public class LiveUpgrade extends Service1 implements DialogInterface.OnClickList
 	void confirmExit(){
 		new Msgbox("确认退出？","",
 			"是","取消"){
-			@Override void onClick(int i){
+			@Override public void onClick(int i){
 				if(i==vbno)return;
 				This.stopForeground(true);
 				This.stopSelf();

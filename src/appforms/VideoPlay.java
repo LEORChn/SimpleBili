@@ -10,7 +10,6 @@ import android.widget.*;
 import com.LEORChn.SimpleBili.*;
 import leorchn.lib.*;
 
-import leorchn.lib.CrashHandlerReg;
 import static leorchn.lib.Global.*;
 
 public class VideoPlay extends Activity1 implements MessageQueue.IdleHandler {
@@ -33,7 +32,6 @@ public class VideoPlay extends Activity1 implements MessageQueue.IdleHandler {
 	int hasinit=0; boolean onlineplay=false;
 	protected void onCreate(Bundle sis){
 		super.onCreate(sis);
-		CrashHandlerReg.reg(this);
 		This=this;
 		Looper.myQueue().addIdleHandler(this);
 	}

@@ -34,12 +34,6 @@ public class FSON {
 		}catch(Exception e){}
 		return false;
 	}
-	public static FSON fromXML(String xml){
-		try{
-			return new FSON(org.json.XML.toJSONObject(xml));
-		}catch(Exception e){}
-		return new FSON("");
-	}
 	public <E extends Object> E get(String key,E defval){
 		try{
 			if(usable && baseisobj && baseobj.has(key)){

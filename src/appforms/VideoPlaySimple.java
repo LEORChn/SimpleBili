@@ -1,6 +1,7 @@
 package appforms;
 
 import android.app.*;
+import android.content.*;
 import android.graphics.drawable.*;
 import android.media.*;
 import android.net.*;
@@ -23,10 +24,17 @@ import simplebili.lib.*;
 public class VideoPlaySimple extends Activity1 implements View.OnTouchListener,MessageQueue.IdleHandler,OnErrorListener,OnPreparedListener,OnBufferingUpdateListener,OnCompletionListener,DanmakuViewControl.OnDanmakuLogListener {
 	VideoPlaySimple This; public Activity getContext(){return This;}
 	String path="",title="",partname="",vid="",cid="",
-	referer="Referer: http://www.bilibili.com/video/\r\n",
+	referer="Referer: http://www.bilibili.com/video/av\r\n",
 	useragent="User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/43.0.2357.134 Safari/537.36\r\n";
 	int hasinit=0; DanmakuViewControl dvc;
 	boolean allowhistory=false,readyplay=false,readyinfo=false;int readydanmaku=0;//0=准备加载，1=不开启弹幕，2=弹幕错误，3=弹幕完成
+	public static void start(Activity a,String url, String aid, String cid, boolean history){
+		a.startActivity(new Intent(a, VideoPlaySimple.class)
+			.putExtra("vid", aid)
+			.putExtra("cid", cid)
+			.putExtra("path", url)
+			.putExtra("history", history));
+	}
 	protected void oncreate(){
 		This=this; if(sets==null)setsload();
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) 
@@ -55,6 +63,7 @@ public class VideoPlaySimple extends Activity1 implements View.OnTouchListener,M
 				bg.start();
 				path=getIntent().getStringExtra("path");
 				vid=getIntent().getStringExtra("vid");
+				referer=referer.replace("av", string("av", vid));
 				cid=getIntent().getStringExtra("cid");
 				allowhistory=getIntent().getBooleanExtra("history",false);
 				//loadStringParam(new String[]{path,title,partname,vid,cid,cookie},"path,title,partname,vid,cid,cookie".split(","));

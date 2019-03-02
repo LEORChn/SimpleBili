@@ -1,12 +1,12 @@
 package leorchn.lib;
 import android.graphics.*;
-import java.util.*;
-import java.io.*;
-import android.net.Uri;
-import simplebili.*;
-import simplebili.lib.*;
 import android.view.*;
 import android.widget.*;
+import java.io.*;
+import java.util.*;
+import leorchn.App;
+import simplebili.lib.*;
+
 
 public class Icon{
 	static com.LEORChn.SimpleBili.R.drawable draw;

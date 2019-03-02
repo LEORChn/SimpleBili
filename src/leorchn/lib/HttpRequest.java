@@ -8,41 +8,15 @@ import android.app.*;
 import android.content.*;
 import android.net.*;
 import android.os.*;
+import android.widget.*;
 import appforms.*;
 import java.io.*;
 import java.net.*;
 import java.util.*;
-import android.widget.*;
 import java.util.zip.*;
+import leorchn.App;
 
-public class HttpRequest {
-	/*public static String 获得数据(Activity form,String msg,final String 方法,final String 地址,final String 请求头,final String 主体){
-		final ArrayList<String>ok=new ArrayList<String>();
-		ProgressDialog pd=ProgressDialog.show(form,"",msg,true,true);
-		try{
-			new Thread(){public void run(){
-				ok.add(http(方法,地址,请求头,主体));
-				new Handler(Looper.getMainLooper()){
-					public void handleMessage(Message msg) {
-						throw new RuntimeException();
-					} 
-				}.obtainMessage().sendToTarget();
-			}}.start();
-			Looper.getMainLooper().loop();
-		}catch(Exception e){}
-		pd.dismiss();
-		return ok.get(0);
-	}
-	public static String 获得数据(final String 方法,final String 地址,final String 请求头,final String 主体){
-		final ArrayList<String>ok=new ArrayList<String>();
-		try{
-			Thread t=new Thread(){public void run(){
-				ok.add(http(方法,地址,请求头,主体));
-			}};
-			t.start();t.join();
-		}catch(Exception e){}
-		return ok.get(0);
-	}*/
+public class HttpRequest{
 	public static String http(String method,String url,String reqHeader,String formdata){
 		String v8="";//方法：GET、POST等
 		try{
@@ -89,7 +63,7 @@ public class HttpRequest {
 	public static void 下载文件(String 网络文件,String 文件名,Runnable 下载完成时执行){下载文件(网络文件,文件名,下载完成时执行,true);}
 	public static void 下载文件(String 网络文件,String 文件名,Runnable 下载完成时执行,boolean 覆盖文件){
 		try{
-			Context c=simplebili.App.getContext();//创建下载任务
+			Context c=App.getContext();//创建下载任务
 			java.io.File f=c.getExternalCacheDir();f.mkdir();
 			DownloadManager.Request request = new DownloadManager.Request(Uri.parse(网络文件));
 			request.setAllowedOverRoaming(false);//指定下载路径和下载文件名
@@ -142,11 +116,11 @@ public class HttpRequest {
 			byte[] output = outputStream.toByteArray();
 			outputStream.close();
 			return new String(output, "UTF-8");
-		}catch(Exception e){
+		}catch(Throwable e){
 			return E.trace(e);
 		}
     }
-	static void tip(String s){Toast.makeText(simplebili.App.getContext(),s,0).show();}
+	static void tip(String s){Toast.makeText(App.getContext(),s,0).show();}
 	abstract static class t{
 		abstract void r();
 		public t(){

@@ -6,7 +6,7 @@ import android.view.*;
 import java.io.*;
 import com.LEORChn.SimpleBili.R;
 
-public class Service1 extends Service implements Thread.UncaughtExceptionHandler{
+public class Service1 extends Service implements Consts, Thread.UncaughtExceptionHandler{
 	@Override public IBinder onBind(Intent p1){ return null; }
 	
 	protected static R.id id;
@@ -43,7 +43,7 @@ public class Service1 extends Service implements Thread.UncaughtExceptionHandler
 			ad.show();
 		}
 		public void onClick(DialogInterface p1,int p2){ onClick(p2); }
-		void onClick(int i){}
+		protected void onClick(int i){}
 	}
 	protected class 通知 extends BroadcastReceiver implements Runnable{
 		private android.graphics.Bitmap BIC=null;

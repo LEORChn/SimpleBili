@@ -2,16 +2,16 @@ package appforms;
 import android.app.*;
 import android.content.*;
 import android.os.*;
-import leorchn.lib.*;
 import android.view.*;
 import android.widget.*;
+import leorchn.lib.*;
+import static leorchn.lib.Activity1.*;
 /*	usage:
 	if(com.LEORChn.SimpleBili.BuildConfig.DEBUG) startService(new Intent(this,appforms.MemMonitor.class));
 	xml:
 	<service android:name="appforms.MemMonitor"/>
 */
-public class MemMonitor extends Service1  {
-	MemMonitor This=this;
+public class MemMonitor extends Service1 {
 	int TAG_INT=hashCode();
 	String TAG_STR=Long.toHexString(System.currentTimeMillis());
 	
@@ -20,9 +20,10 @@ public class MemMonitor extends Service1  {
 		Notification n=new Notification.Builder(this)
 			.setTicker("调试模式已启动")
 			.setContentTitle("调试模式界面")
-			.setContentText("简哔调试模式运行中")
+			.setContentText(string(getString(string.app_name),"调试模式运行中"))
 			.setContentIntent(PendingIntent.getBroadcast(this, 0, new Intent(TAG_STR), 0))
 			.setOngoing(true)//n.flags=运行中?0x22:16;
+			.setPriority(Notification.PRIORITY_MIN)
 			.build();
 		n.icon=android.R.drawable.ic_menu_preferences;
 		IntentFilter ifilter = new IntentFilter(TAG_STR);// 行为筛选器如果用在服务上可以用随机生成的一个字符串
@@ -35,9 +36,13 @@ public class MemMonitor extends Service1  {
 	BroadcastReceiver rec=new BroadcastReceiver(){
 		public void onReceive(Context p1, Intent p2) {
 			new Msgbox("",dumpmsg(),"【继续】","退出"){
-				void onClick(int i){
-					if(i==vbno)This.stopSelf();
-					else if(i==vbmid) setFwindowStat(!fwindow);
+				@Override public void onClick(int i){
+					if(i==vbno){
+						setFwindowStat(false);
+						MemMonitor.this.stopSelf();
+					}else if(i==vbmid){
+						setFwindowStat(!fwindow);
+					}
 				}
 			};
 		}
@@ -95,16 +100,17 @@ public class MemMonitor extends Service1  {
 		fwindow=b;
 		WindowManager m=(WindowManager)getSystemService(WINDOW_SERVICE);
 		if(b){
+			if(v != null) setFwindowStat(false);
 			v=new TextView(this);
 			
 			int wflag=0,
 			wtype=0,
 			w=lp.WRAP_CONTENT,
 			h=lp.WRAP_CONTENT;
-			wflag|=lp.FLAG_NOT_FOCUSABLE;
+			wflag|=lp.FLAG_NOT_FOCUSABLE|lp.FLAG_NOT_TOUCHABLE;
 			wtype|=lp.TYPE_SYSTEM_ALERT;
 			lp=new WindowManager.LayoutParams(w,h,wtype,wflag,android.graphics.PixelFormat.TRANSLUCENT);
-			lp.gravity=Gravity.TOP;
+			lp.gravity=Gravity.TOP|Gravity.LEFT;
 			try{
 				m.addView(v,lp);
 			}catch(Throwable e){}

@@ -3,28 +3,26 @@ import android.app.*;
 import android.content.*;
 import android.content.DialogInterface.OnClickListener;
 import android.graphics.Bitmap;
+import android.net.*;
 import android.os.*;
 import android.view.*;
 import android.widget.*;
 import appforms.*;
 import java.io.*;
 import java.util.*;
-import simplebili.App;
+import leorchn.App;
 import simplebili.lib.User;
-import com.LEORChn.SimpleBili.R;
-public abstract class Activity1 extends Activity implements MessageQueue.IdleHandler,Thread.UncaughtExceptionHandler,View.OnClickListener{
+public abstract class Activity1 extends Activity implements Consts, MessageQueue.IdleHandler,Thread.UncaughtExceptionHandler,View.OnClickListener{
 	protected static Icon icon;
 	protected static Bitmap ic_sys(int id){ return icon.sys(id); }
-	protected static R.id id;
-	protected static R.layout layout;
-	protected static R.drawable drawable,draw,d;//可以给 R 类定义快捷方式和多个别名而且不用额外声明，超爽
-	protected static R.color color;
-	protected static R.menu menu;
 	
 	public static final String UA="User-Agent: ",
 	UA_win="Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/43.0.2357.134 Safari/537.36",
 	UA_android="Mozilla/5.0 (Linux; Android 4.4.4;) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2307.2 Mobile Safari/537.36",
 	UA_mobilebili="Mozilla/5.0 BiliDroid/4.11.7 (bbcallen@gmail.com)";
+	
+	// 调试模式的初始值直接链接过去就行，以后想动态修改也可以直接在这改
+	public static boolean DEBUG = DEBUG_MODE_INIT; // 调试标记放在此处而不在接口中的原因是，接口中默认final，要修改就要声明数组，改起来麻烦
 	
 	public static String DIR_cache=App.getContext().getExternalCacheDir().getPath()+"/",
 	DIR_data=App.getContext().getFilesDir().getPath()+"/",
@@ -174,6 +172,7 @@ public abstract class Activity1 extends Activity implements MessageQueue.IdleHan
 	protected void btnbind(View...v){ for(View btnv:v)btnv.setOnClickListener(this); }//连续绑定多个【动态】view的点击事件到本activity
 	protected void btnbind(int...id){ for(int btnid:id)fv(btnid).setOnClickListener(this); }//连续绑定多个【静态】view的点击事件到本activity
 	abstract public void onClick(View v);//每个窗口应该都有按钮吧？
+	protected void setText(View v,String s){((TextView)v).setText(s);}
 	protected void seticon(View v,android.graphics.Bitmap i){
 		if(v instanceof ImageView){ ((ImageView)v).setImageBitmap(i); }
 	}
@@ -186,11 +185,15 @@ public abstract class Activity1 extends Activity implements MessageQueue.IdleHan
 		}catch(Throwable e){ return null; }
 	}
 	protected ViewGroup inflateView(int id){return(ViewGroup)LayoutInflater.from(this).inflate(id,null);}
-	protected void setText(View v,String s){((TextView)v).setText(s);}
+
 	protected void startActivity(Class<?>c){startActivity(new Intent(this,c));}
+	public void openurl(String url){
+		startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
+	}
 	protected static boolean visible(View v){return v.getVisibility()==View.VISIBLE;}
 	protected static void visible(final View v,final boolean visible){v.post(new Runnable(){public void run(){v.setVisibility(visible?View.VISIBLE:View.GONE);}});}
-	protected static void tip(String s){Toast.makeText(App.getContext(),s,0).show();}
+	public static void tip(Object...s){new Toast1(string(s));}
+	public static void multip(Object...s){Toast1.multip(string(s));}
 	private Thread.UncaughtExceptionHandler defUeh;
 	private Activity1 This=this;//一个默认指向当前activity的指针，在内部类中使用
 	public Activity1(){
@@ -199,6 +202,7 @@ public abstract class Activity1 extends Activity implements MessageQueue.IdleHan
 		Thread.setDefaultUncaughtExceptionHandler(this);
 		
 	}
+	protected void onCreate(){ super.onCreate(null); }
 	@Override protected void onCreate(Bundle sis){
 		super.onCreate(sis);
 		oncreate();
@@ -365,7 +369,35 @@ public abstract class Activity1 extends Activity implements MessageQueue.IdleHan
 
 		}return super.onOptionsItemSelected(item);
 	}
-	void openurl(String url){
-		startActivity(new Intent(Intent.ACTION_VIEW,android.net.Uri.parse(url)));
+}
+class Toast1 implements Runnable{ // 这个是为了解决在高版本系统连续弹出 toast 时重叠的问题
+	static long lastpost=0;
+	static Handler h;
+	CharSequence s;
+	public Toast1(String chr){
+		if(h==null) h=new Handler(Looper.getMainLooper());
+		if(chr==null || chr.length()==0) return;
+		s=chr;
+		long now=System.currentTimeMillis();
+		if(lastpost<now) lastpost=now; // 如果 lastpost 小于 now，那么把 lastpost 设为等于 now
+		h.postDelayed(this, lastpost-now);// lastpost 肯定大于等于 now
+		lastpost+=chr.length()>9?4000:2500;
+	}
+	public static void initHandler(){
+		h=new Handler(Looper.getMainLooper());
+	}
+	public void run(){
+		Toast.makeText(
+			App.getContext(),
+			s,
+			s.length()>9?
+				Toast.LENGTH_LONG:
+				Toast.LENGTH_SHORT)
+		.show();
+	}
+	static Toast mul=Toast.makeText(App.getContext(),"",Toast.LENGTH_LONG);
+	public static void multip(String s){
+		mul.setText(s);
+		mul.show();
 	}
 }

@@ -1,12 +1,12 @@
 package appforms;
 import android.app.*;
 import android.content.*;
+import android.net.*;
 import android.os.*;
 import android.view.*;
 import java.lang.reflect.*;
 import leorchn.lib.*;
-import static simplebili.App.getContext;
-import android.net.*;
+import static leorchn.App.getContext;
 public class PermissionGuide extends Activity1 {
 
 	@Override protected void oncreate(){} 

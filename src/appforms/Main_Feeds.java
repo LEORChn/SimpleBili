@@ -10,7 +10,7 @@ import android.widget.*;
 import leorchn.lib.*;
 import simplebili.lib.*;
 
-import static leorchn.lib.Global.*;
+import android.view.inputmethod.*;
 
 public class Main_Feeds extends Activity1 implements OnClickListener,OnKeyListener{//},OnGenericMotionListener{//},AbsListView.OnScrollListener{
 	@Override protected void oncreate(){
@@ -69,15 +69,15 @@ public class Main_Feeds extends Activity1 implements OnClickListener,OnKeyListen
 			if(!visible(searchbox)){
 				visible(searchbox,true);//已修BUG:输入框出现时，请自动获取焦点
 				searchbox.setText("");
-				searchbox.setFocusableInTouchMode(true);
-				searchbox.postDelayed(new Runnable(){public void run(){
+				searchbox.post(new Runnable(){public void run(){
 					searchbox.requestFocus();
-				}},1000);
+					((InputMethodManager)getSystemService("input_method")).showSoftInput(searchbox,InputMethodManager.SHOW_FORCED);
+				}});
 			}else visible(searchbox,false);
 			break;
 		case id.main_download: tip("下载功能以后开放...");break;
 		case id.main_gosetting: startActivity(Settings.class); break;
-		case id.main_menu: popupMenu.show(); break;//this.openOptionsMenu();break;
+		case id.main_menu: popupMenu.show(); break;
 		case id.main_refreshfromfirstpage: if(!feedupdating){ sv.clear(); getVideoUpdates(1); } break;
 		case id.listsub_videofeeds:
 			startActivity(new Intent(this,VideoDetail.class).putExtra("vid",(String)v.getTag())); break;
@@ -87,7 +87,7 @@ public class Main_Feeds extends Activity1 implements OnClickListener,OnKeyListen
 	}}
 	int tms=0; boolean loadover=false;
 	public boolean onKey(View p1, int p2, KeyEvent p3) {
-		if(p2==p3.KEYCODE_ENTER || p2==p3.KEYCODE_DPAD_CENTER)
+		if((p2==p3.KEYCODE_ENTER || p2==p3.KEYCODE_DPAD_CENTER) && p3.getAction() == p3.ACTION_UP)
 			startActivity(new Intent(this,VideoDetail.class).putExtra("vid",searchbox.getText().toString()));
 		return false;
 	}
@@ -106,20 +106,23 @@ public class Main_Feeds extends Activity1 implements OnClickListener,OnKeyListen
 		if(updater!=null) return;
 		updater=new Http("GET","http://api.bilibili.com/x/web-feed/feed?ps=20&pn="+page,string(UA,UA_win,"\r\n",mcok),""){
 			@Override protected void onload(String data){
-				FSON j=new FSON(data),j2;
+				FSON j=new FSON(data);
 				if(!j.canRead()){
 					multip("网络连接失败，请再试一次"); return;
 				}
 				if(j.get("code",1002)!=0){
 					multip("数据读取错误，请检查帐号状况"); return;
 				}
-				if((j2=j.getList("data"))==null){
+				if((j=j.getList("data"))==null){
 					multip("翻到底了哟，没有更多数据"); return;
 				}
-				for(int i=0,len=j2.length();i<len;i++) {
-					final FSON d=j2.getObject(i).getObject("archive"),
-						d2=d.getObject("stat"),
-						owninfo=d.getObject("owner");
+				FSON d, d2, owninfo;
+				StringBuilder errs=buildstring(); int errnum=0;
+				for(int i=0,len=j.length();i<len;i++) {
+					try{
+					d=j.getObject(i).getObject("archive"); // 如果是番剧，这个会得到null
+					d2=d.getObject("stat");
+					owninfo=d.getObject("owner");
 					ViewGroup sub=inflateView(layout.listsub_video_feeds_basic);
 					sub.setTag(d.get("aid","-1"));
 					TextView owner=(TextView)fv(sub,id.listsub_auth_name);
@@ -137,7 +140,12 @@ public class Main_Feeds extends Activity1 implements OnClickListener,OnKeyListen
 					seticon(fv(sub,id.listsub_ic_send),ic_sys(draw.ic_menu_send));
 					btnbind(sub,owner);
 					sv.addView(sub);
+					}catch(Throwable e){
+						errnum++;
+						string(errs, "index: ", i, "\n", E.trace(e).substring(0,256), "\n==============\n");
+					}
 				}
+				new Msgbox("errors!", string("error count:", errnum, "\n", errs), "ok");
 				updater=null;
 			}//update ui here
 		};

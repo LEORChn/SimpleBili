@@ -11,7 +11,7 @@
 	<uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
 	<!--uses-permission android:name="android.permission.WRITE_SETTINGS"/-->
 	<uses-permission android:name="android.permission.WAKE_LOCK"/>
-    <application android:name="simplebili.App"
+    <application android:name="leorchn.App"
         android:allowBackup="false"
         android:icon="@drawable/ic_launcher"
 		android:theme="@style/BlackTheme"
@@ -33,6 +33,7 @@
             </intent-filter>
         </activity>
 		<activity android:name="appforms.VideoDetail" android:configChanges="orientation|screenSize"/>
+		<activity android:name="appforms.VideoDecryptor" android:configChanges="orientation|screenSize"/>
 		<activity android:name="appforms.VideoPlaySimple" android:configChanges="orientation|screenSize" android:screenOrientation="landscape"/>
 		<activity android:name="appforms.VideoHistory" android:configChanges="orientation|screenSize"/>
 		<activity android:name="appforms.MyFavorite" android:configChanges="orientation|screenSize"/>
@@ -54,6 +55,37 @@
         </activity>
 		<activity android:name="appforms.Login" android:configChanges="orientation|screenSize" android:process=":Activity.WebView"/><!-- android:launchMode="singleInstance"/-->
 		<activity android:name="appforms.PermissionGuide" android:configChanges="orientation|screenSize"/>
+		
+		<activity android:name="appforms.VideoDetailEntrance" android:configChanges="orientation|screenSize"
+			android:label="用简哔打开视频"
+			android:exported="true">
+			<intent-filter>
+				<action android:name="android.intent.action.VIEW" />
+				<category android:name="android.intent.category.DEFAULT" />
+				<category android:name="android.intent.category.BROWSABLE" />
+				<data android:scheme="bilibili" android:host="video" />
+			</intent-filter>
+			<intent-filter>
+				<action android:name="android.intent.action.VIEW" />
+				<category android:name="android.intent.category.DEFAULT" />
+				<category android:name="android.intent.category.BROWSABLE" />
+				<data android:scheme="http" android:host="bilibili.kankanews.com" android:pathPattern="/video/av.*" />
+				<data android:scheme="http" android:host="bilibili.tv" android:pathPattern="/video/av.*" />
+				<data android:scheme="http" android:host="bilibili.cn" android:pathPattern="/video/av.*" />
+				<data android:scheme="http" android:host="bilibili.com" android:pathPattern="/video/av.*" />
+				<data android:scheme="http" android:host="www.bilibili.tv" android:pathPattern="/video/av.*" />
+				<data android:scheme="http" android:host="www.bilibili.cn" android:pathPattern="/video/av.*" />
+				<data android:scheme="http" android:host="www.bilibili.com" android:pathPattern="/video/av.*" />
+				<data android:scheme="http" android:host="bilibili.smgbb.cn" android:pathPattern="/video/av.*" />
+				<data android:scheme="http" android:host="m.acg.tv" android:pathPattern="/video/av.*" />
+				<data android:scheme="http" android:host="www.bilibili.com" android:pathPattern="/mobile/video/av.*" />
+			</intent-filter>
+			<intent-filter><!--分享文本到此处-->
+				<action android:name="android.intent.action.SEND" />
+				<category android:name="android.intent.category.DEFAULT" />
+				<data android:mimeType="text/plain" />
+			</intent-filter>
+		</activity>
 		
 		<service android:name="appforms.LiveUpgrade" android:label="@string/service_name_liveupgrade" android:process=":Service.LiveUpgrade"/>
 		<service android:name="appforms.GetAllowance" android:label="@string/service_name_getallowance" android:process=":Service.GetAllowance"/>

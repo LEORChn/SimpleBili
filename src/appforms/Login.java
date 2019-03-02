@@ -92,7 +92,7 @@ public class Login extends Activity1{
 		}
 		String retrylink="https://link.bilibili.com/p/center/index";//当此处更改时，还有两处String.contain中的值需要更新
 		int tms=0;
-		static final String[]verifyitem={"DedeUserID=","DedeUserID__ckMd5=","SESSDATA=","bili_jct=","_dfcaptcha="};
+		static final String[]verifyitem={"DedeUserID=","DedeUserID__ckMd5=","SESSDATA=","bili_jct="};
 		public void onPageFinished(WebView w,String u){
 			if(u.contains("bilibili.com/p")){
 				//判断cookie完整性
@@ -117,7 +117,7 @@ public class Login extends Activity1{
 			w.clearCache(true);
 			w.clearFormData();
 			CookieManager.getInstance().removeAllCookie();
-			Files.allDelete(simplebili.App.getContext().getDir("webview",0));//Context.MODE_PRIVATE
+			Files.allDelete(leorchn.App.getContext().getDir("webview",0));//Context.MODE_PRIVATE
 		}
 		/*public boolean shouldOverrideUrlLoading(WebView w,String u){
 		 w.loadUrl(u);

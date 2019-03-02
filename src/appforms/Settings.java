@@ -1,17 +1,15 @@
 package appforms;
 
-import android.app.*;
+import android.content.*;
 import android.os.*;
 import android.view.*;
 import android.widget.*;
 import java.io.*;
+import java.text.*;
+import leorchn.App;
 import leorchn.lib.*;
 import simplebili.lib.*;
-import static leorchn.lib.Global.*; 
 
-import android.content.*;
-import java.text.*;
-import java.util.*;
 
 public class Settings extends Activity1 implements View.OnClickListener{
     protected void oncreate() {
@@ -36,7 +34,7 @@ public class Settings extends Activity1 implements View.OnClickListener{
 				//});
 			case 4://case 5:
 				if(getIntent().getBooleanExtra("launchfromfeed",false)){
-					Toast t=Toast.makeText(simplebili.App.getContext(),"视频观看功能正在加班升级中！\n很快就会回来的\n应该吧...",1);
+					Toast t=Toast.makeText(App.getContext(),"视频观看功能正在加班升级中！\n很快就会回来的\n应该吧...",1);
 						t.setGravity(Gravity.TOP,0,0);
 						t.show();
 				}

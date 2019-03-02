@@ -10,8 +10,8 @@ import appforms.*;
 import java.io.*;
 import java.lang.reflect.*;
 
+import static leorchn.App.getContext;
 import static leorchn.lib.Activity1.*;
-import static simplebili.App.getContext;
 
 public class Global {
 		

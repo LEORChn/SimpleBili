@@ -24,6 +24,13 @@
 			android:layout_weight="1.0"
 			android:id="@+id/upzone_searchbox"/>
 
+		<ImageView
+			android:layout_height="wrap_content"
+			android:layout_width="wrap_content"
+			android:src="@drawable/topmenu_date"
+			style="@style/actionBartton"
+			android:id="@+id/upzone_skiptodate"/>
+
 		<ImageButton
 			android:layout_height="wrap_content"
 			android:layout_width="wrap_content"
@@ -33,21 +40,13 @@
 
 	</LinearLayout>
 
-	<ScrollView
+	<viewproxy.ListView
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
 		android:layout_marginLeft="5dp"
 		android:layout_marginRight="5dp"
 		android:layout_weight="1.0"
-		android:id="@+id/upzone_vlist">
-
-		<LinearLayout
-			android:layout_height="wrap_content"
-			android:layout_width="match_parent"
-			android:orientation="vertical"
-			android:id="@+id/ScrollViewRoot"/>
-
-	</ScrollView>
+		android:id="@+id/upzone_vlist"/>
 
 </LinearLayout>
 

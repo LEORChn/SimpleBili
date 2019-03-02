@@ -80,7 +80,7 @@ public class DailyQuest extends Service1 implements DialogInterface.OnClickListe
 	}
 	void confirmExit(){
 		new Msgbox("确认退出？","","是","取消"){
-			@Override void onClick(int i){
+			@Override public void onClick(int i){
 				if(i==vbyes)
 					android.os.Process.killProcess(android.os.Process.myPid());
 			}};

@@ -13,6 +13,7 @@ public class ListView extends android.widget.ListView implements AbsListView.OnS
 	//以上覆盖
 	void init(){
 		setOnScrollListener(this); //允许用手指刷动态
+		setFastScrollEnabled(true); //api 3
 		if(Sys.apiLevel()>=12)
 			setOnGenericMotionListener(new OnGenericMotionListener(){
 				@Override public boolean onGenericMotion(View v,MotionEvent e) {
@@ -23,6 +24,11 @@ public class ListView extends android.widget.ListView implements AbsListView.OnS
 					return false;
 				}
 			}); //允许用鼠标滚轮刷动态
+	}
+	//很纠结这段要不要因为兼容旧版而不加 @Override 
+	public void setFastScrollAlwaysVisible(boolean b){
+		if(Sys.apiLevel()>=11)
+			super.setFastScrollAlwaysVisible(b);
 	}
 	public void setAdapter(View headView,BaseAdapter itemControl){ setAdapter(headView,itemControl,null); }
 	public void setAdapter(BaseAdapter itemControl,View footerView){ setAdapter(null,itemControl,footerView); }

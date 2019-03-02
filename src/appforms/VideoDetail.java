@@ -22,18 +22,22 @@ public class VideoDetail extends Activity1 implements OnClickListener{
 	@Override public boolean onIdle(){ switch(hasinit){
 			case 0:
 				setContentView(layout.activity_video_detail);
-				break;
-			case 1:
 				Intent i=getIntent();
-				vid=i.getStringExtra("vid"); if(vid==null)vid="-1";
+				int x=i.getIntExtra("vid",0);
+				vid=x==0?
+					i.getStringExtra("vid"):
+					x+"";
+				if(vid==null)vid="-1";
 				setText(fv(id.videodetail_v_id),"av"+vid);
 				setText(fv(id.videodetail_v_title),i.getStringExtra("title"));
 				setText(fv(id.videodetail_v_desc),i.getStringExtra("desc"));
 				setText(fv(id.videodetail_auth_name),i.getStringExtra("name"));
-				setText(fv(id.videodetail_plays),i.getStringExtra("plays"));
-				setText(fv(id.videodetail_danmaku_count),i.getStringExtra("danmaku"));
+				x=i.getIntExtra("plays",0);
+				setText(fv(id.videodetail_plays),x>0?x+"":i.getStringExtra("plays"));
+				x=i.getIntExtra("danmaku",0);
+				setText(fv(id.videodetail_danmaku_count),x>0?x+"":i.getStringExtra("danmaku"));
 				break;
-			case 2:
+			case 1:
 				btnbind(id.videodetail_goback,id.videodetail_refresh,id.videodetail_gosetting, id.videodetail_goupzone,
 						id.videodetail_like,id.videodetail_coin,id.videodetail_star,id.videodetail_download,id.videodetail_share,
 						id.videodetail_review,id.videodetail_playfirst);
@@ -58,7 +62,6 @@ public class VideoDetail extends Activity1 implements OnClickListener{
 				break;
 			case id.videodetail_gosetting: startActivity(new Intent(this,Settings.class)); break;
 			case id.videodetail_goupzone:
-				tip("准备加载 space"+uid);
 				startActivity(new Intent(this,UpZone.class).putExtra("space",uid)); break;
 			case id.videodetail_share: tip("客户端每日分享经验功能以后开放...");break;
 			case id.videodetail_download: changeDownloadState(); break;
@@ -164,13 +167,16 @@ public class VideoDetail extends Activity1 implements OnClickListener{
 		getVideoUrl(cid,intentId,checksumretry);
 	}
 	void getVideoUrl(final String cid,final int intentId,final int chanceCount){//获取视频地址//请勿直接调用此函数，由proxy进入
+		VideoDecryptor.start(this, vid, cid);
+		if(0==0) return;
+		// =============================
 		final ProgressDialog pd=ProgressDialog.show(VideoDetail.this,"","解析视频地址...",true,true);
 		String[]qns={"1","25","50","100"};
 		int qn=sets.get("quality",0);
 		String quality=qns[qn],
 			prms = string("appkey=84956560bc028eb7&cid=",cid,"&otype=json&qn=",quality,"&quality=",quality,"&type=",qn==0?"mp4":"flv"),
 			seckey = "94aba54af9065f71de72f5508f1cd42e",
-			chksum = toMD5(prms+seckey),
+			chksum = Crypt.md5(prms+seckey),
 			url = "http://interface.bilibili.com/v2/playurl?"+prms+"&sign="+chksum.toLowerCase();
 		new Http("get",url,mcok,""){
 			@Override protected void onload(String data){
@@ -234,11 +240,5 @@ public class VideoDetail extends Activity1 implements OnClickListener{
 			case 2://下载
 				
 		}
-	}
-	String toMD5(String s){
-		try{
-			return new BigInteger(1,MessageDigest.getInstance("MD5").digest(s.getBytes("utf-8"))).toString(16);
-		}catch(Exception e){}
-		return"";
 	}
 }
